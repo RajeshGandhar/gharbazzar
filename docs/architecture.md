@@ -150,6 +150,9 @@ Already installed: `@supabase/supabase-js`, `@supabase/ssr`, `@tanstack/react-qu
 
 - [x] **Phase 1** — architecture, folder structure, dependencies, DB schema, auth design *(Supabase provisioning pending `vercel login`)*
 - [x] **PRD v2** — journey separation, Student Housing, seller model, NCR region, trust layer *(superseded by blueprint)*
-- [x] **Startup Blueprint v1.1** — 13 documents in `docs/blueprint/`, all FINAL after 10-dimension Founder Review (register: `13-founder-review.md`). **Development gate: awaiting founder approval**
-- [ ] **Phase 2 backend** — begins with schema v2 revision (§4.1 + blueprint 07), then API layer (blueprint 08)
-- [ ] 3 frontend core · 4 admin · 5 seller dashboard · 6 customer · 7 property module · 8 search · 9 SEO · 10 optimization · 11 testing · 12 deployment
+- [x] **Startup Blueprint v1.1** — 14 documents in `docs/blueprint/`, all FINAL after 10-dimension Founder Review + pre-build reality check. **Development gate: awaiting founder approval**
+- [x] **Phase 2 backend** — REST API layer (`/api/v1/*`), service layer, Zod schemas, cron suite, middleware, health endpoint
+- [x] **Phase 3 frontend core** — 13 public pages (property detail, college/university, search, sell, auth flows, seller profile, dealer directory, city student-housing), 4 shared components (ContactReveal with DPDP consent, InquiryForm, Pagination, SearchBar)
+- [x] **Phase 4 admin** — approval queue (6-point checklist), KYC queue, reports queue (2h/24h SLA), seeds management (cities/areas/universities/amenities/property-types), user management (360° view, strikes, toggle-active), field CRM (Kanban pipeline), support tickets (macros, internal notes), metrics home; 19 admin API routes under `/api/v1/admin/`
+- [x] **Phase 5 seller dashboard** — onboarding wizard (3-step seller setup), 5-step listing wizard with autosave, listings management (status tabs, renew), leads inbox with CSV export, KYC submission (Aadhaar disclaimer), profile edit; 10 new API routes (seller onboard/profile/kyc, property publish/images/room-types/stats, leads export, areas)
+- [ ] 6 customer account · 7 property module (maps, media upload) · 8 search enhancements · 9 SEO · 10 optimization · 11 testing · 12 deployment
