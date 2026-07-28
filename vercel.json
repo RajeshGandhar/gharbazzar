@@ -1,0 +1,16 @@
+{
+  "crons": [
+    {
+      "path": "/api/v1/crons/expire-listings",
+      "schedule": "0 20 * * *"
+    },
+    {
+      "path": "/api/v1/crons/alert-matcher",
+      "schedule": "*/30 * * * *"
+    },
+    {
+      "path": "/api/v1/crons/drain-outbox",
+      "schedule": "*/5 * * * *"
+    }
+  ]
+}
