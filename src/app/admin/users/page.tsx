@@ -1,5 +1,6 @@
 export const revalidate = 0;
 
+import { Suspense } from "react";
 import Link from "next/link";
 import { listUsers } from "@/features/admin/server/queries";
 import { formatFreshness } from "@/lib/utils/format";
@@ -47,7 +48,9 @@ export default async function UsersPage({
         </h1>
       </div>
 
-      <UsersFilter />
+      <Suspense fallback={null}>
+        <UsersFilter />
+      </Suspense>
 
       <div className="rounded-xl border border-border bg-card overflow-hidden">
         {users.length === 0 ? (

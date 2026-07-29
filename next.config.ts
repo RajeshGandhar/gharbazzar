@@ -49,9 +49,6 @@ const securityHeaders = [
 const nextConfig: NextConfig = {
   poweredByHeader: false,
 
-  // Enable Next.js 16 cache components ('use cache' directive + cacheTag/cacheLife)
-  cacheComponents: true,
-
   // Image optimization
   images: {
     formats: ["image/avif", "image/webp"],

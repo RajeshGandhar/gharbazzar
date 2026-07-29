@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Loader2, Mail } from "lucide-react";
@@ -13,7 +13,7 @@ import { z } from "zod";
 
 const emailSchema = z.string().email("Enter a valid email address");
 
-export default function LoginPage() {
+function LoginContent() {
   const searchParams = useSearchParams();
   const next = searchParams.get("next") ?? "/";
   const errorParam = searchParams.get("error");
@@ -195,5 +195,13 @@ export default function LoginPage() {
         </p>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div className="min-h-[calc(100dvh-120px)]" />}>
+      <LoginContent />
+    </Suspense>
   );
 }
