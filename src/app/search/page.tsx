@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Bell, Filter, LayoutList, Map, Search, SlidersHorizontal, X } from "lucide-react";
+import { Filter, LayoutList, Map, Search, SlidersHorizontal, X } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -15,8 +15,11 @@ import { Pagination } from "@/components/shared/pagination";
 import { SearchBar } from "@/components/shared/search-bar";
 import { searchProperties } from "@/features/search/server/queries";
 import { searchSchema } from "@/features/search/schemas";
+import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { cn } from "@/lib/utils";
 import { SearchMapView } from "./map-view";
+import { SaveSearchButton } from "./save-search-button";
 
 export const revalidate = 0;
 
@@ -45,6 +48,13 @@ const bhkOptions = [
   { value: "4", label: "4+ BHK" },
 ];
 
+const distanceOptions = [
+  { value: "500", label: "500m" },
+  { value: "1000", label: "1 km" },
+  { value: "2000", label: "2 km" },
+  { value: "5000", label: "5 km" },
+];
+
 const sortOptions = [
   { value: "newest", label: "Newest first" },
   { value: "price_asc", label: "Price: low to high" },
@@ -67,16 +77,52 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
     rental_kind: getStr(sp, "rental_kind"),
     gender_policy: getStr(sp, "gender_policy"),
     furnishing: getStr(sp, "furnishing"),
+    university: getStr(sp, "university"),
+    max_distance: getStr(sp, "max_distance"),
     sort: getStr(sp, "sort") ?? "newest",
     page: getStr(sp, "page") ?? "1",
     per_page: "20",
   });
 
   const input = parsed.success ? parsed.data : searchSchema.parse({ sort: "newest", page: 1, per_page: 20 });
-
-  const { data, count } = await searchProperties(input);
-  const properties = (data ?? []) as unknown as PropertyCardData[];
   const viewMode = getStr(sp, "view") === "map" ? "map" : "list";
+
+  // Parallel: search results + auth + master data
+  const admin = createAdminClient();
+  const supabase = await createClient();
+
+  const [
+    { data: searchData, count },
+    { data: { user } },
+    { data: propertyTypes },
+  ] = await Promise.all([
+    searchProperties(input),
+    supabase.auth.getUser(),
+    admin.from("property_types").select("id, name, slug").eq("is_active", true).order("name"),
+  ]);
+
+  // Universities: only when city is active (needs city_id lookup first)
+  let universitiesData: Array<{ id: number; name: string; slug: string }> = [];
+  if (input.city) {
+    const { data: cityRow } = await admin
+      .from("cities")
+      .select("id")
+      .eq("slug", input.city)
+      .single();
+    if (cityRow) {
+      const { data: unis } = await admin
+        .from("universities")
+        .select("id, name, slug")
+        .eq("is_active", true)
+        .eq("city_id", cityRow.id)
+        .order("name");
+      universitiesData = unis ?? [];
+    }
+  }
+
+  const properties = (searchData ?? []) as unknown as PropertyCardData[];
+  const types = propertyTypes ?? [];
+  const universities = universitiesData;
 
   // Build base params (without page)
   const baseParams = new URLSearchParams();
@@ -87,13 +133,16 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
   if (input.min_price) baseParams.set("min_price", String(input.min_price));
   if (input.max_price) baseParams.set("max_price", String(input.max_price));
   if (input.bedrooms !== undefined) baseParams.set("bedrooms", String(input.bedrooms));
+  if (input.property_type) baseParams.set("property_type", input.property_type);
   if (input.rental_kind) baseParams.set("rental_kind", input.rental_kind);
   if (input.gender_policy) baseParams.set("gender_policy", input.gender_policy);
   if (input.furnishing) baseParams.set("furnishing", input.furnishing);
+  if (input.university) baseParams.set("university", input.university);
+  if (input.max_distance) baseParams.set("max_distance", String(input.max_distance));
   if (input.sort) baseParams.set("sort", input.sort);
   const baseUrl = `/search?${baseParams.toString()}`;
 
-  // Active filters
+  // Active filter chips
   const activeFilters: { label: string; removeKey: string }[] = [];
   if (input.purpose) activeFilters.push({ label: purposeLabel[input.purpose] ?? input.purpose, removeKey: "purpose" });
   if (input.city) activeFilters.push({ label: `City: ${input.city}`, removeKey: "city" });
@@ -101,13 +150,16 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
   if (input.min_price) activeFilters.push({ label: `From ₹${(input.min_price / 100000).toFixed(0)}L`, removeKey: "min_price" });
   if (input.max_price) activeFilters.push({ label: `Up to ₹${(input.max_price / 100000).toFixed(0)}L`, removeKey: "max_price" });
   if (input.bedrooms !== undefined) activeFilters.push({ label: input.bedrooms === 0 ? "Studio" : `${input.bedrooms} BHK`, removeKey: "bedrooms" });
+  if (input.property_type) activeFilters.push({ label: types.find((t) => t.slug === input.property_type)?.name ?? input.property_type, removeKey: "property_type" });
   if (input.rental_kind) activeFilters.push({ label: input.rental_kind === "student" ? "Student Housing" : "Standard", removeKey: "rental_kind" });
   if (input.gender_policy && input.gender_policy !== "any") activeFilters.push({ label: input.gender_policy.replace(/_/g, " "), removeKey: "gender_policy" });
   if (input.furnishing) activeFilters.push({ label: input.furnishing.replace(/_/g, " "), removeKey: "furnishing" });
+  if (input.university) activeFilters.push({ label: `Near: ${universities.find((u) => u.slug === input.university)?.name ?? input.university}`, removeKey: "university" });
 
   function removeFilterUrl(key: string): string {
     const p = new URLSearchParams(baseParams);
     p.delete(key);
+    if (key === "university") p.delete("max_distance");
     p.delete("page");
     return `/search?${p.toString()}`;
   }
@@ -119,14 +171,36 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
     return `/search?${p.toString()}`;
   }
 
-  function filterUrl(key: string, value: string, toggle = false): string {
+  function filterUrl(key: string, value: string): string {
     const p = new URLSearchParams(baseParams);
-    if (toggle && p.get(key) === value) p.delete(key);
-    else if (value) p.set(key, value);
+    if (value) p.set(key, value);
     else p.delete(key);
     p.delete("page");
     return `/search?${p.toString()}`;
   }
+
+  // Filter summary for saved search name
+  const filterSummaryParts: string[] = [];
+  if (input.bedrooms !== undefined) filterSummaryParts.push(input.bedrooms === 0 ? "Studio" : `${input.bedrooms} BHK`);
+  if (input.city) filterSummaryParts.push(input.city.charAt(0).toUpperCase() + input.city.slice(1));
+  if (input.purpose) filterSummaryParts.push(purposeLabel[input.purpose] ?? "");
+  if (input.q) filterSummaryParts.push(`"${input.q}"`);
+  const filterSummary = filterSummaryParts.join(" · ");
+
+  // Filters payload for DB storage
+  const savedFilters: Record<string, unknown> = {};
+  if (input.city) savedFilters.city = input.city;
+  if (input.area) savedFilters.area = input.area;
+  if (input.min_price) savedFilters.min_price = input.min_price;
+  if (input.max_price) savedFilters.max_price = input.max_price;
+  if (input.bedrooms !== undefined) savedFilters.bedrooms = input.bedrooms;
+  if (input.property_type) savedFilters.property_type = input.property_type;
+  if (input.rental_kind) savedFilters.rental_kind = input.rental_kind;
+  if (input.gender_policy) savedFilters.gender_policy = input.gender_policy;
+  if (input.furnishing) savedFilters.furnishing = input.furnishing;
+  if (input.university) savedFilters.university = input.university;
+  if (input.max_distance) savedFilters.max_distance = input.max_distance;
+  if (input.q) savedFilters.q = input.q;
 
   const FilterPanel = () => (
     <div className="flex flex-col gap-6">
@@ -159,6 +233,23 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
           })}
         </div>
       </div>
+
+      {types.length > 0 && (
+        <div>
+          <p className="text-sm font-semibold text-foreground mb-3">Property type</p>
+          <div className="flex flex-wrap gap-2">
+            {types.map((t) => {
+              const active = input.property_type === t.slug;
+              return (
+                <Link key={t.slug} href={filterUrl("property_type", active ? "" : t.slug)} className={cn(
+                  "rounded-full border px-3 py-1.5 text-xs font-medium transition-smooth",
+                  active ? "border-primary bg-primary text-primary-foreground" : "border-border hover:border-primary hover:text-primary"
+                )}>{t.name}</Link>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       <div>
         <p className="text-sm font-semibold text-foreground mb-3">Furnishing</p>
@@ -201,6 +292,42 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
           })}
         </div>
       </div>
+
+      {/* University proximity — only shown when a city is selected */}
+      {input.city && universities.length > 0 && (
+        <div>
+          <p className="text-sm font-semibold text-foreground mb-3">Near college / university</p>
+          <div className="flex flex-col gap-2">
+            <div className="flex flex-wrap gap-2">
+              {universities.slice(0, 6).map((u) => {
+                const active = input.university === u.slug;
+                return (
+                  <Link key={u.slug} href={filterUrl("university", active ? "" : u.slug)} className={cn(
+                    "rounded-full border px-3 py-1.5 text-xs font-medium transition-smooth",
+                    active ? "border-primary bg-primary text-primary-foreground" : "border-border hover:border-primary hover:text-primary"
+                  )}>{u.name}</Link>
+                );
+              })}
+            </div>
+            {input.university && (
+              <div>
+                <p className="text-xs text-muted-foreground mb-2">Within</p>
+                <div className="flex flex-wrap gap-2">
+                  {distanceOptions.map(({ value, label }) => {
+                    const active = String(input.max_distance ?? "2000") === value;
+                    return (
+                      <Link key={value} href={filterUrl("max_distance", value)} className={cn(
+                        "rounded-full border px-3 py-1.5 text-xs font-medium transition-smooth",
+                        active ? "border-primary bg-primary text-primary-foreground" : "border-border hover:border-primary hover:text-primary"
+                      )}>{label}</Link>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 
@@ -229,8 +356,17 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
             </p>
           </div>
 
-          <div className="flex items-center gap-2">
-            {/* Sort links */}
+          <div className="flex items-center gap-2 flex-wrap">
+            {/* Save search */}
+            <SaveSearchButton
+              searchUrl={`/search?${baseParams.toString()}`}
+              filterSummary={filterSummary}
+              isLoggedIn={!!user}
+              purpose={input.purpose}
+              filters={savedFilters}
+            />
+
+            {/* Sort */}
             <div className="relative">
               <select
                 defaultValue={input.sort ?? "newest"}
@@ -355,13 +491,16 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
                 </div>
                 <h2 className="text-xl font-semibold text-foreground">No properties found</h2>
                 <p className="text-muted-foreground max-w-sm text-sm">
-                  Try adjusting your filters or search term. Or create an alert and be notified when a matching listing goes live.
+                  Try adjusting your filters or search term. Save this search and we&apos;ll alert you when a matching listing goes live.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-3">
-                  <Link href="/auth/login?next=/alerts/new" className={buttonVariants()}>
-                    <Bell className="mr-2 h-4 w-4" />
-                    Create alert for this search
-                  </Link>
+                  <SaveSearchButton
+                    searchUrl={`/search?${baseParams.toString()}`}
+                    filterSummary={filterSummary}
+                    isLoggedIn={!!user}
+                    purpose={input.purpose}
+                    filters={savedFilters}
+                  />
                   {activeFilters.length > 0 && (
                     <Link href="/search" className={buttonVariants({ variant: "outline" })}>
                       Clear all filters
