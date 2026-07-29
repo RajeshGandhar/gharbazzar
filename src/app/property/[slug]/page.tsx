@@ -56,6 +56,7 @@ import {
 import { cn } from "@/lib/utils";
 import { ContactReveal } from "@/components/shared/contact-reveal";
 import { InquiryForm } from "@/components/shared/inquiry-form";
+import { listingSchema } from "@/lib/seo/schema";
 
 export const revalidate = 60;
 
@@ -207,25 +208,30 @@ export default async function PropertyDetailPage({ params }: Props) {
     owner: "Owner", agent: "Agent", builder: "Builder", property_manager: "Property Manager",
   };
 
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@type": "RealEstateListing",
-    name: p.title,
+  const coverImages = (p.property_images ?? [])
+    .filter((img: { is_cover: boolean; path: string }) => img.is_cover || true)
+    .slice(0, 5)
+    .map((img: { path: string }) => img.path);
+
+  const jsonLd = listingSchema({
+    title: p.title,
     description: p.description,
-    url: `${process.env.NEXT_PUBLIC_SITE_URL}/property/${p.slug}`,
-    offers: { "@type": "Offer", price: p.price, priceCurrency: "INR" },
-    address: {
-      "@type": "PostalAddress",
-      streetAddress: p.address,
-      addressLocality: p.areas?.name,
-      addressRegion: p.state,
-      postalCode: p.pincode,
-      addressCountry: "IN",
-    },
-    ...(p.latitude && p.longitude
-      ? { geo: { "@type": "GeoCoordinates", latitude: p.latitude, longitude: p.longitude } }
-      : {}),
-  };
+    slug: p.slug,
+    price: p.price,
+    address: p.address,
+    locality: p.areas?.name,
+    city: p.cities?.name,
+    state: p.state,
+    pincode: p.pincode,
+    latitude: p.latitude,
+    longitude: p.longitude,
+    bedrooms: p.bedrooms,
+    builtUpArea: p.built_up_area,
+    images: coverImages,
+    availabilityStatus: p.status === "active" ? "InStock" : "Discontinued",
+    publishedAt: p.published_at,
+    updatedAt: p.updated_at,
+  });
 
   // Contact box — rendered both in sidebar and sheet
   function ContactBox() {

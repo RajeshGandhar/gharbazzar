@@ -17,6 +17,7 @@ import { PropertyCard, type PropertyCardData } from "@/components/properties/pro
 import { getSellerBySlug } from "@/features/sellers/server/queries";
 import { listProperties } from "@/features/properties/server/queries";
 import { cn } from "@/lib/utils";
+import { realEstateAgentSchema, breadcrumbSchema } from "@/lib/seo/schema";
 
 export const revalidate = 300;
 
@@ -72,7 +73,24 @@ export default async function SellerProfilePage({ params }: Props) {
     year: "numeric",
   });
 
+  const agentSchema = realEstateAgentSchema({
+    name: displayName,
+    slug: s.slug,
+    city: city?.name ?? null,
+    image: s.profiles?.avatar_url ?? null,
+    description: s.about ?? null,
+  });
+
+  const breadcrumb = breadcrumbSchema([
+    { name: "Home", url: "/" },
+    { name: "Property Dealers", url: city ? `/property-dealers/${city.slug}` : "/property-dealers/mathura" },
+    { name: displayName, url: `/seller/${s.slug}` },
+  ]);
+
   return (
+    <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(agentSchema) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumb) }} />
     <div className="flex flex-col">
       {/* Breadcrumb */}
       <div className="border-b border-border bg-muted/20">
@@ -280,5 +298,6 @@ export default async function SellerProfilePage({ params }: Props) {
         )}
       </section>
     </div>
+    </>
   );
 }
