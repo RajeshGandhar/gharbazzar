@@ -6,11 +6,11 @@
     },
     {
       "path": "/api/v1/crons/alert-matcher",
-      "schedule": "*/30 * * * *"
+      "schedule": "0 8 * * *"
     },
     {
       "path": "/api/v1/crons/drain-outbox",
-      "schedule": "*/5 * * * *"
+      "schedule": "0 9 * * *"
     }
   ]
 }
