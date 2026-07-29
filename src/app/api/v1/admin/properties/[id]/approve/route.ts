@@ -1,6 +1,7 @@
 export const runtime = "nodejs";
 
 import { NextRequest } from "next/server";
+import { revalidatePath } from "next/cache";
 import { requireAdmin } from "@/lib/api/middleware";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { ok, unauthorized, notFound, serverError } from "@/lib/api/response";
@@ -45,6 +46,13 @@ export async function POST(
     entity_type: "property",
     entity_id: id,
   });
+
+  // Invalidate ISR cache for the listing detail page and browse surfaces
+  revalidatePath(`/property/${property.slug}`);
+  revalidatePath("/buy", "page");
+  revalidatePath("/rent", "page");
+  revalidatePath("/search", "page");
+  revalidatePath("/admin/approvals", "page");
 
   return ok({ id, slug: property.slug });
 }

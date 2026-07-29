@@ -1,6 +1,7 @@
 export const runtime = "nodejs";
 
 import { NextRequest } from "next/server";
+import { revalidatePath } from "next/cache";
 import { requireAdmin } from "@/lib/api/middleware";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { ok, unauthorized, badRequest, notFound, serverError } from "@/lib/api/response";
@@ -23,7 +24,7 @@ export async function POST(
 
   const { data: property } = await supabase
     .from("properties")
-    .select("id")
+    .select("id, slug")
     .eq("id", id)
     .single();
   if (!property) return notFound("Property not found");
@@ -46,6 +47,12 @@ export async function POST(
     entity_id: id,
     new_data: { reason_code, internal_notes: internal_notes ?? null },
   });
+
+  // Invalidate ISR cache so listing is no longer visible on browse pages
+  revalidatePath(`/property/${property.slug}`);
+  revalidatePath("/buy", "page");
+  revalidatePath("/rent", "page");
+  revalidatePath("/admin/approvals", "page");
 
   return ok({ id });
 }

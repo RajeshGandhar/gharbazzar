@@ -1,4 +1,5 @@
 import { NextRequest } from "next/server";
+import { revalidatePath } from "next/cache";
 import {
   ok,
   badRequest,
@@ -72,6 +73,12 @@ export async function PATCH(req: NextRequest, { params }: Params) {
     if (error.code === "PGRST116") return notFound(); // no rows matched
     return serverError(error.message);
   }
+
+  // Invalidate ISR cache so edits appear immediately on the listing page
+  if (data && "slug" in data && typeof (data as { slug?: string }).slug === "string") {
+    revalidatePath(`/property/${(data as { slug: string }).slug}`);
+  }
+
   return ok(data);
 }
 

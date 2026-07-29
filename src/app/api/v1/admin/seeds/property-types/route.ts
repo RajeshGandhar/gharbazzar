@@ -1,6 +1,7 @@
 export const runtime = "nodejs";
 
 import { NextRequest } from "next/server";
+import { revalidateTag } from "next/cache";
 import { requireAdmin } from "@/lib/api/middleware";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { ok, created, unauthorized, badRequest, serverError } from "@/lib/api/response";
@@ -44,6 +45,7 @@ export async function POST(req: NextRequest) {
     new_data: parsed.data as unknown as import("@/types/database.types").Json,
   });
 
+  revalidateTag("property-types", "max");
   return created(data);
 }
 
