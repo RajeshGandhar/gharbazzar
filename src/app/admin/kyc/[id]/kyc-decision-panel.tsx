@@ -94,15 +94,12 @@ export function KycDecisionPanel({ docId }: Props) {
       </Button>
 
       <Dialog open={rejectOpen} onOpenChange={setRejectOpen}>
-        <DialogTrigger asChild>
-          <Button
-            variant="outline"
-            disabled={verifying || rejecting}
-            className="w-full border-red-200 text-red-600 hover:bg-red-50"
-          >
-            <X className="h-4 w-4 mr-2" />
-            Reject document
-          </Button>
+        <DialogTrigger
+          disabled={verifying || rejecting}
+          className="w-full inline-flex items-center justify-center rounded-md border border-red-200 bg-background px-4 py-2 text-sm font-medium text-red-600 shadow-xs hover:bg-red-50 disabled:pointer-events-none disabled:opacity-50"
+        >
+          <X className="h-4 w-4 mr-2" />
+          Reject document
         </DialogTrigger>
         <DialogContent>
           <DialogHeader>

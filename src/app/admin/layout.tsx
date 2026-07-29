@@ -112,11 +112,9 @@ export default async function AdminLayout({
       <div className="flex flex-1 flex-col">
         <header className="sticky top-0 z-30 flex h-12 items-center gap-3 border-b border-border bg-background px-4 md:hidden">
           <Sheet>
-            <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" className="h-8 w-8">
-                <Menu className="h-4 w-4" />
-                <span className="sr-only">Open menu</span>
-              </Button>
+            <SheetTrigger className="inline-flex items-center justify-center rounded-md h-8 w-8 text-foreground hover:bg-accent hover:text-accent-foreground">
+              <Menu className="h-4 w-4" />
+              <span className="sr-only">Open menu</span>
             </SheetTrigger>
             <SheetContent side="left" className="w-60 p-0">
               <SheetHeader className="sr-only">

@@ -49,7 +49,7 @@ export async function POST(req: NextRequest) {
     action: "seed.city.created",
     entity_type: "city",
     entity_id: String(data.id),
-    new_data: parsed.data as Record<string, unknown>,
+    new_data: parsed.data as unknown as import("@/types/database.types").Json,
   });
 
   return created(data);

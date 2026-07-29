@@ -86,7 +86,7 @@ export default async function AreasPage({
             </thead>
             <tbody>
               {areas.map((a) => {
-                const city = a.cities as { name: string } | null;
+                const city = a.cities as unknown as { name: string } | null;
                 return (
                   <tr key={a.id} className="hover:bg-accent">
                     <td className="px-3 py-3 border-t border-border font-mono text-xs text-muted-foreground">

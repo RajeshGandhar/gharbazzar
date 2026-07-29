@@ -86,11 +86,9 @@ export function AddAreaDialog({ cities }: { cities: City[] }) {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button size="sm" className="gap-1.5">
-          <Plus className="h-4 w-4" />
-          Add area
-        </Button>
+      <DialogTrigger className="inline-flex items-center justify-center rounded-md bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground shadow-xs hover:bg-primary/90 gap-1.5">
+        <Plus className="h-4 w-4" />
+        Add area
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
@@ -99,7 +97,7 @@ export function AddAreaDialog({ cities }: { cities: City[] }) {
         <form onSubmit={handleSubmit} className="space-y-4 pt-2">
           <div className="space-y-1.5">
             <Label>City</Label>
-            <Select value={form.city_id} onValueChange={(v) => set("city_id", v)}>
+            <Select value={form.city_id} onValueChange={(v) => { if (v != null) set("city_id", v); }}>
               <SelectTrigger>
                 <SelectValue placeholder="Select city…" />
               </SelectTrigger>

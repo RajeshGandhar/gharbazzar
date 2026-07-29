@@ -61,7 +61,7 @@ export default async function UniversitiesPage() {
             </thead>
             <tbody>
               {universities.map((u) => {
-                const city = u.cities as { name: string } | null;
+                const city = u.cities as unknown as { name: string } | null;
                 return (
                   <tr key={u.id} className="hover:bg-accent">
                     <td className="px-3 py-3 border-t border-border font-medium">

@@ -43,7 +43,7 @@ export async function PATCH(
     action: "seed.city.updated",
     entity_type: "city",
     entity_id: id,
-    new_data: parsed.data as Record<string, unknown>,
+    new_data: parsed.data as unknown as import("@/types/database.types").Json,
   });
 
   return ok(data);

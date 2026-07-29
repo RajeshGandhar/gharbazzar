@@ -80,7 +80,7 @@ export default async function UsersPage({
             </thead>
             <tbody>
               {users.map((u) => {
-                const seller = u.sellers as {
+                const seller = u.sellers as unknown as {
                   seller_type: string;
                   kyc_status: string;
                   is_verified: boolean;

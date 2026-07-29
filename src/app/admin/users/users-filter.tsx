@@ -42,7 +42,7 @@ export function UsersFilter() {
       />
       <Select
         value={sp.get("role") ?? "all"}
-        onValueChange={(v) => update("role", v)}
+        onValueChange={(v) => { if (v != null) update("role", v); }}
       >
         <SelectTrigger className="h-8 w-36 text-sm">
           <SelectValue placeholder="All roles" />
@@ -56,7 +56,7 @@ export function UsersFilter() {
       </Select>
       <Select
         value={sp.get("active") ?? "all"}
-        onValueChange={(v) => update("active", v)}
+        onValueChange={(v) => { if (v != null) update("active", v); }}
       >
         <SelectTrigger className="h-8 w-36 text-sm">
           <SelectValue placeholder="All statuses" />

@@ -91,11 +91,9 @@ export function UserActionsBar({ userId, isActive, strikeCount }: Props) {
     <div className="flex items-center gap-2 flex-wrap">
       {/* Issue strike */}
       <Dialog open={strikeOpen} onOpenChange={setStrikeOpen}>
-        <DialogTrigger asChild>
-          <Button size="sm" variant="outline" className="gap-1.5">
-            <AlertTriangle className="h-3.5 w-3.5" />
-            Issue strike ({strikeCount})
-          </Button>
+        <DialogTrigger className="inline-flex items-center justify-center rounded-md border border-input bg-background px-3 py-1.5 text-sm font-medium shadow-xs hover:bg-accent hover:text-accent-foreground gap-1.5">
+          <AlertTriangle className="h-3.5 w-3.5" />
+          Issue strike ({strikeCount})
         </DialogTrigger>
         <DialogContent>
           <DialogHeader>
@@ -104,7 +102,7 @@ export function UserActionsBar({ userId, isActive, strikeCount }: Props) {
           <div className="space-y-4 pt-2">
             <div className="space-y-2">
               <Label>Reason code</Label>
-              <Select value={reasonCode} onValueChange={setReasonCode}>
+              <Select value={reasonCode} onValueChange={(v) => { if (v != null) setReasonCode(v); }}>
                 <SelectTrigger>
                   <SelectValue placeholder="Select reason…" />
                 </SelectTrigger>
@@ -170,24 +168,18 @@ export function UserActionsBar({ userId, isActive, strikeCount }: Props) {
 
       {/* Deactivate / Activate */}
       <Dialog open={deactivateOpen} onOpenChange={setDeactivateOpen}>
-        <DialogTrigger asChild>
-          <Button
-            size="sm"
-            variant="outline"
-            className={`gap-1.5 ${!isActive ? "text-green-700" : "text-red-700 border-red-200"}`}
-          >
-            {isActive ? (
-              <>
-                <UserX className="h-3.5 w-3.5" />
-                Deactivate
-              </>
-            ) : (
-              <>
-                <UserCheck className="h-3.5 w-3.5" />
-                Activate
-              </>
-            )}
-          </Button>
+        <DialogTrigger className={`inline-flex items-center justify-center rounded-md border border-input bg-background px-3 py-1.5 text-sm font-medium shadow-xs hover:bg-accent gap-1.5 ${!isActive ? "text-green-700" : "text-red-700 border-red-200"}`}>
+          {isActive ? (
+            <>
+              <UserX className="h-3.5 w-3.5" />
+              Deactivate
+            </>
+          ) : (
+            <>
+              <UserCheck className="h-3.5 w-3.5" />
+              Activate
+            </>
+          )}
         </DialogTrigger>
         <DialogContent>
           <DialogHeader>

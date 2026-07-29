@@ -50,7 +50,7 @@ export async function POST(req: NextRequest) {
     action: "crm.prospect.created",
     entity_type: "seller_onboarding",
     entity_id: data.id,
-    new_data: parsed.data as Record<string, unknown>,
+    new_data: parsed.data as unknown as import("@/types/database.types").Json,
   });
 
   return created(data);

@@ -72,7 +72,7 @@ export async function getAdminDashboardStats() {
     active_listings: activeListings.count ?? 0,
     total_sellers: totalSellers.count ?? 0,
     total_profiles: totalProfiles.count ?? 0,
-    recent_approvals: (recentApprovals.data ?? []) as Array<{
+    recent_approvals: (recentApprovals.data ?? []) as unknown as Array<{
       id: string;
       title: string;
       approved_at: string | null;

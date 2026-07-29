@@ -1,6 +1,24 @@
 export const revalidate = 0;
 
 import { listProspects } from "@/features/admin/server/queries";
+
+type Prospect = {
+  id: string;
+  prospect_name: string;
+  prospect_phone: string;
+  seller_type: string;
+  city_id: number | null;
+  locality_note: string | null;
+  stage: string;
+  notes: string | null;
+  next_action_at: string | null;
+  assignee_id: string | null;
+  seller_id: string | null;
+  created_at: string;
+  updated_at: string;
+  cities?: { name: string } | null;
+  profiles?: { full_name: string } | null;
+};
 import { formatFreshness } from "@/lib/utils/format";
 import { Badge } from "@/components/ui/badge";
 import { AddProspectDialog } from "./add-prospect-dialog";
@@ -19,7 +37,7 @@ const stageLabel: Record<Stage, string> = {
 
 export default async function FieldCrmPage() {
   const supabase = createAdminClient();
-  const [prospects, admins] = await Promise.all([
+  const [prospectsRaw, admins] = await Promise.all([
     listProspects(),
     supabase
       .from("profiles")
@@ -27,12 +45,14 @@ export default async function FieldCrmPage() {
       .eq("role", "super_admin"),
   ]);
 
+  const prospects = prospectsRaw as unknown as Prospect[];
+
   const byStage = STAGES.reduce(
     (acc, s) => {
       acc[s] = prospects.filter((p) => p.stage === s);
       return acc;
     },
-    {} as Record<Stage, typeof prospects>
+    {} as Record<Stage, Prospect[]>
   );
 
   // Today's counts per admin

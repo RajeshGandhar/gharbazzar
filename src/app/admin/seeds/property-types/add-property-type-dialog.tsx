@@ -47,8 +47,8 @@ export function AddPropertyTypeDialog() {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button size="sm" className="gap-1.5"><Plus className="h-4 w-4" />Add type</Button>
+      <DialogTrigger className="inline-flex items-center justify-center rounded-md bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground shadow-xs hover:bg-primary/90 gap-1.5">
+        <Plus className="h-4 w-4" />Add type
       </DialogTrigger>
       <DialogContent>
         <DialogHeader><DialogTitle>Add property type</DialogTitle></DialogHeader>
@@ -64,7 +64,7 @@ export function AddPropertyTypeDialog() {
             </div>
             <div className="space-y-1.5">
               <Label>Category</Label>
-              <Select value={form.category} onValueChange={(v) => set("category", v)}>
+              <Select value={form.category} onValueChange={(v) => { if (v != null) set("category", v); }}>
                 <SelectTrigger><SelectValue placeholder="Select…" /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="residential">Residential</SelectItem>

@@ -24,6 +24,8 @@ import {
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button, buttonVariants } from "@/components/ui/button";
+import { PropertyMap } from "@/features/properties/components/property-map";
+import { PropertyQR } from "@/features/properties/components/property-qr";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import {
@@ -597,6 +599,14 @@ export default async function PropertyDetailPage({ params }: Props) {
                 </section>
               )}
 
+              {/* Map */}
+              {p.latitude && p.longitude && (
+                <section>
+                  <h2 className="text-lg font-semibold text-foreground mb-4">Location</h2>
+                  <PropertyMap latitude={p.latitude} longitude={p.longitude} title={p.title} />
+                </section>
+              )}
+
               {/* Nearby places */}
               {nearbyPlaces.length > 0 && (
                 <section>
@@ -666,12 +676,15 @@ export default async function PropertyDetailPage({ params }: Props) {
 
             {/* ── Desktop sidebar ───────────────────────────────────── */}
             <div className="hidden lg:block">
-              <div className="sticky top-24">
+              <div className="sticky top-24 space-y-3">
                 <Card>
                   <CardContent className="pt-6">
                     <ContactBox />
                   </CardContent>
                 </Card>
+                <div className="flex justify-end">
+                  <PropertyQR slug={p.slug} title={p.title} />
+                </div>
               </div>
             </div>
           </div>

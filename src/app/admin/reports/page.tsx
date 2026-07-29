@@ -60,7 +60,7 @@ export default async function ReportsPage() {
             <tbody>
               {reports.map((report) => {
                 const severe = isSevere(report.reason);
-                const property = report.properties as {
+                const property = report.properties as unknown as {
                   id: string;
                   title: string;
                   slug: string;

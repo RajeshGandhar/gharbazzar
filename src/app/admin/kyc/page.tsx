@@ -50,7 +50,7 @@ export default async function KycPage() {
             </thead>
             <tbody>
               {docs.map((doc) => {
-                const seller = doc.sellers as {
+                const seller = doc.sellers as unknown as {
                   id: string;
                   business_name: string | null;
                   seller_type: string;

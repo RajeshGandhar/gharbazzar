@@ -43,7 +43,7 @@ export function TicketStatusForm({
   return (
     <div className="rounded-xl border border-border bg-card p-4 space-y-3">
       <h2 className="text-sm font-semibold">Status</h2>
-      <Select value={status} onValueChange={setStatus}>
+      <Select value={status} onValueChange={(v) => { if (v != null) setStatus(v); }}>
         <SelectTrigger>
           <SelectValue />
         </SelectTrigger>

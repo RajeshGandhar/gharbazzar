@@ -66,7 +66,7 @@ export default async function ApprovalDetailPage({
   const completenessOk =
     property.quality_score !== null && property.quality_score >= 50;
 
-  const seller = property.sellers as {
+  const seller = property.sellers as unknown as {
     business_name: string | null;
     seller_type: string;
     kyc_status: string;
@@ -74,11 +74,11 @@ export default async function ApprovalDetailPage({
     profiles: { full_name: string; email: string | null } | null;
   } | null;
 
-  const city = property.cities as { name: string } | null;
-  const area = property.areas as { name: string } | null;
+  const city = property.cities as unknown as { name: string } | null;
+  const area = property.areas as unknown as { name: string } | null;
 
   const images = (
-    property.property_images as Array<{
+    property.property_images as unknown as Array<{
       path: string;
       is_cover: boolean;
       position: number;

@@ -68,8 +68,8 @@ export function AddProspectDialog({ admins }: { admins: Admin[] }) {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button size="sm" className="gap-1.5"><Plus className="h-4 w-4" />Add prospect</Button>
+      <DialogTrigger className="inline-flex items-center justify-center rounded-md bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground shadow-xs hover:bg-primary/90 gap-1.5">
+        <Plus className="h-4 w-4" />Add prospect
       </DialogTrigger>
       <DialogContent>
         <DialogHeader><DialogTitle>Add prospect</DialogTitle></DialogHeader>
@@ -85,7 +85,7 @@ export function AddProspectDialog({ admins }: { admins: Admin[] }) {
             </div>
             <div className="space-y-1.5">
               <Label>Seller type</Label>
-              <Select value={form.seller_type} onValueChange={(v) => set("seller_type", v)}>
+              <Select value={form.seller_type} onValueChange={(v) => { if (v != null) set("seller_type", v); }}>
                 <SelectTrigger><SelectValue placeholder="Select…" /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="owner">Owner</SelectItem>
@@ -101,7 +101,7 @@ export function AddProspectDialog({ admins }: { admins: Admin[] }) {
             </div>
             <div className="space-y-1.5">
               <Label>Assignee</Label>
-              <Select value={form.assignee_id} onValueChange={(v) => set("assignee_id", v)}>
+              <Select value={form.assignee_id} onValueChange={(v) => { if (v != null) set("assignee_id", v); }}>
                 <SelectTrigger><SelectValue placeholder="Select agent…" /></SelectTrigger>
                 <SelectContent>
                   {admins.map((a) => (

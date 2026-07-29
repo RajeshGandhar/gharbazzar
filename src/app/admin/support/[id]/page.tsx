@@ -29,7 +29,7 @@ export default async function SupportTicketPage({
   const { ticket, messages, requester_listing_count, requester_strike_count } =
     result;
 
-  const requester = ticket.profiles as {
+  const requester = ticket.profiles as unknown as {
     id: string;
     full_name: string;
     email: string | null;

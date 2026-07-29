@@ -117,15 +117,12 @@ export function ApprovalDecisionPanel({ propertyId, rejectionReasons }: Props) {
       </Button>
 
       <Dialog open={rejectOpen} onOpenChange={setRejectOpen}>
-        <DialogTrigger asChild>
-          <Button
-            variant="outline"
-            disabled={approving || rejecting}
-            className="w-full border-red-200 text-red-600 hover:bg-red-50"
-          >
-            <X className="h-4 w-4 mr-2" />
-            Reject listing
-          </Button>
+        <DialogTrigger
+          disabled={approving || rejecting}
+          className="w-full inline-flex items-center justify-center rounded-md border border-red-200 bg-background px-4 py-2 text-sm font-medium text-red-600 shadow-xs hover:bg-red-50 disabled:pointer-events-none disabled:opacity-50"
+        >
+          <X className="h-4 w-4 mr-2" />
+          Reject listing
         </DialogTrigger>
         <DialogContent>
           <DialogHeader>
@@ -134,7 +131,7 @@ export function ApprovalDecisionPanel({ propertyId, rejectionReasons }: Props) {
           <div className="space-y-4 pt-2">
             <div className="space-y-2">
               <Label>Reason code</Label>
-              <Select value={reasonCode} onValueChange={setReasonCode}>
+              <Select value={reasonCode} onValueChange={(v) => { if (v != null) setReasonCode(v); }}>
                 <SelectTrigger>
                   <SelectValue placeholder="Select a reason…" />
                 </SelectTrigger>

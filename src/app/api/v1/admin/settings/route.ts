@@ -53,7 +53,7 @@ export async function PATCH(req: NextRequest) {
     action: "settings.updated",
     entity_type: "site_settings",
     entity_id: parsed.data.key,
-    new_data: { value: parsed.data.value } as Record<string, unknown>,
+    new_data: { value: parsed.data.value } as unknown as import("@/types/database.types").Json,
   });
 
   return ok(data);

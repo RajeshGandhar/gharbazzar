@@ -41,7 +41,7 @@ export async function POST(req: NextRequest) {
     action: "seed.property_type.created",
     entity_type: "property_type",
     entity_id: String(data.id),
-    new_data: parsed.data as Record<string, unknown>,
+    new_data: parsed.data as unknown as import("@/types/database.types").Json,
   });
 
   return created(data);

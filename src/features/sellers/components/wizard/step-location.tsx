@@ -12,6 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { LocationPicker } from "@/features/properties/components/location-picker";
 
 interface City {
   id: number;
@@ -35,6 +36,8 @@ interface StepLocationProps {
     landmark?: string | null;
     pincode?: string | null;
     state?: string;
+    latitude?: number | null;
+    longitude?: number | null;
   };
   cities: City[];
   onSuccess: (id: string) => void;
@@ -60,6 +63,8 @@ export function StepLocation({
   const [landmark, setLandmark] = useState(initialData?.landmark ?? "");
   const [pincode, setPincode] = useState(initialData?.pincode ?? "");
   const [state, setState] = useState(initialData?.state ?? "UP");
+  const [latitude, setLatitude] = useState<number | null>(initialData?.latitude ?? null);
+  const [longitude, setLongitude] = useState<number | null>(initialData?.longitude ?? null);
   const [areas, setAreas] = useState<Area[]>([]);
   const [loadingAreas, setLoadingAreas] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -110,6 +115,8 @@ export function StepLocation({
     if (areaId) body.area_id = parseInt(areaId, 10);
     if (landmark.trim()) body.landmark = landmark.trim();
     if (pincode.trim()) body.pincode = pincode.trim();
+    if (latitude != null) body.latitude = latitude;
+    if (longitude != null) body.longitude = longitude;
 
     try {
       const res = await fetch(`/api/v1/properties/${propertyId}`, {
@@ -225,6 +232,16 @@ export function StepLocation({
       <div>
         <Label htmlFor="state">State</Label>
         <Input id="state" value={state} readOnly className="mt-1 bg-muted cursor-not-allowed" />
+      </div>
+
+      {/* Map pin picker */}
+      <div>
+        <Label className="mb-2 block">Pin exact location <span className="text-muted-foreground text-xs">(optional but recommended)</span></Label>
+        <LocationPicker
+          latitude={latitude}
+          longitude={longitude}
+          onChange={(lat, lng) => { setLatitude(lat); setLongitude(lng); }}
+        />
       </div>
 
       {serverError && (

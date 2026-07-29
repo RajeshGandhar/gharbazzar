@@ -79,12 +79,12 @@ export default async function ApprovalsPage() {
             </thead>
             <tbody>
               {approvals.map((p) => {
-                const seller = p.sellers as {
+                const seller = p.sellers as unknown as {
                   business_name: string | null;
                   seller_type: string;
                   profiles: { full_name: string; email: string | null } | null;
                 } | null;
-                const city = p.cities as { name: string } | null;
+                const city = p.cities as unknown as { name: string } | null;
                 const sellerName =
                   seller?.business_name ??
                   seller?.profiles?.full_name ??

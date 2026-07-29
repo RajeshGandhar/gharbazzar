@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Bell, Filter, Search, SlidersHorizontal, X } from "lucide-react";
+import { Bell, Filter, LayoutList, Map, Search, SlidersHorizontal, X } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -16,6 +16,7 @@ import { SearchBar } from "@/components/shared/search-bar";
 import { searchProperties } from "@/features/search/server/queries";
 import { searchSchema } from "@/features/search/schemas";
 import { cn } from "@/lib/utils";
+import { SearchMapView } from "./map-view";
 
 export const revalidate = 0;
 
@@ -75,6 +76,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
 
   const { data, count } = await searchProperties(input);
   const properties = (data ?? []) as unknown as PropertyCardData[];
+  const viewMode = getStr(sp, "view") === "map" ? "map" : "list";
 
   // Build base params (without page)
   const baseParams = new URLSearchParams();
@@ -245,6 +247,30 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
               </select>
             </div>
 
+            {/* List / Map toggle */}
+            <div className="flex rounded-lg border border-border overflow-hidden text-sm">
+              <Link
+                href={`${baseUrl}&view=list`}
+                className={cn(
+                  "flex items-center gap-1.5 px-3 py-1.5 transition-colors",
+                  viewMode === "list" ? "bg-primary text-primary-foreground" : "hover:bg-muted"
+                )}
+              >
+                <LayoutList className="h-3.5 w-3.5" />
+                List
+              </Link>
+              <Link
+                href={`${baseUrl}&view=map`}
+                className={cn(
+                  "flex items-center gap-1.5 px-3 py-1.5 transition-colors border-l border-border",
+                  viewMode === "map" ? "bg-primary text-primary-foreground" : "hover:bg-muted"
+                )}
+              >
+                <Map className="h-3.5 w-3.5" />
+                Map
+              </Link>
+            </div>
+
             {/* Mobile filter button */}
             <Sheet>
               <SheetTrigger className={cn(buttonVariants({ variant: "outline", size: "sm" }), "gap-2 lg:hidden")}>
@@ -343,6 +369,19 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
                   )}
                 </div>
               </div>
+            ) : viewMode === "map" ? (
+              <SearchMapView
+                properties={properties.map((p) => ({
+                  id: p.id,
+                  title: p.title,
+                  slug: p.slug,
+                  price: p.price,
+                  purpose: p.purpose,
+                  latitude: (p as unknown as { latitude?: number | null }).latitude ?? null,
+                  longitude: (p as unknown as { longitude?: number | null }).longitude ?? null,
+                  cities: (p as unknown as { cities?: { name: string } | null }).cities ?? null,
+                }))}
+              />
             ) : (
               <>
                 <div className="grid gap-5 grid-cols-1 sm:grid-cols-2 xl:grid-cols-3">

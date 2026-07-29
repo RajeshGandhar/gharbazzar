@@ -22,7 +22,7 @@ export default async function KycDetailPage({
 
   const { doc, all_docs } = result;
 
-  const seller = doc.sellers as {
+  const seller = doc.sellers as unknown as {
     id: string;
     business_name: string | null;
     seller_type: string;

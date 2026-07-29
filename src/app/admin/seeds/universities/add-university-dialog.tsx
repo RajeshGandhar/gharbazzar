@@ -87,11 +87,9 @@ export function AddUniversityDialog({ cities }: { cities: City[] }) {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button size="sm" className="gap-1.5">
-          <Plus className="h-4 w-4" />
-          Add university
-        </Button>
+      <DialogTrigger className="inline-flex items-center justify-center rounded-md bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground shadow-xs hover:bg-primary/90 gap-1.5">
+        <Plus className="h-4 w-4" />
+        Add university
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
@@ -109,7 +107,7 @@ export function AddUniversityDialog({ cities }: { cities: City[] }) {
             </div>
             <div className="space-y-1.5">
               <Label>Type</Label>
-              <Select value={form.institution_type} onValueChange={(v) => set("institution_type", v)}>
+              <Select value={form.institution_type} onValueChange={(v) => { if (v != null) set("institution_type", v); }}>
                 <SelectTrigger>
                   <SelectValue placeholder="Select type…" />
                 </SelectTrigger>
@@ -123,7 +121,7 @@ export function AddUniversityDialog({ cities }: { cities: City[] }) {
             </div>
             <div className="space-y-1.5 col-span-2">
               <Label>City</Label>
-              <Select value={form.city_id} onValueChange={(v) => set("city_id", v)}>
+              <Select value={form.city_id} onValueChange={(v) => { if (v != null) set("city_id", v); }}>
                 <SelectTrigger>
                   <SelectValue placeholder="Select city…" />
                 </SelectTrigger>

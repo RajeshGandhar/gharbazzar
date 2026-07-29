@@ -88,7 +88,7 @@ export default async function SupportPage({
             </thead>
             <tbody>
               {sorted.map((t) => {
-                const requester = t.profiles as {
+                const requester = t.profiles as unknown as {
                   full_name: string;
                   email: string | null;
                 } | null;
