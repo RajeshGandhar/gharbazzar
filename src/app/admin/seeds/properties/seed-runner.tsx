@@ -4,6 +4,7 @@ import { useState } from "react";
 import { CheckCircle2, Loader2, AlertTriangle, Sparkles, Building2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { seedPropertyImage } from "./actions";
 
 type City     = { id: number; name: string; slug: string; region_id: number | null };
 type Area     = { id: number; name: string; slug: string; city_id: number };
@@ -195,6 +196,16 @@ export function SeedRunner({ cities, areas, amenities, sellers }: Props) {
             }
           }
 
+          // Upload cover image from picsum.photos via server action
+          if (propId) {
+            const imgResult = await seedPropertyImage(propId, i);
+            if (imgResult.ok) {
+              addLog(`  📷 Image uploaded: seed/${propId.slice(0, 8)}…/cover.jpg`);
+            } else {
+              addLog(`  ⚠ Image skipped: ${imgResult.error}`);
+            }
+          }
+
           addLog(`✓ Created: ${tpl.title.slice(0, 55)}…`);
           created++;
         } else {
@@ -223,8 +234,9 @@ export function SeedRunner({ cities, areas, amenities, sellers }: Props) {
             Seed 50 properties
           </h2>
           <p className="text-sm text-muted-foreground mt-1">
-            Creates realistic residential & student housing listings across Braj &amp; NCR.
-            Each property gets amenities attached. Safe to run multiple times (new slugs each run).
+            Creates realistic residential &amp; student housing listings across Braj &amp; NCR.
+            Each property gets amenities attached and a real cover photo fetched from picsum.photos.
+            Safe to run multiple times (new slugs each run).
           </p>
         </div>
         <Building2 className="h-8 w-8 text-muted-foreground/30 shrink-0" />
@@ -239,7 +251,7 @@ export function SeedRunner({ cities, areas, amenities, sellers }: Props) {
               style={{ width: `${progress}%` }}
             />
           </div>
-          <p className="text-xs text-muted-foreground">{progress}% complete</p>
+          <p className="text-xs text-muted-foreground">{progress}% complete — creating properties &amp; uploading images…</p>
         </div>
       )}
 
