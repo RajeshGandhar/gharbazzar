@@ -71,7 +71,7 @@ export default async function HomePage() {
           {/* Buy */}
           <Link
             href="/buy"
-            className="group relative overflow-hidden rounded-2xl border border-border bg-card p-8 transition-smooth hover:border-primary/40 hover:shadow-xl hover:shadow-primary/10 hover:-translate-y-0.5"
+            className="tilt-3d shadow-elevated group relative overflow-hidden rounded-2xl border border-border bg-card p-8 hover:border-primary/40 hover:shadow-elevated-lg"
           >
             <div className="flex items-start justify-between">
               <div className="rounded-xl bg-primary/10 p-3">
@@ -92,7 +92,7 @@ export default async function HomePage() {
           {/* Rent */}
           <Link
             href="/rent"
-            className="group relative overflow-hidden rounded-2xl border border-border bg-card p-8 transition-smooth hover:border-primary/40 hover:shadow-xl hover:shadow-primary/10 hover:-translate-y-0.5"
+            className="tilt-3d shadow-elevated group relative overflow-hidden rounded-2xl border border-border bg-card p-8 hover:border-primary/40 hover:shadow-elevated-lg"
           >
             <div className="flex items-start justify-between">
               <div className="rounded-xl bg-primary/10 p-3">
@@ -113,7 +113,7 @@ export default async function HomePage() {
           {/* List */}
           <Link
             href="/list-property"
-            className="group relative overflow-hidden rounded-2xl border border-dashed border-primary/30 bg-gradient-to-br from-primary/5 to-background p-8 transition-smooth hover:border-primary/60 hover:shadow-xl hover:shadow-primary/10 hover:-translate-y-0.5 sm:col-span-2 lg:col-span-1"
+            className="tilt-3d shadow-elevated group relative overflow-hidden rounded-2xl border border-dashed border-primary/30 bg-gradient-to-br from-primary/5 to-background p-8 hover:border-primary/60 hover:shadow-elevated-lg sm:col-span-2 lg:col-span-1"
           >
             <div className="flex items-start justify-between">
               <div className="rounded-xl bg-primary/15 p-3">

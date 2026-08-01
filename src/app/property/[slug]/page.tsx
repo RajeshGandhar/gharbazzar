@@ -371,7 +371,7 @@ export default async function PropertyDetailPage({ params }: Props) {
                 ) : (
                   <div className={cn("grid gap-2", images.length === 1 ? "grid-cols-1" : "grid-cols-2")}>
                     <div className={cn(
-                      "relative overflow-hidden rounded-xl bg-muted aspect-[4/3]",
+                      "shadow-elevated relative overflow-hidden rounded-xl bg-muted aspect-[4/3]",
                       images.length >= 3 ? "row-span-2" : ""
                     )}>
                       <Image
@@ -673,7 +673,7 @@ export default async function PropertyDetailPage({ params }: Props) {
             {/* ── Desktop sidebar ───────────────────────────────────── */}
             <div className="hidden lg:block">
               <div className="sticky top-24 space-y-3">
-                <Card>
+                <Card className="shadow-elevated-lg">
                   <CardContent className="pt-6">
                     <ContactBox />
                   </CardContent>

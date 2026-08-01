@@ -62,7 +62,7 @@ export function PropertyCard({ property: p, className }: PropertyCardProps) {
 
   return (
     <Link href={`/property/${p.slug}`} className={cn("group block", className)}>
-      <Card className="overflow-hidden border-border transition-smooth hover:shadow-lg hover:border-primary/30 h-full flex flex-col">
+      <Card className="tilt-3d shadow-elevated overflow-hidden border-border hover:shadow-elevated-lg hover:border-primary/30 h-full flex flex-col">
         {/* Image */}
         <div className="relative aspect-[4/3] w-full overflow-hidden bg-muted">
           {coverImageUrl ? (
