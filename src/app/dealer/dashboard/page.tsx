@@ -4,8 +4,7 @@ import Image from "next/image";
 import { createClient } from "@/lib/supabase/server";
 import { getDealerDashboardData } from "@/features/sellers/server/dealer-queries";
 import { Badge } from "@/components/ui/badge";
-import { Button, buttonVariants } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { buttonVariants } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import {
   Building2,
@@ -19,39 +18,42 @@ import {
   Square,
   ArrowRight,
   TrendingUp,
+  Sparkles,
 } from "lucide-react";
 import { formatPrice, formatFreshness } from "@/lib/utils/format";
 import { cn } from "@/lib/utils";
 
 export const revalidate = 60;
 
-const statusConfig: Record<string, { label: string; className: string }> = {
+const statusConfig: Record<string, { label: string; dot: string; pill: string }> = {
   active_approved: {
     label: "Live",
-    className: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400",
+    dot: "bg-emerald-500",
+    pill: "bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400",
   },
   pending: {
     label: "In Review",
-    className: "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400",
+    dot: "bg-amber-500",
+    pill: "bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-400",
   },
   draft: {
     label: "Draft",
-    className: "bg-muted text-muted-foreground",
+    dot: "bg-muted-foreground/40",
+    pill: "bg-muted text-muted-foreground",
   },
   rejected: {
     label: "Rejected",
-    className: "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400",
+    dot: "bg-red-500",
+    pill: "bg-red-50 text-red-700 dark:bg-red-950/40 dark:text-red-400",
   },
   expired: {
     label: "Expired",
-    className: "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400",
+    dot: "bg-orange-500",
+    pill: "bg-orange-50 text-orange-700 dark:bg-orange-950/40 dark:text-orange-400",
   },
 };
 
-function getListingStatusKey(
-  status: string,
-  approvalStatus: string
-): string {
+function getListingStatusKey(status: string, approvalStatus: string): string {
   if (approvalStatus === "pending") return "pending";
   if (approvalStatus === "rejected") return "rejected";
   if (status === "draft") return "draft";
@@ -67,21 +69,55 @@ const sourceLabels: Record<string, string> = {
   chat: "Chat",
 };
 
-const leadStatusConfig: Record<string, { label: string; className: string }> = {
-  new: { label: "New", className: "bg-primary/10 text-primary" },
-  contacted: { label: "Contacted", className: "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400" },
-  visit_scheduled: { label: "Visit Scheduled", className: "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400" },
-  negotiating: { label: "Negotiating", className: "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400" },
-  closed_won: { label: "Won", className: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400" },
-  closed_lost: { label: "Lost", className: "bg-muted text-muted-foreground" },
+const leadStatusConfig: Record<string, { label: string; pill: string }> = {
+  new:              { label: "New",           pill: "bg-primary/10 text-primary" },
+  contacted:        { label: "Contacted",     pill: "bg-blue-50 text-blue-700 dark:bg-blue-950/40 dark:text-blue-400" },
+  visit_scheduled:  { label: "Visit",         pill: "bg-purple-50 text-purple-700 dark:bg-purple-950/40 dark:text-purple-400" },
+  negotiating:      { label: "Negotiating",   pill: "bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-400" },
+  closed_won:       { label: "Won",           pill: "bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400" },
+  closed_lost:      { label: "Lost",          pill: "bg-muted text-muted-foreground" },
 };
+
+function StatCard({
+  label,
+  value,
+  icon: Icon,
+  href,
+  accent,
+}: {
+  label: string;
+  value: number;
+  icon: React.ElementType;
+  href: string;
+  accent?: boolean;
+}) {
+  return (
+    <Link href={href} className="group block">
+      <div className={cn(
+        "rounded-2xl border bg-card p-5 shadow-card hover:shadow-elevated transition-all duration-200 hover:-translate-y-0.5",
+        accent ? "border-primary/20 bg-primary/3" : "border-border"
+      )}>
+        <div className="flex items-start justify-between mb-3">
+          <div className={cn(
+            "rounded-xl p-2",
+            accent ? "bg-primary/15" : "bg-muted"
+          )}>
+            <Icon className={cn("h-4 w-4", accent ? "text-primary" : "text-muted-foreground")} />
+          </div>
+          <TrendingUp className="h-3.5 w-3.5 text-muted-foreground/40 group-hover:text-primary/50 transition-colors" />
+        </div>
+        <p className={cn("text-2xl font-bold tabular-nums", accent ? "text-primary" : "text-foreground")}>
+          {value.toLocaleString("en-IN")}
+        </p>
+        <p className="text-xs text-muted-foreground mt-0.5">{label}</p>
+      </div>
+    </Link>
+  );
+}
 
 export default async function DashboardPage() {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
+  const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/auth/login?next=/dealer/dashboard");
 
   const [profileResult, sellerResult] = await Promise.all([
@@ -95,204 +131,191 @@ export default async function DashboardPage() {
 
   const profile = profileResult.data;
   const seller = sellerResult.data;
-
   if (!seller) redirect("/dealer/onboard");
 
   const dashData = await getDealerDashboardData(seller.id);
 
-  const isNewSeller =
-    dashData.listing_counts.total < 2 && !seller.is_verified;
-
+  const isNewSeller = dashData.listing_counts.total < 2 && !seller.is_verified;
   const onboardingChecks = [
-    {
-      label: "WhatsApp number set",
-      done: !!seller.whatsapp_number,
-    },
-    {
-      label: "First listing published",
-      done: dashData.listing_counts.active > 0,
-    },
-    {
-      label: "KYC submitted",
-      done: seller.kyc_status !== "not_submitted",
-    },
+    { label: "WhatsApp number set",    done: !!seller.whatsapp_number },
+    { label: "First listing published", done: dashData.listing_counts.active > 0 },
+    { label: "KYC submitted",           done: seller.kyc_status !== "not_submitted" },
   ];
-
   const allDone = onboardingChecks.every((c) => c.done);
+  const firstName = profile?.full_name?.split(" ")[0] ?? "there";
 
   return (
     <div className="space-y-8 max-w-5xl">
-      {/* Header */}
+
+      {/* ── Header ── */}
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div>
-          <h1 className="text-2xl font-bold">
-            Welcome back, {profile?.full_name?.split(" ")[0] ?? "there"}!
+          <h1 className="text-2xl font-bold text-foreground">
+            Welcome back, {firstName}
           </h1>
-          <div className="flex items-center gap-2 mt-1.5 flex-wrap">
+          <div className="flex items-center gap-2 mt-2 flex-wrap">
             {seller.seller_type && (
-              <Badge variant="outline" className="capitalize">
+              <Badge variant="outline" className="capitalize text-xs">
                 {seller.seller_type.replace("_", " ")}
               </Badge>
             )}
-            {seller.is_verified && (
-              <Badge className="bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400 gap-1">
+            {seller.is_verified ? (
+              <Badge className="gap-1 bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border-0 text-xs">
                 <CheckCircle2 className="h-3 w-3" />
-                Verified
+                Verified seller
               </Badge>
+            ) : seller.kyc_status === "submitted" ? (
+              <Badge className="gap-1 bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-400 border-0 text-xs">
+                KYC under review
+              </Badge>
+            ) : (
+              <Link href="/dealer/kyc" className="text-xs text-primary font-medium hover:underline">
+                Submit KYC →
+              </Link>
             )}
           </div>
         </div>
-        <Link href="/dealer/listings/new" className={buttonVariants()}>
-          <Plus className="h-4 w-4 mr-2" />
+        <Link href="/dealer/listings/new" className={cn(buttonVariants(), "gap-2 shadow-sm")}>
+          <Plus className="h-4 w-4" />
           Add listing
         </Link>
       </div>
 
-      {/* Onboarding checklist — shown for new sellers */}
+      {/* ── Onboarding checklist — new sellers ── */}
       {isNewSeller && !allDone && (
-        <Card className="border-primary/30 bg-primary/5">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-base">Get started — complete your setup</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-2.5">
+        <div className="rounded-2xl border border-primary/20 bg-primary/5 p-6">
+          <div className="flex items-center gap-2 mb-4">
+            <Sparkles className="h-4 w-4 text-primary" />
+            <h2 className="text-sm font-semibold text-foreground">Complete your setup to start receiving leads</h2>
+          </div>
+          <div className="space-y-3">
             {onboardingChecks.map(({ label, done }) => (
               <div key={label} className="flex items-center gap-3">
                 {done ? (
                   <CheckSquare className="h-4 w-4 text-primary shrink-0" />
                 ) : (
-                  <Square className="h-4 w-4 text-muted-foreground shrink-0" />
+                  <Square className="h-4 w-4 text-muted-foreground/50 shrink-0" />
                 )}
                 <span className={cn("text-sm", done && "line-through text-muted-foreground")}>
                   {label}
                 </span>
+                {done && (
+                  <span className="ml-auto text-xs text-emerald-600 dark:text-emerald-400 font-medium">Done</span>
+                )}
               </div>
             ))}
-          </CardContent>
-        </Card>
+          </div>
+          <div className="mt-4 pt-4 border-t border-primary/15">
+            <div className="flex h-1.5 rounded-full bg-primary/15 overflow-hidden">
+              <div
+                className="h-full rounded-full bg-primary transition-all duration-500"
+                style={{ width: `${(onboardingChecks.filter((c) => c.done).length / onboardingChecks.length) * 100}%` }}
+              />
+            </div>
+            <p className="text-xs text-muted-foreground mt-1.5">
+              {onboardingChecks.filter((c) => c.done).length}/{onboardingChecks.length} steps completed
+            </p>
+          </div>
+        </div>
       )}
 
-      {/* Stats row */}
+      {/* ── Stats row ── */}
       <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
-        {[
-          {
-            label: "Active listings",
-            value: dashData.listing_counts.active,
-            icon: Building2,
-            href: "/dealer/listings?status=active",
-          },
-          {
-            label: "Draft listings",
-            value: dashData.listing_counts.draft,
-            icon: FileEdit,
-            href: "/dealer/listings?status=draft",
-          },
-          {
-            label: "New leads",
-            value: dashData.new_leads_count,
-            icon: MessageSquare,
-            href: "/dealer/leads?status=new",
-          },
-          {
-            label: "Views (30d)",
-            value: dashData.event_stats.views,
-            icon: Eye,
-            href: "/dealer/listings",
-          },
-          {
-            label: "Reveals (30d)",
-            value: dashData.event_stats.reveals,
-            icon: Phone,
-            href: "/dealer/listings",
-          },
-        ].map(({ label, value, icon: Icon, href }) => (
-          <Link key={label} href={href}>
-            <div className="rounded-xl border border-border bg-card p-5 hover:border-primary/30 transition-colors">
-              <div className="flex items-center justify-between mb-2">
-                <Icon className="h-4 w-4 text-muted-foreground" />
-                <TrendingUp className="h-3 w-3 text-muted-foreground/50" />
-              </div>
-              <p className="text-2xl font-bold">{value}</p>
-              <p className="text-xs text-muted-foreground mt-0.5">{label}</p>
-            </div>
-          </Link>
-        ))}
+        <StatCard label="Active listings" value={dashData.listing_counts.active}    icon={Building2}    href="/dealer/listings?status=active" accent />
+        <StatCard label="Draft listings"  value={dashData.listing_counts.draft}     icon={FileEdit}     href="/dealer/listings?status=draft" />
+        <StatCard label="New leads"       value={dashData.new_leads_count}          icon={MessageSquare} href="/dealer/leads?status=new" accent={dashData.new_leads_count > 0} />
+        <StatCard label="Views (30d)"     value={dashData.event_stats.views}        icon={Eye}          href="/dealer/listings" />
+        <StatCard label="Reveals (30d)"   value={dashData.event_stats.reveals}      icon={Phone}        href="/dealer/listings" />
       </div>
 
       <div className="grid lg:grid-cols-2 gap-6">
-        {/* Recent leads */}
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-3">
-            <CardTitle className="text-base">Recent leads</CardTitle>
-            <Link href="/dealer/leads" className="text-xs text-primary hover:underline flex items-center gap-1">
+        {/* ── Recent leads ── */}
+        <div className="rounded-2xl border border-border bg-card shadow-card">
+          <div className="flex items-center justify-between px-5 py-4 border-b border-border/60">
+            <div className="flex items-center gap-2">
+              <MessageSquare className="h-4 w-4 text-primary" />
+              <h2 className="text-sm font-semibold text-foreground">Recent leads</h2>
+              {dashData.new_leads_count > 0 && (
+                <span className="h-5 min-w-5 rounded-full bg-primary text-primary-foreground text-[10px] font-bold flex items-center justify-center px-1">
+                  {dashData.new_leads_count}
+                </span>
+              )}
+            </div>
+            <Link href="/dealer/leads" className="text-xs text-primary hover:text-primary/80 flex items-center gap-1 transition-colors">
               View all <ArrowRight className="h-3 w-3" />
             </Link>
-          </CardHeader>
-          <CardContent className="space-y-0">
+          </div>
+          <div className="divide-y divide-border/60">
             {dashData.recent_leads.length === 0 ? (
-              <p className="text-sm text-muted-foreground py-4 text-center">
-                No leads yet. Your first inquiry will appear here.
-              </p>
+              <div className="py-10 text-center px-5">
+                <div className="mx-auto w-10 h-10 rounded-xl bg-muted flex items-center justify-center mb-3">
+                  <MessageSquare className="h-5 w-5 text-muted-foreground/50" />
+                </div>
+                <p className="text-sm font-medium text-foreground mb-1">No leads yet</p>
+                <p className="text-xs text-muted-foreground">Your first inquiry will appear here.</p>
+              </div>
             ) : (
-              dashData.recent_leads.map((lead, idx) => {
+              dashData.recent_leads.map((lead) => {
                 const statusCfg = leadStatusConfig[lead.status] ?? leadStatusConfig.new;
                 const maskedPhone = `****${lead.phone.slice(-4)}`;
                 const prop = lead.properties;
                 return (
-                  <div key={lead.id}>
-                    {idx > 0 && <Separator />}
-                    <Link
-                      href={`/dealer/leads/${lead.id}`}
-                      className="flex items-center gap-3 py-3 hover:bg-muted/50 -mx-3 px-3 rounded-lg transition-colors"
-                    >
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium truncate">{lead.name}</p>
-                        <p className="text-xs text-muted-foreground truncate">
-                          {maskedPhone} · {prop?.title ?? "Unknown property"}
-                        </p>
-                        <p className="text-xs text-muted-foreground mt-0.5">
-                          {formatFreshness(lead.created_at)} · {sourceLabels[lead.source] ?? lead.source}
-                        </p>
-                      </div>
-                      <Badge className={cn("text-[10px] shrink-0", statusCfg.className)}>
-                        {statusCfg.label}
-                      </Badge>
-                    </Link>
-                  </div>
+                  <Link
+                    key={lead.id}
+                    href={`/dealer/leads/${lead.id}`}
+                    className="flex items-center gap-3 px-5 py-3.5 hover:bg-muted/40 transition-colors"
+                  >
+                    <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0 text-xs font-bold text-primary">
+                      {lead.name.charAt(0).toUpperCase()}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-foreground truncate">{lead.name}</p>
+                      <p className="text-xs text-muted-foreground truncate">
+                        {maskedPhone} · {prop?.title ?? "Unknown property"}
+                      </p>
+                      <p className="text-[10px] text-muted-foreground mt-0.5">
+                        {formatFreshness(lead.created_at)} · {sourceLabels[lead.source] ?? lead.source}
+                      </p>
+                    </div>
+                    <span className={cn("text-[10px] font-semibold rounded-full px-2 py-0.5 shrink-0", statusCfg.pill)}>
+                      {statusCfg.label}
+                    </span>
+                  </Link>
                 );
               })
             )}
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
-        {/* Recent listings */}
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-3">
-            <CardTitle className="text-base">My listings</CardTitle>
-            <Link href="/dealer/listings" className="text-xs text-primary hover:underline flex items-center gap-1">
+        {/* ── Recent listings ── */}
+        <div className="rounded-2xl border border-border bg-card shadow-card">
+          <div className="flex items-center justify-between px-5 py-4 border-b border-border/60">
+            <div className="flex items-center gap-2">
+              <Building2 className="h-4 w-4 text-primary" />
+              <h2 className="text-sm font-semibold text-foreground">My listings</h2>
+            </div>
+            <Link href="/dealer/listings" className="text-xs text-primary hover:text-primary/80 flex items-center gap-1 transition-colors">
               View all <ArrowRight className="h-3 w-3" />
             </Link>
-          </CardHeader>
-          <CardContent className="space-y-0">
+          </div>
+          <div className="divide-y divide-border/60">
             {dashData.recent_listings.length === 0 ? (
-              <div className="py-8 text-center space-y-3">
-                <p className="text-sm text-muted-foreground">
-                  You have no listings yet.
-                </p>
-                <Link href="/dealer/listings/new" className={buttonVariants({ size: "sm" })}>
-                  <Plus className="h-4 w-4 mr-2" />
-                  Add your first listing
+              <div className="py-10 text-center px-5">
+                <div className="mx-auto w-10 h-10 rounded-xl bg-muted flex items-center justify-center mb-3">
+                  <Building2 className="h-5 w-5 text-muted-foreground/50" />
+                </div>
+                <p className="text-sm font-medium text-foreground mb-1">No listings yet</p>
+                <p className="text-xs text-muted-foreground mb-4">Add your first property to start getting leads.</p>
+                <Link href="/dealer/listings/new" className={cn(buttonVariants({ size: "sm" }), "gap-1.5")}>
+                  <Plus className="h-3.5 w-3.5" />
+                  Add listing
                 </Link>
               </div>
             ) : (
-              dashData.recent_listings.map((listing, idx) => {
+              dashData.recent_listings.map((listing) => {
                 const l = listing as unknown as {
-                  id: string;
-                  slug: string;
-                  title: string;
-                  price: number;
-                  purpose: string;
-                  status: string;
-                  approval_status: string;
+                  id: string; slug: string; title: string; price: number;
+                  purpose: string; status: string; approval_status: string;
                   created_at: string;
                   property_images: Array<{ path: string; is_cover: boolean }>;
                 };
@@ -304,41 +327,38 @@ export default async function DashboardPage() {
                 const statusCfg = statusConfig[statusKey] ?? statusConfig.draft;
 
                 return (
-                  <div key={l.id}>
-                    {idx > 0 && <Separator />}
-                    <div className="flex items-center gap-3 py-3">
-                      <div className="relative h-14 w-20 rounded-md overflow-hidden bg-muted shrink-0">
-                        {imageUrl ? (
-                          <Image
-                            src={imageUrl}
-                            alt={l.title}
-                            fill
-                            sizes="80px"
-                            className="object-cover"
-                          />
-                        ) : (
-                          <div className="absolute inset-0 flex items-center justify-center">
-                            <Building2 className="h-5 w-5 text-muted-foreground/40" />
-                          </div>
-                        )}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium truncate">{l.title}</p>
-                        <p className="text-xs text-muted-foreground">{formatPrice(l.price)}</p>
-                        <Badge className={cn("text-[10px] mt-1", statusCfg.className)}>
-                          {statusCfg.label}
-                        </Badge>
-                      </div>
-                      <Link href={`/dealer/listings/${l.id}/edit?step=1`} className={cn(buttonVariants({ size: "sm", variant: "outline" }), "shrink-0")}>
-                        Manage
-                      </Link>
+                  <div key={l.id} className="flex items-center gap-3 px-5 py-3.5">
+                    <div className="relative h-14 w-20 rounded-xl overflow-hidden bg-muted shrink-0">
+                      {imageUrl ? (
+                        <Image src={imageUrl} alt={l.title} fill sizes="80px" className="object-cover" />
+                      ) : (
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <Building2 className="h-5 w-5 text-muted-foreground/40" />
+                        </div>
+                      )}
                     </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-foreground truncate">{l.title}</p>
+                      <p className="text-xs text-primary font-semibold mt-0.5">{formatPrice(l.price)}</p>
+                      <div className="flex items-center gap-1 mt-1">
+                        <span className={cn("h-1.5 w-1.5 rounded-full", statusCfg.dot)} />
+                        <span className={cn("text-[10px] font-medium", statusCfg.pill.split(" ").slice(1).join(" "))}>
+                          {statusCfg.label}
+                        </span>
+                      </div>
+                    </div>
+                    <Link
+                      href={`/dealer/listings/${l.id}/edit?step=1`}
+                      className={cn(buttonVariants({ size: "sm", variant: "outline" }), "shrink-0 text-xs")}
+                    >
+                      Manage
+                    </Link>
                   </div>
                 );
               })
             )}
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       </div>
     </div>
   );

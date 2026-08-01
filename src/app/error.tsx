@@ -2,8 +2,9 @@
 
 import { useEffect } from "react";
 import Link from "next/link";
-import { Home, RotateCw, AlertTriangle } from "lucide-react";
+import { Home, RotateCw, AlertTriangle, ArrowRight } from "lucide-react";
 import { Button, buttonVariants } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 export default function GlobalError({
   error,
@@ -17,23 +18,51 @@ export default function GlobalError({
   }, [error]);
 
   return (
-    <div className="flex flex-1 flex-col items-center justify-center px-4 py-24 text-center gap-4">
-      <div className="rounded-2xl bg-destructive/10 p-6">
-        <AlertTriangle className="h-12 w-12 text-destructive" />
+    <div className="flex flex-1 flex-col items-center justify-center px-4 py-24 text-center">
+      {/* Icon */}
+      <div className="mb-8">
+        <div className="mx-auto w-20 h-20 rounded-3xl bg-destructive/10 flex items-center justify-center shadow-card">
+          <AlertTriangle className="h-10 w-10 text-destructive" />
+        </div>
       </div>
-      <h1 className="text-2xl font-bold text-foreground">Something went wrong</h1>
-      <p className="max-w-sm text-sm text-muted-foreground">
-        We hit an unexpected error loading this page. Please try again, or head back home.
+
+      <h1 className="text-2xl font-bold text-foreground mb-2">Something went wrong</h1>
+      <p className="max-w-sm text-sm text-muted-foreground mb-2 leading-relaxed">
+        We hit an unexpected error loading this page. This has been logged and we&apos;ll look into it.
       </p>
+      {error.digest && (
+        <p className="mb-8 font-mono text-[11px] text-muted-foreground/60 bg-muted rounded-lg px-3 py-1">
+          Error ID: {error.digest}
+        </p>
+      )}
+
       <div className="flex flex-col gap-3 sm:flex-row">
-        <Button onClick={() => reset()}>
-          <RotateCw className="mr-2 h-4 w-4" />
+        <Button onClick={() => reset()} className="gap-2">
+          <RotateCw className="h-4 w-4" />
           Try again
         </Button>
-        <Link href="/" className={buttonVariants({ variant: "outline" })}>
-          <Home className="mr-2 h-4 w-4" />
+        <Link href="/" className={cn(buttonVariants({ variant: "outline" }), "gap-2")}>
+          <Home className="h-4 w-4" />
           Back to home
         </Link>
+      </div>
+
+      {/* Quick links */}
+      <div className="mt-12 grid grid-cols-1 sm:grid-cols-3 gap-3 w-full max-w-lg">
+        {[
+          { label: "Browse properties", href: "/search" },
+          { label: "Buy a home",        href: "/buy" },
+          { label: "Rent a property",   href: "/rent" },
+        ].map((link) => (
+          <Link
+            key={link.href}
+            href={link.href}
+            className="flex items-center justify-between rounded-xl border border-border bg-card px-4 py-3 text-sm font-medium text-foreground hover:border-primary/40 hover:text-primary hover:bg-primary/3 transition-all shadow-card"
+          >
+            {link.label}
+            <ArrowRight className="h-3.5 w-3.5" />
+          </Link>
+        ))}
       </div>
     </div>
   );
