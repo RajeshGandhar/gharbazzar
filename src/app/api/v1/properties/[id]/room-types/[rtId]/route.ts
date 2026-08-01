@@ -3,6 +3,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { requireSeller } from "@/lib/api/middleware";
 import { roomTypeSchema } from "@/features/properties/schemas";
 import { badRequest, forbidden, noContent, ok, serverError, unauthorized } from "@/lib/api/response";
+import { syncPropertyPriceFromRoomTypes } from "@/features/properties/server/mutations";
 import type { Database } from "@/types/database.types";
 
 export const runtime = "nodejs";
@@ -53,6 +54,8 @@ export async function PATCH(
     return serverError("Failed to update room type");
   }
 
+  await syncPropertyPriceFromRoomTypes(ctx.supabase, id);
+
   return ok(updated);
 }
 
@@ -77,6 +80,8 @@ export async function DELETE(
     console.error("room_type delete error", error);
     return serverError("Failed to delete room type");
   }
+
+  await syncPropertyPriceFromRoomTypes(ctx.supabase, id);
 
   return noContent();
 }

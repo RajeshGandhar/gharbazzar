@@ -20,6 +20,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { cn } from "@/lib/utils";
 import { SearchMapView } from "./map-view";
 import { SaveSearchButton } from "./save-search-button";
+import { SortSelect } from "./sort-select";
 
 export const revalidate = 0;
 
@@ -55,12 +56,15 @@ const distanceOptions = [
   { value: "5000", label: "5 km" },
 ];
 
-const sortOptions = [
+const baseSortOptions = [
   { value: "newest", label: "Newest first" },
   { value: "price_asc", label: "Price: low to high" },
   { value: "price_desc", label: "Price: high to low" },
   { value: "popular", label: "Most popular" },
 ];
+
+// "Nearest to campus" only makes sense once a university filter is applied.
+const distanceSortOption = { value: "distance", label: "Nearest to campus" };
 
 export default async function SearchPage({ searchParams }: SearchPageProps) {
   const sp = await searchParams;
@@ -86,6 +90,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
 
   const input = parsed.success ? parsed.data : searchSchema.parse({ sort: "newest", page: 1, per_page: 20 });
   const viewMode = getStr(sp, "view") === "map" ? "map" : "list";
+  const sortOptions = input.university ? [...baseSortOptions, distanceSortOption] : baseSortOptions;
 
   // Parallel: search results + auth + master data
   const admin = createAdminClient();
@@ -95,10 +100,12 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
     { data: searchData, count },
     { data: { user } },
     { data: propertyTypes },
+    { data: amenitiesData },
   ] = await Promise.all([
     searchProperties(input),
     supabase.auth.getUser(),
     admin.from("property_types").select("id, name, slug").eq("is_active", true).order("name"),
+    admin.from("amenities").select("id, name, slug").eq("is_active", true).order("name"),
   ]);
 
   // Universities: only when city is active (needs city_id lookup first)
@@ -123,6 +130,8 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
   const properties = (searchData ?? []) as unknown as PropertyCardData[];
   const types = propertyTypes ?? [];
   const universities = universitiesData;
+  const amenities = amenitiesData ?? [];
+  const selectedAmenitySlugs = new Set((input.amenities ?? "").split(",").map((s) => s.trim()).filter(Boolean));
 
   // Build base params (without page)
   const baseParams = new URLSearchParams();
@@ -155,6 +164,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
   if (input.gender_policy && input.gender_policy !== "any") activeFilters.push({ label: input.gender_policy.replace(/_/g, " "), removeKey: "gender_policy" });
   if (input.furnishing) activeFilters.push({ label: input.furnishing.replace(/_/g, " "), removeKey: "furnishing" });
   if (input.university) activeFilters.push({ label: `Near: ${universities.find((u) => u.slug === input.university)?.name ?? input.university}`, removeKey: "university" });
+  if (selectedAmenitySlugs.size > 0) activeFilters.push({ label: `${selectedAmenitySlugs.size} amenities`, removeKey: "amenities" });
 
   function removeFilterUrl(key: string): string {
     const p = new URLSearchParams(baseParams);
@@ -175,6 +185,20 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
     const p = new URLSearchParams(baseParams);
     if (value) p.set(key, value);
     else p.delete(key);
+    p.delete("page");
+    return `/search?${p.toString()}`;
+  }
+
+  // Amenities are multi-select (comma-separated slugs), unlike every other
+  // filter above which replaces a single value — so toggling one adds/
+  // removes it from the list rather than replacing the whole param.
+  function amenityToggleUrl(slug: string): string {
+    const current = new Set(selectedAmenitySlugs);
+    if (current.has(slug)) current.delete(slug);
+    else current.add(slug);
+    const p = new URLSearchParams(baseParams);
+    if (current.size > 0) p.set("amenities", [...current].join(","));
+    else p.delete("amenities");
     p.delete("page");
     return `/search?${p.toString()}`;
   }
@@ -201,6 +225,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
   if (input.university) savedFilters.university = input.university;
   if (input.max_distance) savedFilters.max_distance = input.max_distance;
   if (input.q) savedFilters.q = input.q;
+  if (input.amenities) savedFilters.amenities = input.amenities;
 
   const FilterPanel = () => (
     <div className="flex flex-col gap-6">
@@ -269,6 +294,30 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
           })}
         </div>
       </div>
+
+      {amenities.length > 0 && (
+        <div>
+          <p className="text-sm font-semibold text-foreground mb-3">Amenities</p>
+          <div className="flex flex-wrap gap-2">
+            {amenities.map((a) => {
+              const active = selectedAmenitySlugs.has(a.slug);
+              return (
+                <Link
+                  key={a.slug}
+                  href={amenityToggleUrl(a.slug)}
+                  aria-pressed={active}
+                  className={cn(
+                    "rounded-full border px-3 py-1.5 text-xs font-medium transition-smooth",
+                    active ? "border-primary bg-primary text-primary-foreground" : "border-border hover:border-primary hover:text-primary"
+                  )}
+                >
+                  {a.name}
+                </Link>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       <div>
         <p className="text-sm font-semibold text-foreground mb-3">For students</p>
@@ -367,21 +416,10 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
             />
 
             {/* Sort */}
-            <div className="relative">
-              <select
-                defaultValue={input.sort ?? "newest"}
-                className="rounded-lg border border-border bg-background px-3 py-1.5 text-sm appearance-none pr-8 focus:outline-none focus:ring-2 focus:ring-primary/30"
-                onChange={(e) => {
-                  if (typeof window !== "undefined") {
-                    window.location.href = sortUrl(e.target.value);
-                  }
-                }}
-              >
-                {sortOptions.map(({ value, label }) => (
-                  <option key={value} value={value}>{label}</option>
-                ))}
-              </select>
-            </div>
+            <SortSelect
+              value={input.sort ?? "newest"}
+              options={sortOptions.map(({ value, label }) => ({ value, label, url: sortUrl(value) }))}
+            />
 
             {/* List / Map toggle */}
             <div className="flex rounded-lg border border-border overflow-hidden text-sm">

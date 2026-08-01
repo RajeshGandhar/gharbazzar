@@ -1,8 +1,9 @@
 import { NextRequest } from "next/server";
-import { created, badRequest, serverError } from "@/lib/api/response";
+import { created, badRequest, serverError, tooManyRequests } from "@/lib/api/response";
 import { getAuthContext } from "@/lib/api/middleware";
 import { createInquirySchema } from "@/features/leads/schemas";
 import { createInquiry } from "@/features/leads/server/mutations";
+import { checkRateLimit, getClientIp } from "@/lib/api/rate-limit";
 
 export const runtime = "nodejs";
 
@@ -16,6 +17,13 @@ type Params = { params: Promise<{ id: string }> };
 export async function POST(req: NextRequest, { params }: Params) {
   const { id } = await params;
   const ctx = await getAuthContext(req);
+
+  // Best-effort throttle: 5 inquiries/10min per IP (anonymous endpoint —
+  // blocks scripted lead spam; see src/lib/api/rate-limit.ts).
+  const rateLimitKey = ctx ? `inquire:user:${ctx.user.id}` : `inquire:ip:${getClientIp(req)}`;
+  if (!checkRateLimit(rateLimitKey, { limit: 5, windowMs: 10 * 60 * 1000 })) {
+    return tooManyRequests("Too many inquiries. Please try again later.");
+  }
 
   let body: unknown;
   try {

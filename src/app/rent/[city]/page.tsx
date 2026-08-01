@@ -28,7 +28,7 @@ export function generateStaticParams() {
 
 type Props = {
   params: Promise<{ city: string }>;
-  searchParams: Promise<{ bedrooms?: string; gender?: string; page?: string }>;
+  searchParams: Promise<{ bedrooms?: string; gender?: string; page?: string; rental_kind?: string }>;
 };
 
 const rentalKindOptions = [
@@ -44,7 +44,13 @@ const bhkOptions = [
   { value: "3", label: "3 BHK" },
 ];
 
-async function getCityWithRentals(citySlug: string, bedrooms?: number, page = 1, perPage = 20) {
+async function getCityWithRentals(
+  citySlug: string,
+  bedrooms?: number,
+  page = 1,
+  perPage = 20,
+  rentalKind?: string
+) {
   const supabase = createAdminClient();
 
   const { data: cityRow } = await supabase
@@ -61,7 +67,8 @@ async function getCityWithRentals(citySlug: string, bedrooms?: number, page = 1,
       `id, slug, title, price, purpose, city_id, area_id, bedrooms,
        built_up_area, rental_kind, gender_policy, is_featured, published_at,
        areas!area_id ( name, slug ),
-       cities!city_id ( name, slug )`,
+       cities!city_id ( name, slug ),
+       property_images ( path, thumbnail_path, is_cover, position )`,
       { count: "exact" }
     )
     .eq("status", "active")
@@ -69,6 +76,16 @@ async function getCityWithRentals(citySlug: string, bedrooms?: number, page = 1,
     .eq("purpose", "rent")
     .eq("city_id", cityRow.id)
     .is("deleted_at", null);
+
+  // rentalKindOptions in the UI implies standard-vs-student is filterable
+  // here; it previously wasn't wired to any query condition at all, so
+  // student and standard listings were always mixed together — duplicating
+  // what /student-housing/[city] shows. Default to excluding student
+  // listings (matching the top-level /rent page's behavior, which has the
+  // same "student housing has its own hub" comment) unless the student
+  // filter is explicitly selected.
+  if (rentalKind) q = q.eq("rental_kind", rentalKind as "standard" | "student");
+  else q = q.neq("rental_kind", "student");
 
   if (bedrooms !== undefined) q = q.eq("bedrooms", bedrooms);
 
@@ -95,8 +112,11 @@ export async function generateMetadata({ params, searchParams }: Props): Promise
   return {
     title: `${titleParts} | GharBazaar`,
     description: `Find verified flats, PG, rooms and student housing for rent in ${city.name}. Direct contact with owners and agents — zero brokerage for seekers on GharBazaar.`,
+    // Query-string filter variants (?bedrooms=) canonicalize to the base
+    // path per docs/blueprint/06-seo-blueprint.md §facets — see the
+    // noindex on the bedrooms filter below, not a self-canonical.
     alternates: {
-      canonical: `/rent/${city.slug}${bedrooms !== undefined ? `?bedrooms=${bedrooms}` : ""}`,
+      canonical: `/rent/${city.slug}`,
     },
     openGraph: {
       title: titleParts,
@@ -107,17 +127,22 @@ export async function generateMetadata({ params, searchParams }: Props): Promise
 
 export default async function RentCityPage({ params, searchParams }: Props) {
   const { city: citySlug } = await params;
-  const { bedrooms: bedroomsStr, page: pageStr } = await searchParams;
+  const { bedrooms: bedroomsStr, page: pageStr, rental_kind: rentalKind } = await searchParams;
 
   const bedrooms = bedroomsStr !== undefined ? parseInt(bedroomsStr, 10) : undefined;
   const page = Math.max(1, parseInt(pageStr ?? "1", 10) || 1);
   const perPage = 20;
 
-  const result = await getCityWithRentals(citySlug, bedrooms, page, perPage);
+  const result = await getCityWithRentals(citySlug, bedrooms, page, perPage, rentalKind);
   if (!result) notFound();
 
   const { city, properties, count } = result;
-  const shouldIndex = count >= 3;
+  // Index only the base (unfiltered) path, and only if ≥3 live listings
+  // (blueprint §1). Query-string filter variants (?bedrooms=) are
+  // noindex,follow with canonical pointing at the base path above —
+  // matching docs/blueprint/06-seo-blueprint.md's facet rule rather than
+  // being indexed as their own near-duplicate pages.
+  const shouldIndex = count >= 3 && bedrooms === undefined;
 
   const priceMin = properties.length > 0 ? Math.min(...properties.map((p) => p.price)) : null;
 
@@ -183,23 +208,43 @@ export default async function RentCityPage({ params, searchParams }: Props) {
                 : "Listings coming soon — save a search to be notified."}
             </p>
 
-            {/* BHK filter */}
+            {/* Standard vs. student housing — preserves the BHK filter below */}
             <div className="flex flex-wrap gap-2 mt-5">
-              <Link
-                href={`/rent/${city.slug}`}
-                className={`rounded-full border px-3 py-1.5 text-xs font-medium transition-smooth ${bedrooms === undefined ? "border-primary bg-primary text-primary-foreground" : "border-border hover:border-primary hover:text-primary"}`}
-              >
-                All types
-              </Link>
-              {bhkOptions.map(({ value, label }) => (
-                <Link
-                  key={value}
-                  href={`/rent/${city.slug}?bedrooms=${value}`}
-                  className={`rounded-full border px-3 py-1.5 text-xs font-medium transition-smooth ${String(bedrooms) === value ? "border-primary bg-primary text-primary-foreground" : "border-border hover:border-primary hover:text-primary"}`}
-                >
-                  {label}
-                </Link>
-              ))}
+              {rentalKindOptions.map(({ value, label }) => {
+                const p = new URLSearchParams();
+                if (bedrooms !== undefined) p.set("bedrooms", String(bedrooms));
+                if (value) p.set("rental_kind", value);
+                const qs = p.toString();
+                return (
+                  <Link
+                    key={value}
+                    href={`/rent/${city.slug}${qs ? `?${qs}` : ""}`}
+                    className={`rounded-full border px-3 py-1.5 text-xs font-medium transition-smooth ${(rentalKind ?? "") === value ? "border-primary bg-primary text-primary-foreground" : "border-border hover:border-primary hover:text-primary"}`}
+                  >
+                    {label}
+                  </Link>
+                );
+              })}
+            </div>
+
+            {/* BHK filter — preserves the standard/student filter above */}
+            <div className="flex flex-wrap gap-2 mt-3">
+              {[{ value: "", label: "All types" }, ...bhkOptions].map(({ value, label }) => {
+                const p = new URLSearchParams();
+                if (rentalKind) p.set("rental_kind", rentalKind);
+                if (value) p.set("bedrooms", value);
+                const qs = p.toString();
+                const active = value === "" ? bedrooms === undefined : String(bedrooms) === value;
+                return (
+                  <Link
+                    key={value || "all"}
+                    href={`/rent/${city.slug}${qs ? `?${qs}` : ""}`}
+                    className={`rounded-full border px-3 py-1.5 text-xs font-medium transition-smooth ${active ? "border-primary bg-primary text-primary-foreground" : "border-border hover:border-primary hover:text-primary"}`}
+                  >
+                    {label}
+                  </Link>
+                );
+              })}
             </div>
           </div>
         </section>

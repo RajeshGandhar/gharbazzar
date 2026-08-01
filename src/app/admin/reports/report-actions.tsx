@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Loader2, Check, X } from "lucide-react";
 
@@ -15,10 +16,16 @@ export function ReportActions({ reportId }: { reportId: string }) {
     else setDismissing(true);
 
     try {
-      await fetch(`/api/v1/admin/reports/${reportId}/${action}`, {
+      const res = await fetch(`/api/v1/admin/reports/${reportId}/${action}`, {
         method: "POST",
       });
+      if (!res.ok) {
+        toast.error(`Failed to ${action} report. Please try again.`);
+        return;
+      }
       router.refresh();
+    } catch {
+      toast.error("Network error. Please try again.");
     } finally {
       setResolving(false);
       setDismissing(false);

@@ -15,6 +15,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
+import { PHONE_REGEX } from "@/features/sellers/schemas";
 
 type SellerType = "owner" | "agent" | "builder" | "property_manager";
 
@@ -88,7 +89,7 @@ export default function OnboardPage() {
   function validateStep2(): boolean {
     const errs: Record<string, string> = {};
     if (!step2.full_name.trim()) errs.full_name = "Full name is required";
-    if (!/^[6-9]\d{9}$/.test(step2.whatsapp_number)) {
+    if (!PHONE_REGEX.test(step2.whatsapp_number)) {
       errs.whatsapp_number = "Enter a valid 10-digit WhatsApp number";
     }
     if (requiresBusiness && !step2.business_name.trim()) {

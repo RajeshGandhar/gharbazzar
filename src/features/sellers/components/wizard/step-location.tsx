@@ -13,6 +13,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { LocationPicker } from "@/features/properties/components/location-picker";
+import { PINCODE_REGEX } from "@/features/properties/schemas";
 
 interface City {
   id: number;
@@ -97,7 +98,7 @@ export function StepLocation({
     if (!cityId) errs.city_id = "Select a city";
     if (!address.trim() || address.trim().length < 5)
       errs.address = "Enter a valid address (min 5 characters)";
-    if (pincode && !/^\d{6}$/.test(pincode)) errs.pincode = "Enter a valid 6-digit pincode";
+    if (pincode && !PINCODE_REGEX.test(pincode)) errs.pincode = "Enter a valid 6-digit pincode";
     setErrors(errs);
     return Object.keys(errs).length === 0;
   }

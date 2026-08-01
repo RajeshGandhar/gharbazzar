@@ -27,6 +27,12 @@ export async function createClient() {
           }
         },
       },
+      // See client.ts for why httpOnly is intentionally not set here.
+      cookieOptions: {
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+        path: "/",
+      },
     }
   );
 }

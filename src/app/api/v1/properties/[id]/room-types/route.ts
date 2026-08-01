@@ -3,6 +3,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { requireSeller } from "@/lib/api/middleware";
 import { roomTypeSchema } from "@/features/properties/schemas";
 import { badRequest, created, forbidden, notFound, ok, serverError, unauthorized } from "@/lib/api/response";
+import { syncPropertyPriceFromRoomTypes } from "@/features/properties/server/mutations";
 import type { Database } from "@/types/database.types";
 
 export const runtime = "nodejs";
@@ -77,6 +78,8 @@ export async function POST(
     console.error("room_type insert error", error);
     return serverError("Failed to create room type");
   }
+
+  await syncPropertyPriceFromRoomTypes(ctx.supabase, id);
 
   return created(roomType);
 }

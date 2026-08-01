@@ -8,6 +8,7 @@ import { GitCompare, Loader2, X, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { formatPrice, formatRent, formatArea } from "@/lib/utils/format";
+import { resolveCoverImageUrl } from "@/lib/utils/storage";
 
 interface PropertyImage { path: string; is_cover: boolean; position: number }
 interface CompareProperty {
@@ -23,12 +24,6 @@ interface CompareProperty {
   furnishing: string | null;
   property_images: PropertyImage[];
   cities: { name: string } | null;
-}
-
-function coverImage(images: PropertyImage[]): string | null {
-  if (!images?.length) return null;
-  const cover = images.find((i) => i.is_cover) ?? images.sort((a, b) => a.position - b.position)[0];
-  return cover?.path ?? null;
 }
 
 const FURNISHING_LABELS: Record<string, string> = {
@@ -149,13 +144,13 @@ export default function ComparePage() {
             <tr className="border-b">
               <th className="text-left text-xs font-medium text-muted-foreground px-4 py-3 w-32">Attribute</th>
               {properties.map((p) => {
-                const imgPath = coverImage(p.property_images);
+                const imgUrl = resolveCoverImageUrl(p.property_images);
                 return (
                   <th key={p.id} className="px-4 py-3 text-left">
                     <div className="flex flex-col gap-2">
                       <div className="relative h-24 w-full rounded-lg overflow-hidden bg-muted">
-                        {imgPath ? (
-                          <Image src={imgPath} alt={p.title} fill className="object-cover" sizes="200px" />
+                        {imgUrl ? (
+                          <Image src={imgUrl} alt={p.title} fill className="object-cover" sizes="200px" />
                         ) : (
                           <div className="w-full h-full flex items-center justify-center text-muted-foreground text-[10px]">No image</div>
                         )}

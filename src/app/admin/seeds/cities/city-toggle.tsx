@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Loader2 } from "lucide-react";
 
@@ -19,13 +20,19 @@ export function CityToggle({
   async function toggle() {
     setLoading(true);
     try {
-      await fetch(`/api/v1/admin/seeds/cities/${cityId}`, {
+      const res = await fetch(`/api/v1/admin/seeds/cities/${cityId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ is_active: !current }),
       });
+      if (!res.ok) {
+        toast.error("Failed to update city. Please try again.");
+        return;
+      }
       setCurrent((v) => !v);
       router.refresh();
+    } catch {
+      toast.error("Network error. Please try again.");
     } finally {
       setLoading(false);
     }

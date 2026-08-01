@@ -7,12 +7,16 @@ export const runtime = "nodejs";
 export const maxDuration = 300;
 
 // ---------------------------------------------------------------------------
-// POST /api/v1/crons/drain-outbox
-// Runs every 5 minutes: picks up pending notifications and dispatches them.
-// Email dispatch requires an email provider env var (provisioned via Vercel
-// Marketplace messaging category — see docs/blueprint/14 §1.9).
-// This stub is production-ready routing logic; sending is provider-pluggable.
-// Schedule: */5 * * * *
+// GET|POST /api/v1/crons/drain-outbox
+// Runs daily on the Vercel Hobby plan (see vercel.json — more frequent
+// schedules require a paid plan): picks up pending notifications and
+// dispatches them. Email dispatch requires an email provider env var
+// (provisioned via Vercel Marketplace messaging category — see
+// docs/blueprint/14 §1.9). This stub is production-ready routing logic;
+// sending is provider-pluggable.
+// Schedule: 0 9 * * *
+// Vercel Cron invokes scheduled paths via GET; POST is kept for manual/admin
+// triggering, so both methods run the same handler.
 // ---------------------------------------------------------------------------
 export async function POST(req: NextRequest) {
   const guardError = verifyCronSecret(req);
@@ -74,6 +78,9 @@ export async function POST(req: NextRequest) {
 
   return ok({ sent, failed, batch: batch.length, ranAt: now });
 }
+
+// Vercel Cron invokes scheduled functions via GET, not POST.
+export const GET = POST;
 
 // ---------------------------------------------------------------------------
 // Dispatch — route to the appropriate channel

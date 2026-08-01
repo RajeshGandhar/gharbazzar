@@ -4,6 +4,11 @@ import { z } from "zod";
 // Seller profile schemas
 // ---------------------------------------------------------------------------
 
+// Single source of truth for the Indian 10-digit mobile number format —
+// import this instead of re-declaring the pattern in client-side validators
+// (e.g. the seller onboarding wizard) so the two can't silently drift apart.
+export const PHONE_REGEX = /^[6-9]\d{9}$/;
+
 export const updateSellerProfileSchema = z.object({
   business_name: z.string().min(2).max(120).optional(),
   about: z.string().max(1000).optional(),
@@ -12,7 +17,7 @@ export const updateSellerProfileSchema = z.object({
   city_id: z.number().int().positive().optional(),
   whatsapp_number: z
     .string()
-    .regex(/^[6-9]\d{9}$/, "Enter a valid 10-digit mobile number")
+    .regex(PHONE_REGEX, "Enter a valid 10-digit mobile number")
     .optional(),
   website: z.string().url().optional().or(z.literal("")),
   rera_number: z.string().max(50).optional(),
@@ -22,7 +27,7 @@ export const updateMyProfileSchema = z.object({
   full_name: z.string().min(2).max(100).optional(),
   phone: z
     .string()
-    .regex(/^[6-9]\d{9}$/, "Enter a valid 10-digit mobile number")
+    .regex(PHONE_REGEX, "Enter a valid 10-digit mobile number")
     .optional(),
   avatar_url: z.string().url().optional(),
 });

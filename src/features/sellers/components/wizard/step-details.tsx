@@ -119,17 +119,17 @@ export function StepDetails({
         return;
       }
 
-      // Save amenities — first delete existing, then insert selected
-      if (selectedAmenities.size > 0) {
-        // Use upsert pattern: delete all then insert
-        await fetch(`/api/v1/properties/${propertyId}/amenities`, {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ amenity_ids: Array.from(selectedAmenities) }),
-        });
-        // Note: /api/v1/properties/[id]/amenities route is not yet built;
-        // we'll handle amenities via direct Supabase client in a server action pattern
-        // For now, we proceed — amenities can be added in a post-MVP iteration
+      // Save amenities — full replace (delete existing, insert selected)
+      const amenitiesRes = await fetch(`/api/v1/properties/${propertyId}/amenities`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ amenity_ids: Array.from(selectedAmenities) }),
+      });
+
+      if (!amenitiesRes.ok) {
+        const data = await amenitiesRes.json().catch(() => ({}));
+        setServerError((data as { error?: { message?: string } })?.error?.message ?? "Failed to save amenities. Please try again.");
+        return;
       }
 
       onSuccess(propertyId);

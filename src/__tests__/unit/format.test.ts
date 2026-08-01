@@ -134,7 +134,7 @@ describe("formatFreshness", () => {
   });
 
   it("returns N months ago for 30+ days", () => {
-    expect(formatFreshness(daysAgo(30))).toBe("1 months ago");
+    expect(formatFreshness(daysAgo(30))).toBe("1 month ago");
     expect(formatFreshness(daysAgo(60))).toBe("2 months ago");
   });
 });

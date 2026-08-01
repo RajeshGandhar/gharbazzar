@@ -5,15 +5,10 @@ import { createClient } from "@/lib/supabase/server";
 import { History } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { formatPrice, formatRent, formatFreshness } from "@/lib/utils/format";
+import { resolveCoverImageUrl } from "@/lib/utils/storage";
 import type { RecentlyViewedWithProperty } from "@/features/account/server/queries";
 
 export const revalidate = 0;
-
-function coverImage(images: { path: string; is_cover: boolean; position: number }[]): string | null {
-  if (!images?.length) return null;
-  const cover = images.find((i) => i.is_cover) ?? images.sort((a, b) => a.position - b.position)[0];
-  return cover?.path ?? null;
-}
 
 export default async function RecentlyViewedPage() {
   const supabase = await createClient();
@@ -59,14 +54,14 @@ export default async function RecentlyViewedPage() {
           {items.map((rv) => {
             const prop = rv.properties;
             if (!prop) return null;
-            const imgPath = coverImage(prop.property_images);
+            const imgUrl = resolveCoverImageUrl(prop.property_images);
             const isRent = prop.purpose === "rent" || prop.purpose === "student";
             return (
               <Link key={rv.property_id} href={`/property/${prop.slug}`}>
                 <div className="rounded-xl border overflow-hidden hover:border-primary transition-colors">
                   <div className="relative h-36 bg-muted">
-                    {imgPath ? (
-                      <Image src={imgPath} alt={prop.title} fill className="object-cover" sizes="(max-width:640px) 50vw, (max-width:1024px) 33vw, 25vw" />
+                    {imgUrl ? (
+                      <Image src={imgUrl} alt={prop.title} fill className="object-cover" sizes="(max-width:640px) 50vw, (max-width:1024px) 33vw, 25vw" />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center text-muted-foreground text-xs">No image</div>
                     )}

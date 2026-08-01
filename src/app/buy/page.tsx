@@ -22,7 +22,8 @@ async function getSaleProperties() {
       `id, slug, title, price, purpose, city_id, area_id, bedrooms,
        built_up_area, rental_kind, gender_policy, is_featured, published_at,
        areas!area_id ( name, slug ),
-       cities!city_id ( name, slug )`
+       cities!city_id ( name, slug ),
+       property_images ( path, thumbnail_path, is_cover, position )`
     )
     .eq("status", "active")
     .eq("approval_status", "approved")

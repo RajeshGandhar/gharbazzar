@@ -4,6 +4,8 @@ const SUPABASE_HOST = process.env.NEXT_PUBLIC_SUPABASE_URL
   ? new URL(process.env.NEXT_PUBLIC_SUPABASE_URL).hostname
   : "*.supabase.co";
 
+const isDev = process.env.NODE_ENV === "development";
+
 // Security headers applied to all responses
 const securityHeaders = [
   // Prevent MIME-type sniffing
@@ -29,7 +31,8 @@ const securityHeaders = [
     value: [
       "default-src 'self'",
       // Scripts: self + inline (JSON-LD, React) + Google Maps
-      "script-src 'self' 'unsafe-inline' https://maps.googleapis.com https://maps.gstatic.com",
+      // 'unsafe-eval' is needed by React dev mode for call stack reconstruction; omitted in production
+      `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""} https://maps.googleapis.com https://maps.gstatic.com`,
       // Styles: self + inline (Tailwind/shadcn, Google Maps UI)
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
       // Images: self + Supabase storage + Google Maps tiles + data URIs
@@ -42,6 +45,10 @@ const securityHeaders = [
       "frame-ancestors 'none'",
       // Form submissions: only to self
       "form-action 'self'",
+      // No plugins/embeds (Flash, Java applets, etc.)
+      "object-src 'none'",
+      // Prevent base-tag hijacking from redirecting relative URLs off-origin
+      "base-uri 'self'",
     ].join("; "),
   },
 ];

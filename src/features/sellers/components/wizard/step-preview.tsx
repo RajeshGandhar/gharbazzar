@@ -31,8 +31,6 @@ interface StepPreviewProps {
   onBack: () => void;
 }
 
-const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-
 export function StepPreview({ propertyId, property, onBack }: StepPreviewProps) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
@@ -40,7 +38,6 @@ export function StepPreview({ propertyId, property, onBack }: StepPreviewProps) 
   const [serverError, setServerError] = useState<string | null>(null);
 
   // Checklist
-  const coverImage = property.property_images?.find((i) => i.is_cover) ?? property.property_images?.[0];
   const imageCount = property.property_images?.length ?? 0;
 
   const checks = [
@@ -62,11 +59,7 @@ export function StepPreview({ propertyId, property, onBack }: StepPreviewProps) 
     },
   ];
 
-  // Build card data
-  const coverUrl = coverImage
-    ? `${SUPABASE_URL}/storage/v1/object/public/property-images/${coverImage.path}`
-    : null;
-
+  // Build card data — PropertyCard resolves the cover image URL itself from property_images
   const cardData: PropertyCardData = {
     id: property.id,
     slug: property.slug,
@@ -83,7 +76,7 @@ export function StepPreview({ propertyId, property, onBack }: StepPreviewProps) 
     published_at: property.published_at,
     areas: property.areas,
     cities: property.cities,
-    cover_image_url: coverUrl,
+    property_images: property.property_images,
   };
 
   async function handleSubmit() {

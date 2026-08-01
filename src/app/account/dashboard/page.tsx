@@ -6,6 +6,7 @@ import { getAccountDashboard } from "@/features/account/server/queries";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatPrice, formatRent, formatFreshness } from "@/lib/utils/format";
+import { resolveCoverImageUrl } from "@/lib/utils/storage";
 import {
   Heart,
   Search,
@@ -18,12 +19,6 @@ import {
 } from "lucide-react";
 
 export const revalidate = 0;
-
-function coverImage(images: { path: string; is_cover: boolean; position: number }[]): string | null {
-  if (!images || images.length === 0) return null;
-  const cover = images.find((i) => i.is_cover) ?? images.sort((a, b) => a.position - b.position)[0];
-  return cover?.path ?? null;
-}
 
 export default async function DashboardPage() {
   const supabase = await createClient();
@@ -125,14 +120,14 @@ export default async function DashboardPage() {
             {data.recentlyViewed.map((rv) => {
               const prop = rv.properties;
               if (!prop) return null;
-              const imgPath = coverImage(prop.property_images);
+              const imgUrl = resolveCoverImageUrl(prop.property_images);
               const isRent = prop.purpose === "rent" || prop.purpose === "student";
               return (
                 <Link key={rv.property_id} href={`/property/${prop.slug}`}>
                   <div className="rounded-xl border overflow-hidden hover:border-primary transition-colors">
                     <div className="relative h-28 bg-muted">
-                      {imgPath ? (
-                        <Image src={imgPath} alt={prop.title} fill className="object-cover" sizes="(max-width:768px) 50vw, 33vw" />
+                      {imgUrl ? (
+                        <Image src={imgUrl} alt={prop.title} fill className="object-cover" sizes="(max-width:768px) 50vw, 33vw" />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center text-muted-foreground text-xs">No image</div>
                       )}

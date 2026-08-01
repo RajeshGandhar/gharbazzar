@@ -7,10 +7,16 @@ export const runtime = "nodejs";
 export const maxDuration = 300;
 
 // ---------------------------------------------------------------------------
-// POST /api/v1/crons/alert-matcher
-// Runs every 30 minutes: matches new listings to saved_searches with
-// instant/daily frequency and queues outbox notifications.
-// Schedule: */30 * * * *
+// GET|POST /api/v1/crons/alert-matcher
+// Runs daily on the Vercel Hobby plan (see vercel.json — more frequent
+// schedules require a paid plan): matches listings published since the last
+// run to saved_searches with alerting enabled, and queues outbox
+// notifications. The lookback window matches the daily cadence (with a
+// 1-hour overlap buffer for scheduling jitter) so no listing published
+// between runs is skipped.
+// Schedule: 0 8 * * *
+// Vercel Cron invokes scheduled paths via GET; POST is kept for manual/admin
+// triggering, so both methods run the same handler.
 // ---------------------------------------------------------------------------
 export async function POST(req: NextRequest) {
   const guardError = verifyCronSecret(req);
@@ -18,7 +24,7 @@ export async function POST(req: NextRequest) {
 
   const supabase = createAdminClient();
   const now = new Date();
-  const cutoff = new Date(now.getTime() - 35 * 60 * 1000).toISOString(); // last 35 min
+  const cutoff = new Date(now.getTime() - 25 * 60 * 60 * 1000).toISOString(); // last 25h (daily cadence + jitter buffer)
 
   // Fetch newly published listings in the window
   const { data: newListings, error: listErr } = await supabase
@@ -109,11 +115,16 @@ export async function POST(req: NextRequest) {
   if (outboxRows.length > 0) {
     await supabase.from("notification_outbox").insert(outboxRows);
 
-    // Update last_alerted_at on matched searches
-    const alertedIds = [...new Set(outboxRows.map((r) => {
-      const s = searches.find((s) => s.user_id === r.user_id);
-      return s?.id;
-    }).filter(Boolean))];
+    // Update last_alerted_at on matched searches. Read search_id directly
+    // from each row's own payload (set above) rather than re-deriving it by
+    // user_id — a user with multiple matching saved searches would
+    // otherwise always resolve to the same (first) search via .find(),
+    // leaving the others' last_alerted_at stale.
+    const alertedIds = [...new Set(
+      outboxRows
+        .map((r) => (r.payload as { search_id?: string } | null)?.search_id)
+        .filter((id): id is string => !!id)
+    )];
     if (alertedIds.length) {
       await supabase
         .from("saved_searches")
@@ -129,3 +140,6 @@ export async function POST(req: NextRequest) {
     ranAt: now.toISOString(),
   });
 }
+
+// Vercel Cron invokes scheduled functions via GET, not POST.
+export const GET = POST;

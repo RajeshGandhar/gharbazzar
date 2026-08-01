@@ -3,6 +3,7 @@ import {
   propertyBasicSchema,
   propertyLocationSchema,
   propertyDetailsSchema,
+  updateAmenitiesSchema,
 } from "@/features/properties/schemas";
 
 // ---------------------------------------------------------------------------
@@ -165,5 +166,38 @@ describe("propertyDetailsSchema", () => {
   it("accepts empty string for youtube_url", () => {
     const result = propertyDetailsSchema.parse({ youtube_url: "" });
     expect(result.youtube_url).toBe("");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// updateAmenitiesSchema — PUT /api/v1/properties/:id/amenities
+// ---------------------------------------------------------------------------
+describe("updateAmenitiesSchema", () => {
+  it("accepts an array of positive integer amenity ids", () => {
+    const result = updateAmenitiesSchema.parse({ amenity_ids: [1, 2, 3] });
+    expect(result.amenity_ids).toEqual([1, 2, 3]);
+  });
+
+  it("accepts an empty array (clearing all amenities)", () => {
+    const result = updateAmenitiesSchema.parse({ amenity_ids: [] });
+    expect(result.amenity_ids).toEqual([]);
+  });
+
+  it("rejects non-integer amenity ids", () => {
+    expect(() => updateAmenitiesSchema.parse({ amenity_ids: [1.5] })).toThrow();
+  });
+
+  it("rejects negative or zero amenity ids", () => {
+    expect(() => updateAmenitiesSchema.parse({ amenity_ids: [0] })).toThrow();
+    expect(() => updateAmenitiesSchema.parse({ amenity_ids: [-1] })).toThrow();
+  });
+
+  it("rejects more than 100 amenity ids", () => {
+    const tooMany = Array.from({ length: 101 }, (_, i) => i + 1);
+    expect(() => updateAmenitiesSchema.parse({ amenity_ids: tooMany })).toThrow();
+  });
+
+  it("rejects a missing amenity_ids field", () => {
+    expect(() => updateAmenitiesSchema.parse({})).toThrow();
   });
 });

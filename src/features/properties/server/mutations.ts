@@ -1,7 +1,9 @@
 import "server-only";
+import type { SupabaseClient } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import type { CreatePropertyInput, UpdatePropertyInput } from "../schemas";
+import type { Database } from "@/types/database.types";
 
 // ---------------------------------------------------------------------------
 // Property mutations — called from Route Handlers
@@ -155,6 +157,40 @@ export async function revealContact(
   });
 
   return { phone: profile?.phone ?? null, error: profileErr };
+}
+
+/**
+ * Keep a student listing's headline `price` in sync with its room-type
+ * rates. Student listings collect a single top-level `price` in the wizard's
+ * first step, then per-room-type `monthly_rent_per_bed` rates later in the
+ * same flow, with nothing keeping them in sync — so the card price, the
+ * search min/max price filter, and a college page's AggregateOffer range
+ * could silently diverge from what a seeker actually sees on the detail
+ * page. Call after any room_types create/update/delete for a student
+ * listing; a no-op for standard listings or listings with no room types.
+ */
+export async function syncPropertyPriceFromRoomTypes(
+  supabase: SupabaseClient<Database>,
+  propertyId: string
+): Promise<void> {
+  const { data: property } = await supabase
+    .from("properties")
+    .select("id, rental_kind")
+    .eq("id", propertyId)
+    .single();
+
+  if (!property || property.rental_kind !== "student") return;
+
+  const { data: roomTypes } = await supabase
+    .from("room_types")
+    .select("monthly_rent_per_bed")
+    .eq("property_id", propertyId)
+    .eq("is_active", true);
+
+  if (!roomTypes || roomTypes.length === 0) return;
+
+  const minRent = Math.min(...roomTypes.map((rt) => rt.monthly_rent_per_bed));
+  await supabase.from("properties").update({ price: minRent }).eq("id", propertyId);
 }
 
 /** Renew an expired/expiring listing by 60 more days */

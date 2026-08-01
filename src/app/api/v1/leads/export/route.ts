@@ -6,7 +6,16 @@ export const runtime = "nodejs";
 
 function escapeCsv(value: string | null | undefined): string {
   if (value == null) return "";
-  const str = String(value);
+  let str = String(value);
+  // CSV formula injection (CWE-1236): a cell starting with =, +, -, or @ is
+  // evaluated as a formula by Excel/Sheets when opened. Leads originate
+  // from the fully-anonymous inquiry endpoint with no character-class
+  // restriction, so a submitted name/message could otherwise execute
+  // arbitrary formulas in a seller's spreadsheet. Prefix with a single
+  // quote to force literal-text interpretation — the standard mitigation.
+  if (/^[=+\-@]/.test(str)) {
+    str = `'${str}`;
+  }
   if (str.includes(",") || str.includes('"') || str.includes("\n")) {
     return `"${str.replace(/"/g, '""')}"`;
   }

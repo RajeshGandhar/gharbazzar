@@ -11,6 +11,19 @@ import { cn } from "@/lib/utils";
 
 export const revalidate = 300;
 
+// Same hardcoded launch-city list used by /buy/[city] and /rent/[city] — no
+// DB call at build time. Brings this route's ISR strategy in line with
+// those (it previously had revalidate but no generateStaticParams, so it
+// was purely on-demand rather than pre-built).
+const LAUNCH_CITIES = [
+  "mathura", "vrindavan", "delhi", "noida",
+  "greater-noida", "gurgaon", "faridabad", "ghaziabad",
+];
+
+export function generateStaticParams() {
+  return LAUNCH_CITIES.map((city) => ({ city }));
+}
+
 type Props = {
   params: Promise<{ city: string }>;
 };
@@ -35,6 +48,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     description:
       city.seo_description ||
       `Find verified PG rooms, hostels and student flats near top universities in ${city.name}. Distance from campus auto-computed.`,
+    alternates: { canonical: `/student-housing/${citySlug}` },
   };
 }
 

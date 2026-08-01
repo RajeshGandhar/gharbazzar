@@ -24,7 +24,7 @@ export default async function AccountLayout({
   } = await supabase.auth.getUser();
 
   if (!user) {
-    redirect("/login?next=/account/dashboard");
+    redirect("/auth/login?next=/account/dashboard");
   }
 
   const [profileRes, favCountRes, unreadCountRes] = await Promise.all([

@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
@@ -39,12 +40,26 @@ export default async function DealerLayout({
       .single(),
   ]);
 
-  const profile = profileResult.data;
+  let profile = profileResult.data;
   const seller = sellerResult.data;
 
   // Role check: if not seller and no seller row → onboard
   if (profile?.role !== "super_admin" && !seller) {
     redirect("/dealer/onboard");
+  }
+
+  // Self-heal a known edge case: seller/onboard's role update is
+  // intentionally non-fatal (see its own comment), so a sellers row can
+  // exist with profiles.role still unset. This layout's page-level gate
+  // only checks for the sellers row, but requireSeller() on every mutating
+  // API route checks profiles.role — leaving the two out of sync would let
+  // a seller see the dashboard while every mutation silently 403s. Since a
+  // legitimate sellers row is confirmed here, repair the role now rather
+  // than surface a confusing failure later.
+  if (seller && profile?.role !== "super_admin" && profile?.role !== "seller") {
+    const admin = createAdminClient();
+    const { error } = await admin.from("profiles").update({ role: "seller" }).eq("id", user.id);
+    if (!error) profile = { ...profile!, role: "seller" };
   }
 
   const displayName =

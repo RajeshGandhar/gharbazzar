@@ -126,13 +126,19 @@ export function SaveSearchButton({
               </Select>
             </div>
 
-            <label className="flex items-center gap-3 cursor-pointer select-none">
-              <div
-                onClick={() => setEmailAlerts((v) => !v)}
+            <button
+              type="button"
+              role="switch"
+              aria-checked={emailAlerts}
+              onClick={() => setEmailAlerts((v) => !v)}
+              className="flex items-center gap-3 select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 rounded-full"
+            >
+              <span
+                aria-hidden="true"
                 className={`relative w-10 h-5 rounded-full transition-colors ${emailAlerts ? "bg-primary" : "bg-muted-foreground/30"}`}
               >
                 <span className={`absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform ${emailAlerts ? "translate-x-5" : "translate-x-0"}`} />
-              </div>
+              </span>
               <span className="text-sm">
                 {emailAlerts ? (
                   <span className="flex items-center gap-1.5"><Bell className="h-3.5 w-3.5" /> Email alerts on</span>
@@ -140,7 +146,7 @@ export function SaveSearchButton({
                   <span className="flex items-center gap-1.5 text-muted-foreground"><BellOff className="h-3.5 w-3.5" /> Email alerts off</span>
                 )}
               </span>
-            </label>
+            </button>
 
             <div className="flex gap-3 pt-1">
               <Button variant="outline" onClick={() => setOpen(false)} className="flex-1">Cancel</Button>

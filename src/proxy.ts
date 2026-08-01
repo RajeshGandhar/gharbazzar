@@ -5,7 +5,36 @@ import { NextResponse, type NextRequest } from "next/server";
  *  happens in the section layouts (server-side) + RLS as the final gate. */
 const PROTECTED_PREFIXES = ["/admin", "/dealer", "/account"];
 
+const MUTATING_METHODS = new Set(["POST", "PUT", "PATCH", "DELETE"]);
+
+/**
+ * CSRF defense-in-depth: reject cross-origin mutating API requests.
+ * Browsers always send `Origin` on POST/PUT/PATCH/DELETE fetches; a request
+ * carrying an Origin that doesn't match the host that received it is either
+ * cross-site (the thing SameSite=Lax cookies mostly already prevent, but
+ * this doesn't rely on cookie config) or forged. Requests with NO Origin
+ * header are allowed through unchanged — that's the normal shape for
+ * server-to-server calls (Vercel Cron's Bearer-token requests, which carry
+ * no Origin at all) and must not be blocked.
+ */
+function isForgedCrossOriginRequest(request: NextRequest): boolean {
+  if (!request.nextUrl.pathname.startsWith("/api/")) return false;
+  if (!MUTATING_METHODS.has(request.method)) return false;
+
+  const origin = request.headers.get("origin");
+  if (!origin) return false; // non-browser caller (cron, curl, etc.) — allow
+
+  return origin !== request.nextUrl.origin;
+}
+
 export async function proxy(request: NextRequest) {
+  if (isForgedCrossOriginRequest(request)) {
+    return NextResponse.json(
+      { error: { code: "FORBIDDEN", message: "Cross-origin request rejected" } },
+      { status: 403 }
+    );
+  }
+
   let response = NextResponse.next({ request });
 
   const supabase = createServerClient(
@@ -26,6 +55,12 @@ export async function proxy(request: NextRequest) {
           );
         },
       },
+      // See src/lib/supabase/client.ts for why httpOnly is intentionally not set.
+      cookieOptions: {
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+        path: "/",
+      },
     }
   );
 
@@ -41,7 +76,7 @@ export async function proxy(request: NextRequest) {
 
   if (isProtected && !user) {
     const url = request.nextUrl.clone();
-    url.pathname = "/login";
+    url.pathname = "/auth/login";
     url.searchParams.set("next", pathname);
     return NextResponse.redirect(url);
   }

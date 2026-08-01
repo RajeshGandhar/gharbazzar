@@ -18,7 +18,8 @@ export const searchSchema = z.object({
   university: z.string().optional(),    // university slug
   max_distance: z.coerce.number().positive().max(20000).optional(), // metres
   furnishing: z.enum(["unfurnished", "semi_furnished", "fully_furnished"]).optional(),
-  sort: z.enum(["price_asc", "price_desc", "newest", "popular"]).default("newest"),
+  amenities: z.string().optional(), // comma-separated amenity slugs, e.g. "parking,lift"
+  sort: z.enum(["price_asc", "price_desc", "newest", "popular", "distance"]).default("newest"),
   page: z.coerce.number().int().positive().default(1),
   per_page: z.coerce.number().int().positive().max(100).default(20),
 });

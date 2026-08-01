@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Loader2 } from "lucide-react";
@@ -60,12 +61,18 @@ export function ProspectCard({
     if (!nextStage) return;
     setAdvancing(true);
     try {
-      await fetch(`/api/v1/admin/field-crm/${prospect.id}`, {
+      const res = await fetch(`/api/v1/admin/field-crm/${prospect.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ stage: nextStage }),
       });
+      if (!res.ok) {
+        toast.error("Failed to advance stage. Please try again.");
+        return;
+      }
       router.refresh();
+    } catch {
+      toast.error("Network error. Please try again.");
     } finally {
       setAdvancing(false);
     }

@@ -14,6 +14,11 @@ const rentalKindEnum = z.enum(["standard", "student"]);
 const genderPolicyEnum = z.enum(["any", "boys_only", "girls_only", "family_only"]);
 const messTypeEnum = z.enum(["veg", "veg_nonveg"]);
 
+// Single source of truth for the Indian 6-digit PIN code format — import
+// this instead of re-declaring the pattern in client-side validators (e.g.
+// the seller listing wizard) so the two can't silently drift apart.
+export const PINCODE_REGEX = /^\d{6}$/;
+
 // --- Create / wizard step 1: basic info ---
 export const propertyBasicSchema = z.object({
   title: z.string().min(10, "Title must be at least 10 characters").max(120),
@@ -32,7 +37,7 @@ export const propertyLocationSchema = z.object({
   landmark: z.string().max(120).optional(),
   city_id: z.number().int().positive(),
   area_id: z.number().int().positive().optional(),
-  pincode: z.string().regex(/^\d{6}$/, "Invalid pincode").optional(),
+  pincode: z.string().regex(PINCODE_REGEX, "Invalid pincode").optional(),
   latitude: z.number().min(-90).max(90).optional(),
   longitude: z.number().min(-180).max(180).optional(),
 });
@@ -102,7 +107,12 @@ export const roomTypeSchema = z.object({
   available_beds: z.number().int().min(0).default(0),
 });
 
+export const updateAmenitiesSchema = z.object({
+  amenity_ids: z.array(z.number().int().positive()).max(100),
+});
+
 export type CreatePropertyInput   = z.infer<typeof createPropertySchema>;
 export type UpdatePropertyInput   = z.infer<typeof updatePropertySchema>;
 export type ApprovePropertyInput  = z.infer<typeof approvePropertySchema>;
 export type RoomTypeInput         = z.infer<typeof roomTypeSchema>;
+export type UpdateAmenitiesInput  = z.infer<typeof updateAmenitiesSchema>;

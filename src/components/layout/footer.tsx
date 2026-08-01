@@ -28,10 +28,9 @@ const links = {
     { label: "Mukherjee Nagar UPSC PG",    href: "/college/mukherjee-nagar-coaching" },
   ],
   Company: [
-    { label: "About Us",      href: "/about" },
-    { label: "Contact",       href: "/contact" },
-    { label: "Privacy Policy",href: "/privacy" },
-    { label: "Terms of Use",  href: "/terms" },
+    // About/Contact/Privacy/Terms are intentionally omitted until those
+    // pages exist — see 2026-07-31 audit remediation H8. Linking to them
+    // 404'd; do not re-add without also publishing the page.
     { label: "For Sellers",   href: "/list-property" },
   ],
 };

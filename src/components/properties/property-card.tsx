@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { formatPrice, formatBhk, formatFreshness } from "@/lib/utils/format";
+import { resolveCoverImageUrl } from "@/lib/utils/storage";
 import { cn } from "@/lib/utils";
 
 export type PropertyCardData = {
@@ -25,8 +26,13 @@ export type PropertyCardData = {
   // from join
   areas?: { name: string; slug: string } | null;
   cities?: { name: string; slug: string } | null;
-  // cover image (first image from join or separate query)
-  cover_image_url?: string | null;
+  // cover image — resolved from the joined property_images array (see resolveCoverImageUrl)
+  property_images?: Array<{
+    path: string;
+    thumbnail_path?: string | null;
+    is_cover: boolean;
+    position?: number | null;
+  }> | null;
 };
 
 interface PropertyCardProps {
@@ -48,6 +54,7 @@ const genderLabel: Record<string, string> = {
 
 export function PropertyCard({ property: p, className }: PropertyCardProps) {
   const locality = p.areas?.name ?? p.cities?.name ?? "—";
+  const coverImageUrl = resolveCoverImageUrl(p.property_images, { thumbnail: true });
   const isStudent = p.rental_kind === "student";
   const genderBadge = isStudent && p.gender_policy && p.gender_policy !== "any"
     ? genderLabel[p.gender_policy]
@@ -58,9 +65,9 @@ export function PropertyCard({ property: p, className }: PropertyCardProps) {
       <Card className="overflow-hidden border-border transition-smooth hover:shadow-lg hover:border-primary/30 h-full flex flex-col">
         {/* Image */}
         <div className="relative aspect-[4/3] w-full overflow-hidden bg-muted">
-          {p.cover_image_url ? (
+          {coverImageUrl ? (
             <Image
-              src={p.cover_image_url}
+              src={coverImageUrl}
               alt={p.title}
               fill
               sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"

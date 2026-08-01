@@ -8,6 +8,7 @@ import { Heart, Loader2, Trash2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { formatPrice, formatRent } from "@/lib/utils/format";
+import { resolveCoverImageUrl } from "@/lib/utils/storage";
 
 interface PropertyImage { path: string; is_cover: boolean; position: number }
 interface FavoriteProperty {
@@ -24,12 +25,6 @@ interface FavoriteProperty {
     property_images: PropertyImage[];
     cities: { name: string } | null;
   } | null;
-}
-
-function coverImage(images: PropertyImage[]): string | null {
-  if (!images?.length) return null;
-  const cover = images.find((i) => i.is_cover) ?? images.sort((a, b) => a.position - b.position)[0];
-  return cover?.path ?? null;
 }
 
 export default function FavoritesPage() {
@@ -54,14 +49,44 @@ export default function FavoritesPage() {
 
   async function remove(propertyId: string) {
     setRemoving(propertyId);
+
+    // Optimistic: remove immediately and restore on failure, rather than
+    // waiting for the server to confirm before updating the UI.
+    let removedIndex = -1;
+    let removedItem: FavoriteProperty | undefined;
+    setFavorites((prev) => {
+      removedIndex = prev.findIndex((f) => f.property_id === propertyId);
+      removedItem = prev[removedIndex];
+      return prev.filter((f) => f.property_id !== propertyId);
+    });
+
     try {
       const res = await fetch(`/api/v1/me/favorites/${propertyId}`, { method: "DELETE" });
       if (res.ok) {
-        setFavorites((prev) => prev.filter((f) => f.property_id !== propertyId));
         toast.success("Removed from favorites");
       } else {
-        toast.error("Failed to remove");
+        if (removedItem) {
+          const restore = removedItem;
+          const insertAt = removedIndex;
+          setFavorites((prev) => {
+            const next = [...prev];
+            next.splice(insertAt, 0, restore);
+            return next;
+          });
+        }
+        toast.error("Failed to remove. Please try again.");
       }
+    } catch {
+      if (removedItem) {
+        const restore = removedItem;
+        const insertAt = removedIndex;
+        setFavorites((prev) => {
+          const next = [...prev];
+          next.splice(insertAt, 0, restore);
+          return next;
+        });
+      }
+      toast.error("Network error. Please try again.");
     } finally {
       setRemoving(null);
     }
@@ -100,14 +125,14 @@ export default function FavoritesPage() {
           {favorites.map((fav) => {
             const prop = fav.properties;
             if (!prop) return null;
-            const imgPath = coverImage(prop.property_images);
+            const imgUrl = resolveCoverImageUrl(prop.property_images);
             const isRent = prop.purpose === "rent" || prop.purpose === "student";
             return (
               <div key={fav.property_id} className="rounded-xl border overflow-hidden hover:border-primary transition-colors relative group">
                 <Link href={`/property/${prop.slug}`}>
                   <div className="relative h-44 bg-muted">
-                    {imgPath ? (
-                      <Image src={imgPath} alt={prop.title} fill className="object-cover" sizes="(max-width:640px) 100vw, (max-width:1024px) 50vw, 33vw" />
+                    {imgUrl ? (
+                      <Image src={imgUrl} alt={prop.title} fill className="object-cover" sizes="(max-width:640px) 100vw, (max-width:1024px) 50vw, 33vw" />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center text-muted-foreground text-xs">No image</div>
                     )}

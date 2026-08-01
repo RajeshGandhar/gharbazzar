@@ -49,7 +49,8 @@ export function formatFreshness(dateStr: string | null | undefined): string {
   if (days === 1) return "Yesterday";
   if (days < 7) return `${days} days ago`;
   if (days < 30) return `${Math.floor(days / 7)} week${days < 14 ? "" : "s"} ago`;
-  return `${Math.floor(days / 30)} months ago`;
+  const months = Math.floor(days / 30);
+  return `${months} month${months === 1 ? "" : "s"} ago`;
 }
 
 /**

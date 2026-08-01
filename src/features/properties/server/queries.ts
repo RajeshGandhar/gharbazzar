@@ -166,13 +166,18 @@ export async function listStudentProperties(opts: {
     // Filter via property_universities junction
     const { data: links, error: linkErr } = await supabase
       .from("property_universities")
-      .select("property_id")
+      .select("property_id, computed_distance_m")
       .eq("university_id", opts.universityId)
       .lte("computed_distance_m", opts.maxDistance ?? 5000)
-      .order("computed_distance_m", { ascending: true });
+      .order("computed_distance_m", { ascending: true })
+      .limit(500);
 
     if (linkErr || !links?.length) return { data: [], count: 0, error: linkErr };
 
+    // PostgREST does not preserve .in() array order, so re-apply the
+    // distance order client-side after the fetch (rather than discarding
+    // it, as this previously did — see rest of the query below).
+    const distanceById = new Map(links.map((l) => [l.property_id, l.computed_distance_m]));
     const ids = links.map((l) => l.property_id);
     let q = supabase
       .from("properties")
@@ -186,7 +191,12 @@ export async function listStudentProperties(opts: {
     if (opts.genderPolicy) q = q.eq("gender_policy", opts.genderPolicy as import("@/types/database.types").GenderPolicy);
 
     const { data, count, error } = await q.range(from, to);
-    return { data, count: count ?? 0, error };
+    const sorted = data
+      ? [...data].sort(
+          (a, b) => (distanceById.get(a.id) ?? Infinity) - (distanceById.get(b.id) ?? Infinity)
+        )
+      : data;
+    return { data: sorted, count: count ?? 0, error };
   }
 
   // No university filter — city-level student listings

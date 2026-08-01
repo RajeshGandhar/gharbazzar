@@ -49,7 +49,8 @@ async function getCityWithProperties(citySlug: string, bedrooms?: number, page =
       `id, slug, title, price, purpose, city_id, area_id, bedrooms,
        built_up_area, rental_kind, gender_policy, is_featured, published_at,
        areas!area_id ( name, slug ),
-       cities!city_id ( name, slug )`,
+       cities!city_id ( name, slug ),
+       property_images ( path, thumbnail_path, is_cover, position )`,
       { count: "exact" }
     )
     .eq("status", "active")
@@ -83,8 +84,11 @@ export async function generateMetadata({ params, searchParams }: Props): Promise
   return {
     title: `${titleParts} | GharBazaar`,
     description: `Browse verified properties for sale in ${city.name}. Apartments, plots, independent houses and villas — real prices, owner & agent listings on GharBazaar.`,
+    // Query-string filter variants (?bedrooms=) canonicalize to the base
+    // path per docs/blueprint/06-seo-blueprint.md §facets — see the
+    // noindex on the bedrooms filter below, not a self-canonical.
     alternates: {
-      canonical: `/buy/${city.slug}${bedrooms !== undefined ? `?bedrooms=${bedrooms}` : ""}`,
+      canonical: `/buy/${city.slug}`,
     },
     openGraph: {
       title: titleParts,
@@ -114,8 +118,12 @@ export default async function BuyCityPage({ params, searchParams }: Props) {
 
   const { city, properties, count } = result;
 
-  // Index only if ≥3 live listings (blueprint §1)
-  const shouldIndex = count >= 3;
+  // Index only the base (unfiltered) path, and only if ≥3 live listings
+  // (blueprint §1). Query-string filter variants (?bedrooms=) are
+  // noindex,follow with canonical pointing at the base path above —
+  // matching docs/blueprint/06-seo-blueprint.md's facet rule rather than
+  // being indexed as their own near-duplicate pages.
+  const shouldIndex = count >= 3 && bedrooms === undefined;
 
   const priceMin = properties.length > 0 ? Math.min(...properties.map((p) => p.price)) : null;
   const priceMax = properties.length > 0 ? Math.max(...properties.map((p) => p.price)) : null;
