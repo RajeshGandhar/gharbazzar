@@ -163,6 +163,7 @@ async function sendEmail(
 function templateSubject(template: string, payload: Record<string, unknown>): string {
   switch (template) {
     case "new_inquiry":         return "New lead on your property";
+    case "visit_requested":     return "New visit request on your property";
     case "listing_expired":     return `Your listing "${payload.title}" has expired`;
     case "listing_expiring_soon": return `Renew your listing — expires soon`;
     case "saved_search_alert":  return `${payload.match_count} new properties match your alert`;
@@ -176,6 +177,13 @@ function templateHtml(template: string, payload: Record<string, unknown>, name: 
   switch (template) {
     case "new_inquiry":
       return `${greeting}<p>You have a new lead from <strong>${payload.seeker_name}</strong> (${payload.seeker_phone}).</p>`;
+    case "visit_requested": {
+      const when = new Date(payload.scheduled_at as string).toLocaleString("en-IN", {
+        weekday: "short", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit",
+      });
+      const phone = payload.seeker_phone ? ` (${payload.seeker_phone})` : "";
+      return `${greeting}<p><strong>${payload.seeker_name}</strong>${phone} requested a visit on <strong>${when}</strong>. Log in to confirm or reschedule.</p>`;
+    }
     case "listing_expired":
       return `${greeting}<p>Your listing <strong>"${payload.title}"</strong> has expired. Log in to renew it.</p>`;
     case "listing_expiring_soon":

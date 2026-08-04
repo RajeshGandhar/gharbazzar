@@ -7,29 +7,28 @@ import { Calendar } from "lucide-react";
 
 export const revalidate = 0;
 
-type VisitStatus = "scheduled" | "confirmed" | "completed" | "cancelled" | "no_show";
+// Matches the `visit_status` Postgres enum exactly.
+type VisitStatus = "requested" | "confirmed" | "completed" | "cancelled";
 
 const STATUS_LABELS: Record<VisitStatus, string> = {
-  scheduled: "Scheduled",
+  requested: "Requested",
   confirmed: "Confirmed",
   completed: "Completed",
   cancelled: "Cancelled",
-  no_show: "No Show",
 };
 
 const STATUS_VARIANTS: Record<VisitStatus, "default" | "secondary" | "outline" | "destructive"> = {
-  scheduled: "secondary",
+  requested: "secondary",
   confirmed: "default",
   completed: "outline",
   cancelled: "destructive",
-  no_show: "destructive",
 };
 
 const TAB_FILTERS: Record<string, VisitStatus[] | null> = {
   all: null,
-  upcoming: ["scheduled", "confirmed"],
+  upcoming: ["requested", "confirmed"],
   completed: ["completed"],
-  cancelled: ["cancelled", "no_show"],
+  cancelled: ["cancelled"],
 };
 
 export default async function VisitsPage({
@@ -53,9 +52,9 @@ export default async function VisitsPage({
 
   const tabs = [
     { key: "all", label: "All", count: allVisits.length },
-    { key: "upcoming", label: "Upcoming", count: allVisits.filter((v) => ["scheduled", "confirmed"].includes(v.status)).length },
+    { key: "upcoming", label: "Upcoming", count: allVisits.filter((v) => ["requested", "confirmed"].includes(v.status)).length },
     { key: "completed", label: "Completed", count: allVisits.filter((v) => v.status === "completed").length },
-    { key: "cancelled", label: "Cancelled", count: allVisits.filter((v) => ["cancelled", "no_show"].includes(v.status)).length },
+    { key: "cancelled", label: "Cancelled", count: allVisits.filter((v) => v.status === "cancelled").length },
   ];
 
   return (

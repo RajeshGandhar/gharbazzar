@@ -85,3 +85,17 @@ Never request browser push. In-app inbox + email (+ WhatsApp Wave 2) only — pe
 
 ### 15. Post-reveal follow-through (conversion + trust loop)
 24h after a reveal: one prompt — "Did you connect with {seller}?" → yes (review seed later) / no response (nudges seller, feeds response-rate) / report a problem (T&S intake). Closes the loop the incumbents leave open.
+
+---
+
+## v1.2 — Pre-soft-launch redesign initiative (2026-08-04)
+
+**Trigger:** founder-requested full visual/UX pass ahead of soft-launch, explicitly *not* a 99acres clone — inspiration from competitor IA/conversion patterns, original execution. Reviewed under the AGENTS.md feature-request protocol; full 14-step review on file in that session.
+
+**Reality check at decision time:** ~48 approved live listings platform-wide (single digits to low teens per city) — two orders of magnitude below 99acres' per-city volume. This caps what can honestly ship right now.
+
+**Scope split — Track A (approved, in progress) vs. Track B (explicitly deferred, unchanged from §2 of `14-pre-build-reality-check.md`):**
+- **Track A — component/screen-level redesign**, inventory-agnostic, applies to the 26-screen inventory in §10: header/nav, search + filters, property card, property-detail page, post-property wizard, design-system tokens, responsive pass. No schema/API changes anticipated; UI-layer only.
+- **Track B — inventory/content-dependent discovery surfaces** (Featured Builders, Luxury Collection, Trending Localities, New Launches, Editor's Picks, Customer Reviews, Property News, Investment Opportunities): **not built now.** These were already cut in `14-pre-build-reality-check.md` §2 ("Banners/ads + testimonials admin — no advertisers, no testimonials exist at launch → V2") for the same reason — thin/empty sections read worse than their absence and risk the no-mock-data invariant. Each gets built only when gated on a real minimum-data threshold, with its own blueprint update at that time (new PRD/DB/API scope, not a UI pass).
+
+**Invariant guardrails carried into Track A execution:** Student Housing stays a distinct purpose/ecosystem, never flattened into a generic "PG" filter chip alongside Buy/Rent/Commercial; Buy/Rent/Sell stay separated experiences (no unified 99acres-style tab strip that mixes them in one search widget).

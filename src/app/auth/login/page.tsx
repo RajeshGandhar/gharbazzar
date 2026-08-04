@@ -48,6 +48,21 @@ function LoginContent() {
     });
 
     if (error) {
+      // #region agent log
+      fetch("http://127.0.0.1:7876/ingest/9377d0da-0fda-4647-9ccf-573fdc34b7ce", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "a1b27c" },
+        body: JSON.stringify({
+          sessionId: "a1b27c",
+          runId: "pre-fix",
+          hypothesisId: "D",
+          location: "auth/login/page.tsx:otp-error",
+          message: "signInWithOtp failed",
+          data: { errorMessage: error.message },
+          timestamp: Date.now(),
+        }),
+      }).catch(() => {});
+      // #endregion
       setStatus("error");
       if (error.message.toLowerCase().includes("rate limit")) {
         setErrorMsg("Too many requests. Please wait a minute before trying again.");
@@ -56,6 +71,22 @@ function LoginContent() {
       }
       return;
     }
+
+    // #region agent log
+    fetch("http://127.0.0.1:7876/ingest/9377d0da-0fda-4647-9ccf-573fdc34b7ce", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "a1b27c" },
+      body: JSON.stringify({
+        sessionId: "a1b27c",
+        runId: "pre-fix",
+        hypothesisId: "D",
+        location: "auth/login/page.tsx:otp-sent",
+        message: "signInWithOtp succeeded",
+        data: { redirectTo: `${origin}/auth/callback?next=${encodeURIComponent(next)}` },
+        timestamp: Date.now(),
+      }),
+    }).catch(() => {});
+    // #endregion
 
     setStatus("sent");
   }

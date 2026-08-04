@@ -2,11 +2,11 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useState } from "react";
-import { MapPin, BedDouble, Square, CheckCircle2, Clock, Heart, Camera } from "lucide-react";
+import { useRef, useState } from "react";
+import { MapPin, BedDouble, Square, CheckCircle2, Clock, Heart, ChevronLeft, ChevronRight } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { formatPrice, formatBhk, formatFreshness } from "@/lib/utils/format";
-import { resolveCoverImageUrl } from "@/lib/utils/storage";
+import { resolveOrderedImageUrls } from "@/lib/utils/storage";
 import { cn } from "@/lib/utils";
 
 export type PropertyCardData = {
@@ -59,6 +59,84 @@ const genderLabel: Record<string, string> = {
   family_only: "Families",
 };
 
+// Swipeable / arrow-navigable image strip — native scroll-snap so touch
+// swipe works with no gesture library; arrows + dots layer on top for mouse.
+function ImageCarousel({ urls, title }: { urls: string[]; title: string }) {
+  const trackRef = useRef<HTMLDivElement>(null);
+  const [index, setIndex] = useState(0);
+
+  function goTo(i: number, e: React.MouseEvent) {
+    e.preventDefault();
+    e.stopPropagation();
+    const el = trackRef.current;
+    if (!el) return;
+    const clamped = (i + urls.length) % urls.length;
+    el.scrollTo({ left: clamped * el.clientWidth, behavior: "smooth" });
+    setIndex(clamped);
+  }
+
+  function handleScroll() {
+    const el = trackRef.current;
+    if (!el || el.clientWidth === 0) return;
+    setIndex(Math.round(el.scrollLeft / el.clientWidth));
+  }
+
+  return (
+    <>
+      <div
+        ref={trackRef}
+        onScroll={handleScroll}
+        className="flex h-full w-full snap-x snap-mandatory overflow-x-auto scroll-smooth scrollbar-none"
+      >
+        {urls.map((url, i) => (
+          <div key={url} className="relative h-full w-full flex-none snap-start">
+            <Image
+              src={url}
+              alt={`${title} — photo ${i + 1}`}
+              fill
+              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+              className="object-cover"
+              priority={i === 0}
+            />
+          </div>
+        ))}
+      </div>
+
+      {urls.length > 1 && (
+        <>
+          <button
+            type="button"
+            onClick={(e) => goTo(index - 1, e)}
+            aria-label="Previous photo"
+            className="absolute left-2 top-1/2 z-10 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full bg-black/50 text-white opacity-0 backdrop-blur-sm transition-opacity duration-200 group-hover:opacity-100 focus-visible:opacity-100"
+          >
+            <ChevronLeft className="h-4 w-4" />
+          </button>
+          <button
+            type="button"
+            onClick={(e) => goTo(index + 1, e)}
+            aria-label="Next photo"
+            className="absolute right-2 top-1/2 z-10 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full bg-black/50 text-white opacity-0 backdrop-blur-sm transition-opacity duration-200 group-hover:opacity-100 focus-visible:opacity-100"
+          >
+            <ChevronRight className="h-4 w-4" />
+          </button>
+          <div className="absolute top-3 left-1/2 z-10 flex -translate-x-1/2 gap-1">
+            {urls.map((_, i) => (
+              <span
+                key={i}
+                className={cn(
+                  "h-1 rounded-full bg-white transition-all duration-200",
+                  i === index ? "w-3 opacity-100" : "w-1 opacity-50"
+                )}
+              />
+            ))}
+          </div>
+        </>
+      )}
+    </>
+  );
+}
+
 function SaveButton({ propertyId }: { propertyId: string }) {
   const [saved, setSaved] = useState(false);
   return (
@@ -92,7 +170,7 @@ function SaveButton({ propertyId }: { propertyId: string }) {
 
 export function PropertyCard({ property: p, className }: PropertyCardProps) {
   const locality = p.areas?.name ?? p.cities?.name ?? "—";
-  const coverImageUrl = resolveCoverImageUrl(p.property_images, { thumbnail: true });
+  const imageUrls = resolveOrderedImageUrls(p.property_images, { thumbnail: true, limit: 6 });
   const isStudent = p.rental_kind === "student";
   const genderBadge =
     isStudent && p.gender_policy && p.gender_policy !== "any"
@@ -100,7 +178,6 @@ export function PropertyCard({ property: p, className }: PropertyCardProps) {
       : null;
   const purposeCfg = purposeConfig[p.purpose] ?? purposeConfig.rent;
   const placeholderGrad = placeholderGradients[p.purpose] ?? placeholderGradients.sale;
-  const photoCount = p.property_images?.length ?? 0;
 
   return (
     <Link
@@ -117,17 +194,12 @@ export function PropertyCard({ property: p, className }: PropertyCardProps) {
       >
         {/* ── Image container ── */}
         <div className="relative aspect-[4/3] w-full overflow-hidden flex-shrink-0">
-          {coverImageUrl ? (
+          {imageUrls.length > 0 ? (
             <>
-              <Image
-                src={coverImageUrl}
-                alt={p.title}
-                fill
-                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.04]"
-              />
+              <ImageCarousel urls={imageUrls} title={p.title} />
+
               {/* Gradient for price readability */}
-              <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/60 to-transparent pointer-events-none" />
+              <div className="absolute inset-x-0 bottom-0 z-1 h-24 bg-gradient-to-t from-black/60 to-transparent pointer-events-none" />
 
               {/* Price — bottom left of image */}
               <div className="absolute bottom-3 left-3 z-10">
@@ -138,14 +210,6 @@ export function PropertyCard({ property: p, className }: PropertyCardProps) {
                   )}
                 </p>
               </div>
-
-              {/* Photo count — bottom right */}
-              {photoCount > 1 && (
-                <div className="absolute bottom-3 right-3 z-10 flex items-center gap-1 rounded-full bg-black/50 backdrop-blur-sm px-2 py-0.5">
-                  <Camera className="h-3 w-3 text-white/80" />
-                  <span className="text-[10px] text-white/80 font-medium">{photoCount}</span>
-                </div>
-              )}
             </>
           ) : (
             /* Premium placeholder — no image */

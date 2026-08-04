@@ -9,7 +9,7 @@ This blueprint supersedes `docs/prd.md` v2 where they conflict. `docs/architectu
 | 01 | [Vision](01-vision.md) | Mission, USP, competitor teardown, market sizing, risk register, expansion | FINAL v1.1 |
 | 02 | [PRD](02-prd.md) | Modules expanded + acceptance criteria, field CRM, blocking, media policy | FINAL v1.1 |
 | 03 | [User Journeys](03-user-journeys.md) | 10 personas incl. returning seeker + field ops; activation metrics | FINAL v1.1 |
-| 04 | [UX Blueprint](04-ux-blueprint.md) | 3-second rule, 26-screen inventory, flaky-network design, Bharat-first UX | FINAL v1.1 |
+| 04 | [UX Blueprint](04-ux-blueprint.md) | 3-second rule, 26-screen inventory, flaky-network design, Bharat-first UX | FINAL v1.2 |
 | 05 | [Business Blueprint](05-business-blueprint.md) | Revenue waves, burn/runway, LTV:CAC, billing ops, price validation | FINAL v1.1 |
 | 06 | [SEO Blueprint](06-seo-blueprint.md) | Page matrix + dealer directories, linking mesh, schema, content ops | FINAL v1.1 |
 | 07 | [Database Blueprint](07-database-blueprint.md) | Schema review, 19 added tables, retention policy, Mumbai region, scale plan | FINAL v1.1 |

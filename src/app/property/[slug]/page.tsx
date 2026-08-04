@@ -57,6 +57,9 @@ import {
 import { cn } from "@/lib/utils";
 import { ContactReveal } from "@/components/shared/contact-reveal";
 import { InquiryForm } from "@/components/shared/inquiry-form";
+import { ScheduleVisitButton } from "@/components/shared/schedule-visit-button";
+import { EmiCalculator } from "@/components/properties/emi-calculator";
+import { getPropertyImageUrl } from "@/lib/utils/storage";
 import { listingSchema } from "@/lib/seo/schema";
 
 export const revalidate = 60;
@@ -97,6 +100,119 @@ function formatDistance(meters: number): string {
   return `${(meters / 1000).toFixed(1)} km`;
 }
 
+type SellerShape = {
+  id: string; slug: string; business_name: string | null; about: string | null;
+  whatsapp_number: string | null; logo_url: string | null; is_verified: boolean;
+  avg_rating: number | null; total_reviews: number; seller_type: string;
+  profiles?: { full_name: string | null; avatar_url: string | null } | null;
+};
+
+const sellerTypeLabel: Record<string, string> = {
+  owner: "Owner", agent: "Agent", builder: "Builder", property_manager: "Property Manager",
+};
+
+// Contact box — rendered in sidebar and in the mobile sheet. Hoisted to
+// module scope (not a render-time closure) so ContactReveal/InquiryForm/
+// ScheduleVisitButton keep their own state across parent re-renders.
+function PropertyContactBox({
+  seller,
+  sellerName,
+  propertyId,
+  propertyTitle,
+  propertySlug,
+}: {
+  seller: SellerShape | null | undefined;
+  sellerName: string;
+  propertyId: string;
+  propertyTitle: string;
+  propertySlug: string;
+}) {
+  const waUrl = seller?.whatsapp_number
+    ? `https://wa.me/91${seller.whatsapp_number}?text=Hi%2C%20I%27m%20interested%20in%20${encodeURIComponent(propertyTitle)}`
+    : null;
+
+  return (
+    <div className="flex flex-col gap-4">
+      {seller && (
+        <div className="flex items-start gap-3">
+          <Avatar className="h-12 w-12 shrink-0">
+            <AvatarImage src={seller.logo_url || seller.profiles?.avatar_url || undefined} alt={sellerName} />
+            <AvatarFallback className="text-sm font-semibold">
+              {sellerName.slice(0, 2).toUpperCase()}
+            </AvatarFallback>
+          </Avatar>
+          <div className="min-w-0">
+            <Link href={`/seller/${seller.slug}`} className="text-sm font-semibold text-foreground hover:text-primary transition-smooth leading-tight">
+              {sellerName}
+            </Link>
+            <div className="flex flex-wrap items-center gap-1.5 mt-1">
+              <Badge variant="secondary" className="text-[10px] py-0">
+                {sellerTypeLabel[seller.seller_type] ?? seller.seller_type}
+              </Badge>
+              {seller.is_verified && (
+                <Badge variant="outline" className="text-[10px] py-0 border-primary/40 text-primary">
+                  <CheckCircle2 className="mr-1 h-2.5 w-2.5" />
+                  Verified
+                </Badge>
+              )}
+            </div>
+            {(seller.avg_rating ?? 0) > 0 && (
+              <div className="flex items-center gap-1 mt-1">
+                <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
+                <span className="text-xs text-muted-foreground">
+                  {seller.avg_rating?.toFixed(1)} ({seller.total_reviews} reviews)
+                </span>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      <Separator />
+
+      <ContactReveal
+        propertyId={propertyId}
+        propertyTitle={propertyTitle}
+        sellerName={sellerName}
+        propertySlug={propertySlug}
+        whatsappNumber={seller?.whatsapp_number ?? null}
+      />
+
+      {waUrl && (
+        <a
+          href={waUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className={cn(buttonVariants({ variant: "outline" }), "w-full gap-2")}
+        >
+          <WhatsAppIcon className="h-4 w-4 text-green-600" />
+          WhatsApp
+        </a>
+      )}
+
+      <Dialog>
+        <DialogTrigger className={cn(buttonVariants({ variant: "outline" }), "w-full gap-2")}>
+          <MessageSquare className="h-4 w-4" />
+          Send inquiry
+        </DialogTrigger>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Send an inquiry</DialogTitle>
+          </DialogHeader>
+          <InquiryForm propertyId={propertyId} />
+        </DialogContent>
+      </Dialog>
+
+      <ScheduleVisitButton propertyId={propertyId} propertySlug={propertySlug} />
+
+      <p className="text-[11px] text-muted-foreground text-center leading-relaxed">
+        GharBazaar connects buyers and sellers.{" "}
+        <strong>Never pay deposits before visiting.</strong>
+      </p>
+    </div>
+  );
+}
+
 // ---------------------------------------------------------------------------
 // Metadata
 // ---------------------------------------------------------------------------
@@ -112,7 +228,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 
   const fallbackTitle = `${p.title} in ${p.areas?.name ?? ""}, ${p.cities?.name ?? ""}`;
-  const coverImage = (p.property_images ?? []).find((img) => img.is_cover)?.path;
+  const coverImagePath = (p.property_images ?? []).find((img) => img.is_cover)?.path;
+  const coverImage = coverImagePath ? getPropertyImageUrl(coverImagePath) : null;
 
   return {
     title: p.seo_title || fallbackTitle,
@@ -141,14 +258,8 @@ export default async function PropertyDetailPage({ params }: Props) {
     notFound();
   }
 
-  // Type the joined shape
+  // Type the joined shape (SellerShape is hoisted to module scope, above)
   type PropertyImage = { path: string; thumbnail_path: string | null; is_cover: boolean; position: number };
-  type SellerShape = {
-    id: string; slug: string; business_name: string | null; about: string | null;
-    whatsapp_number: string | null; logo_url: string | null; is_verified: boolean;
-    avg_rating: number | null; total_reviews: number; seller_type: string;
-    profiles?: { full_name: string | null; avatar_url: string | null } | null;
-  };
   type AmenityRow = { amenity_id: number; amenities: { id: number; name: string; slug: string; icon: string | null } | null };
   type NearbyPlace = { id: string; kind: string; name: string; distance_km: number };
   type RoomType = {
@@ -174,9 +285,13 @@ export default async function PropertyDetailPage({ params }: Props) {
   };
 
   const seller = p.sellers;
-  const images = [...(p.property_images ?? [])].sort(
-    (a, b) => (a.is_cover ? -1 : b.is_cover ? 1 : a.position - b.position)
-  );
+  // property_images.path is a Supabase Storage object key, not a fetchable
+  // URL — must be resolved before it reaches next/image.
+  const rawImages = (p.property_images ?? []) as PropertyImage[];
+  const images = [...rawImages]
+    .sort((a, b) => (a.is_cover ? -1 : b.is_cover ? 1 : a.position - b.position))
+    .map((img): PropertyImage & { url: string | null } => ({ ...img, url: getPropertyImageUrl(img.path) }))
+    .filter((img): img is PropertyImage & { url: string } => img.url !== null);
   const amenities = (p.property_amenities ?? []).filter((a) => a.amenities);
   const nearbyPlaces = p.nearby_places ?? [];
   const roomTypes = (p.room_types ?? []).filter((r) => r.is_active);
@@ -194,14 +309,11 @@ export default async function PropertyDetailPage({ params }: Props) {
     : { label: "Rent", href: "/rent" };
 
   const sharingLabel: Record<number, string> = { 1: "Single", 2: "Double sharing", 3: "Triple sharing" };
-  const sellerTypeLabel: Record<string, string> = {
-    owner: "Owner", agent: "Agent", builder: "Builder", property_manager: "Property Manager",
-  };
 
-  const coverImages = (p.property_images ?? [])
-    .filter((img: { is_cover: boolean; path: string }) => img.is_cover || true)
+  const coverImages = rawImages
     .slice(0, 5)
-    .map((img: { path: string }) => img.path);
+    .map((img) => getPropertyImageUrl(img.path))
+    .filter((url): url is string => url !== null);
 
   const jsonLd = listingSchema({
     title: p.title,
@@ -222,92 +334,6 @@ export default async function PropertyDetailPage({ params }: Props) {
     publishedAt: p.published_at,
     updatedAt: p.updated_at,
   });
-
-  // Contact box — rendered both in sidebar and sheet
-  function ContactBox() {
-    const waUrl = seller?.whatsapp_number
-      ? `https://wa.me/91${seller.whatsapp_number}?text=Hi%2C%20I%27m%20interested%20in%20${encodeURIComponent(p.title)}`
-      : null;
-
-    return (
-      <div className="flex flex-col gap-4">
-        {seller && (
-          <div className="flex items-start gap-3">
-            <Avatar className="h-12 w-12 shrink-0">
-              <AvatarImage src={seller.logo_url || seller.profiles?.avatar_url || undefined} alt={sellerName} />
-              <AvatarFallback className="text-sm font-semibold">
-                {sellerName.slice(0, 2).toUpperCase()}
-              </AvatarFallback>
-            </Avatar>
-            <div className="min-w-0">
-              <Link href={`/seller/${seller.slug}`} className="text-sm font-semibold text-foreground hover:text-primary transition-smooth leading-tight">
-                {sellerName}
-              </Link>
-              <div className="flex flex-wrap items-center gap-1.5 mt-1">
-                <Badge variant="secondary" className="text-[10px] py-0">
-                  {sellerTypeLabel[seller.seller_type] ?? seller.seller_type}
-                </Badge>
-                {seller.is_verified && (
-                  <Badge variant="outline" className="text-[10px] py-0 border-primary/40 text-primary">
-                    <CheckCircle2 className="mr-1 h-2.5 w-2.5" />
-                    Verified
-                  </Badge>
-                )}
-              </div>
-              {(seller.avg_rating ?? 0) > 0 && (
-                <div className="flex items-center gap-1 mt-1">
-                  <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
-                  <span className="text-xs text-muted-foreground">
-                    {seller.avg_rating?.toFixed(1)} ({seller.total_reviews} reviews)
-                  </span>
-                </div>
-              )}
-            </div>
-          </div>
-        )}
-
-        <Separator />
-
-        <ContactReveal
-          propertyId={p.id}
-          propertyTitle={p.title}
-          sellerName={sellerName}
-          propertySlug={p.slug}
-          whatsappNumber={seller?.whatsapp_number ?? null}
-        />
-
-        {waUrl && (
-          <a
-            href={waUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className={cn(buttonVariants({ variant: "outline" }), "w-full gap-2")}
-          >
-            <WhatsAppIcon className="h-4 w-4 text-green-600" />
-            WhatsApp
-          </a>
-        )}
-
-        <Dialog>
-          <DialogTrigger className={cn(buttonVariants({ variant: "outline" }), "w-full gap-2")}>
-            <MessageSquare className="h-4 w-4" />
-            Send inquiry
-          </DialogTrigger>
-          <DialogContent className="sm:max-w-md">
-            <DialogHeader>
-              <DialogTitle>Send an inquiry</DialogTitle>
-            </DialogHeader>
-            <InquiryForm propertyId={p.id} />
-          </DialogContent>
-        </Dialog>
-
-        <p className="text-[11px] text-muted-foreground text-center leading-relaxed">
-          GharBazaar connects buyers and sellers.{" "}
-          <strong>Never pay deposits before visiting.</strong>
-        </p>
-      </div>
-    );
-  }
 
   return (
     <>
@@ -375,7 +401,7 @@ export default async function PropertyDetailPage({ params }: Props) {
                       images.length >= 3 ? "row-span-2" : ""
                     )}>
                       <Image
-                        src={images[0].path}
+                        src={images[0].url}
                         alt={`${p.title} — main photo`}
                         fill
                         sizes="(max-width: 1024px) 100vw, 700px"
@@ -390,7 +416,7 @@ export default async function PropertyDetailPage({ params }: Props) {
                     {images.slice(1, 3).map((img, idx) => (
                       <div key={img.path} className="relative aspect-[4/3] overflow-hidden rounded-xl bg-muted">
                         <Image
-                          src={img.path}
+                          src={img.url}
                           alt={`${p.title} — photo ${idx + 2}`}
                           fill
                           sizes="(max-width: 1024px) 50vw, 350px"
@@ -526,6 +552,9 @@ export default async function PropertyDetailPage({ params }: Props) {
                 </section>
               )}
 
+              {/* EMI calculator (purchase properties only) */}
+              {isSale && <EmiCalculator price={p.price} />}
+
               {/* Room types (student housing) */}
               {isStudentHousing && roomTypes.length > 0 && (
                 <section>
@@ -630,7 +659,13 @@ export default async function PropertyDetailPage({ params }: Props) {
                   <h2 className="text-lg font-semibold text-foreground mb-4">Listed by</h2>
                   <Card>
                     <CardContent className="pt-5">
-                      <ContactBox />
+                      <PropertyContactBox
+                        seller={seller}
+                        sellerName={sellerName}
+                        propertyId={p.id}
+                        propertyTitle={p.title}
+                        propertySlug={p.slug}
+                      />
                     </CardContent>
                   </Card>
                 </section>
@@ -675,7 +710,13 @@ export default async function PropertyDetailPage({ params }: Props) {
               <div className="sticky top-24 space-y-3">
                 <Card className="shadow-elevated-lg">
                   <CardContent className="pt-6">
-                    <ContactBox />
+                    <PropertyContactBox
+                        seller={seller}
+                        sellerName={sellerName}
+                        propertyId={p.id}
+                        propertyTitle={p.title}
+                        propertySlug={p.slug}
+                      />
                   </CardContent>
                 </Card>
                 <div className="flex justify-end">
@@ -699,7 +740,13 @@ export default async function PropertyDetailPage({ params }: Props) {
                   <SheetTitle>Contact seller</SheetTitle>
                 </SheetHeader>
                 <div className="mt-4 pb-4">
-                  <ContactBox />
+                  <PropertyContactBox
+                        seller={seller}
+                        sellerName={sellerName}
+                        propertyId={p.id}
+                        propertyTitle={p.title}
+                        propertySlug={p.slug}
+                      />
                 </div>
               </SheetContent>
             </Sheet>

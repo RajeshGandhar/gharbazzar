@@ -70,6 +70,28 @@ export async function proxy(request: NextRequest) {
   } = await supabase.auth.getUser();
 
   const { pathname } = request.nextUrl;
+
+  // #region agent log
+  if (pathname.startsWith("/auth/callback") || pathname.startsWith("/account")) {
+    fetch("http://127.0.0.1:7876/ingest/9377d0da-0fda-4647-9ccf-573fdc34b7ce", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "a1b27c" },
+      body: JSON.stringify({
+        sessionId: "a1b27c",
+        runId: "pre-fix",
+        hypothesisId: "E",
+        location: "proxy.ts:auth-check",
+        message: "proxy auth state on sensitive route",
+        data: {
+          pathname,
+          hasUser: !!user,
+          cookieNames: request.cookies.getAll().map((c) => c.name),
+        },
+        timestamp: Date.now(),
+      }),
+    }).catch(() => {});
+  }
+  // #endregion
   const isProtected = PROTECTED_PREFIXES.some(
     (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`)
   );
