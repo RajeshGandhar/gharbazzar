@@ -11,18 +11,15 @@ const MUTATING_METHODS = new Set(["POST", "PUT", "PATCH", "DELETE"]);
  * CSRF defense-in-depth: reject cross-origin mutating API requests.
  * Browsers always send `Origin` on POST/PUT/PATCH/DELETE fetches; a request
  * carrying an Origin that doesn't match the host that received it is either
- * cross-site (the thing SameSite=Lax cookies mostly already prevent, but
- * this doesn't rely on cookie config) or forged. Requests with NO Origin
- * header are allowed through unchanged — that's the normal shape for
- * server-to-server calls (Vercel Cron's Bearer-token requests, which carry
- * no Origin at all) and must not be blocked.
+ * cross-site or forged. Requests with NO Origin header are allowed through —
+ * that's the normal shape for server-to-server calls (Vercel Cron, curl, etc.)
  */
 function isForgedCrossOriginRequest(request: NextRequest): boolean {
   if (!request.nextUrl.pathname.startsWith("/api/")) return false;
   if (!MUTATING_METHODS.has(request.method)) return false;
 
   const origin = request.headers.get("origin");
-  if (!origin) return false; // non-browser caller (cron, curl, etc.) — allow
+  if (!origin) return false; // non-browser caller — allow
 
   return origin !== request.nextUrl.origin;
 }
@@ -55,7 +52,6 @@ export async function proxy(request: NextRequest) {
           );
         },
       },
-      // See src/lib/supabase/client.ts for why httpOnly is intentionally not set.
       cookieOptions: {
         secure: process.env.NODE_ENV === "production",
         sameSite: "lax",
@@ -71,27 +67,6 @@ export async function proxy(request: NextRequest) {
 
   const { pathname } = request.nextUrl;
 
-  // #region agent log
-  if (pathname.startsWith("/auth/callback") || pathname.startsWith("/account")) {
-    fetch("http://127.0.0.1:7876/ingest/9377d0da-0fda-4647-9ccf-573fdc34b7ce", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "a1b27c" },
-      body: JSON.stringify({
-        sessionId: "a1b27c",
-        runId: "pre-fix",
-        hypothesisId: "E",
-        location: "proxy.ts:auth-check",
-        message: "proxy auth state on sensitive route",
-        data: {
-          pathname,
-          hasUser: !!user,
-          cookieNames: request.cookies.getAll().map((c) => c.name),
-        },
-        timestamp: Date.now(),
-      }),
-    }).catch(() => {});
-  }
-  // #endregion
   const isProtected = PROTECTED_PREFIXES.some(
     (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`)
   );
@@ -108,10 +83,6 @@ export async function proxy(request: NextRequest) {
 
 export const config = {
   matcher: [
-    /*
-     * Run on all paths except static assets and files.
-     * API routes are included so sessions stay fresh for API calls.
-     */
     "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|css|js|woff2?)$).*)",
   ],
 };
