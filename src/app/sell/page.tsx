@@ -1,21 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import {
-  ArrowRight,
   Building2,
   CheckCircle2,
-  Clock,
-  Home,
-  MessageSquare,
-  Settings,
-  Shield,
-  Star,
-  UserCheck,
-  Zap,
 } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent } from "@/components/ui/card";
 import { WhatsAppIcon } from "@/components/shared/whatsapp-icon";
 import { cn } from "@/lib/utils";
 
@@ -27,7 +16,7 @@ export const metadata: Metadata = {
     "List your property for free on GharBazaar. Reach verified buyers and tenants in Mathura, Vrindavan and Delhi NCR. 5 minutes to publish. Zero brokerage.",
 };
 
-const WHATSAPP_NUMBER = "919999999999"; // ops team number — replace at launch
+const WHATSAPP_NUMBER = process.env.NEXT_PUBLIC_WHATSAPP_OPS_NUMBER || "919999999999";
 const WHATSAPP_MESSAGE = encodeURIComponent(
   "Hi, I want to list my property on GharBazaar. Can you help me?"
 );
@@ -36,36 +25,22 @@ export default function SellPage() {
   return (
     <div className="flex flex-col">
       {/* ── Hero ─────────────────────────────────────────────────── */}
-      <section className="relative overflow-hidden border-b border-border bg-gradient-to-br from-primary/10 via-background to-background py-16 sm:py-24">
-        <div
-          aria-hidden
-          className="pointer-events-none absolute -top-20 -right-20 h-96 w-96 rounded-full bg-primary/10 blur-3xl"
-        />
-        <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <section className="border-b border-border py-12 sm:py-16">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="max-w-2xl">
-            <Badge
-              variant="secondary"
-              className="mb-4 text-primary border-primary/20 bg-primary/10"
-            >
-              Free to list · Always
-            </Badge>
-            <h1 className="text-4xl font-bold tracking-tight text-foreground sm:text-5xl">
-              List your property for{" "}
-              <span className="text-primary">free</span>.
-              <br />
-              Reach verified buyers &amp; tenants.
+            <h1 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
+              List your property for free
             </h1>
-            <p className="mt-4 text-lg text-muted-foreground max-w-xl">
+            <p className="mt-3 text-base text-muted-foreground">
               Mathura · Vrindavan · Delhi · Noida · Greater Noida. Verified
-              seekers, real leads, WhatsApp notifications. Publish in 5 minutes.
+              seekers, WhatsApp notifications, 5 minute setup.
             </p>
-            <div className="mt-8 flex flex-col sm:flex-row gap-4">
+            <div className="mt-6 flex flex-col sm:flex-row gap-3">
               <Link
                 href="/auth/login?next=/dealer/listings/new"
-                className={cn(buttonVariants({ size: "lg" }), "gap-2")}
+                className={cn(buttonVariants({ size: "lg" }))}
               >
-                Start listing
-                <ArrowRight className="h-4 w-4" />
+                Post property
               </Link>
               <a
                 href={`https://wa.me/${WHATSAPP_NUMBER}?text=${WHATSAPP_MESSAGE}`}
@@ -77,7 +52,7 @@ export default function SellPage() {
                 )}
               >
                 <WhatsAppIcon className="h-4 w-4 text-green-600" />
-                Get free listing help
+                Need help listing?
               </a>
             </div>
           </div>
@@ -85,105 +60,87 @@ export default function SellPage() {
       </section>
 
       {/* ── How it works ─────────────────────────────────────────── */}
-      <section className="py-16 sm:py-20">
+      <section className="py-12 sm:py-16">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-2xl font-bold text-foreground sm:text-3xl">
+          <div className="mb-8">
+            <h2 className="text-xl font-bold text-foreground sm:text-2xl">
               How it works
             </h2>
-            <p className="mt-2 text-muted-foreground">
-              From account to published listing in 5 minutes.
-            </p>
           </div>
-          <div className="grid gap-6 sm:grid-cols-3">
+          <div className="grid gap-4 sm:grid-cols-3">
             {[
               {
                 step: "1",
-                icon: UserCheck,
-                title: "Create your account",
-                desc: "Sign up free with your email or Google. Takes 30 seconds.",
+                title: "Create account",
+                desc: "Sign up with email or Google in 30 seconds.",
               },
               {
                 step: "2",
-                icon: Building2,
-                title: "Submit your listing",
-                desc: "Fill a simple form — photos, price, location, details. Our 5-minute wizard guides you through.",
+                title: "Add property details",
+                desc: "Photos, price, location. Takes 5 minutes.",
               },
               {
                 step: "3",
-                icon: Zap,
-                title: "Get verified leads",
-                desc: "Leads come via WhatsApp notification the moment a buyer contacts you.",
+                title: "Receive leads",
+                desc: "Get WhatsApp alerts when buyers contact you.",
               },
-            ].map(({ step, icon: Icon, title, desc }) => (
-              <Card
+            ].map(({ step, title, desc }) => (
+              <div
                 key={step}
-                className="relative overflow-hidden border-border hover:border-primary/40 hover:shadow-lg transition-smooth"
+                className="border border-border rounded-lg p-5"
               >
-                <CardContent className="pt-6 pb-6">
-                  <div className="flex items-start gap-4">
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary font-bold text-lg">
-                      {step}
-                    </div>
-                    <div>
-                      <div className="mb-2">
-                        <Icon className="h-5 w-5 text-primary" />
-                      </div>
-                      <h3 className="font-semibold text-foreground mb-1">
-                        {title}
-                      </h3>
-                      <p className="text-sm text-muted-foreground leading-relaxed">
-                        {desc}
-                      </p>
-                    </div>
+                <div className="flex items-start gap-3">
+                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary font-bold">
+                    {step}
                   </div>
-                </CardContent>
-              </Card>
+                  <div>
+                    <h3 className="font-semibold text-foreground mb-1">
+                      {title}
+                    </h3>
+                    <p className="text-sm text-muted-foreground">
+                      {desc}
+                    </p>
+                  </div>
+                </div>
+              </div>
             ))}
           </div>
         </div>
       </section>
 
       {/* ── Seller types ─────────────────────────────────────────── */}
-      <section className="border-y border-border bg-muted/30 py-16 sm:py-20">
+      <section className="border-y border-border bg-muted/30 py-12 sm:py-16">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-2xl font-bold text-foreground sm:text-3xl">
-              Who lists on GharBazaar?
+          <div className="mb-8">
+            <h2 className="text-xl font-bold text-foreground sm:text-2xl">
+              Who can list
             </h2>
           </div>
-          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {[
               {
-                icon: Home,
                 title: "Owner",
-                desc: "You own 1–3 properties and want direct control over who you sell or rent to. No middlemen.",
+                desc: "Direct control, no middlemen.",
               },
               {
-                icon: UserCheck,
                 title: "Agent / Dealer",
-                desc: "You manage a client portfolio. GharBazaar helps you showcase listings and build a trusted profile.",
+                desc: "Manage client portfolios.",
               },
               {
-                icon: Building2,
                 title: "Builder",
-                desc: "You develop new projects. Create project pages with floor plans, pricing and possession timeline.",
+                desc: "New projects with floor plans.",
               },
               {
-                icon: Settings,
                 title: "Property Manager",
-                desc: "You manage rental stock on behalf of owners. Multi-listing tools and bulk upload coming soon.",
+                desc: "Rental stock management.",
               },
-            ].map(({ icon: Icon, title, desc }) => (
+            ].map(({ title, desc }) => (
               <div
                 key={title}
-                className="rounded-2xl border border-border bg-card p-6 hover:border-primary/40 hover:shadow-lg transition-smooth"
+                className="border border-border bg-card p-4"
               >
-                <div className="rounded-xl bg-primary/10 p-3 w-fit mb-4">
-                  <Icon className="h-6 w-6 text-primary" />
-                </div>
-                <h3 className="font-semibold text-foreground mb-2">{title}</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">
+                <h3 className="font-semibold text-foreground mb-1">{title}</h3>
+                <p className="text-sm text-muted-foreground">
                   {desc}
                 </p>
               </div>
@@ -193,48 +150,42 @@ export default function SellPage() {
       </section>
 
       {/* ── Why GharBazaar ───────────────────────────────────────── */}
-      <section className="py-16 sm:py-20">
+      <section className="py-12 sm:py-16">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-2xl font-bold text-foreground sm:text-3xl">
-              Why sellers choose GharBazaar
+          <div className="mb-8">
+            <h2 className="text-xl font-bold text-foreground sm:text-2xl">
+              Why list here
             </h2>
           </div>
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid gap-4 sm:grid-cols-2">
             {[
               {
-                icon: CheckCircle2,
                 title: "Free to list",
-                desc: "Listing is always free. We charge nothing until you choose a premium plan.",
+                desc: "Always free. No charges.",
               },
               {
-                icon: Shield,
-                title: "Verified seekers only",
-                desc: "Every person who contacts you has verified their mobile number. No spam leads.",
+                title: "Verified seekers",
+                desc: "Mobile-verified contacts only.",
               },
               {
-                icon: MessageSquare,
-                title: "WhatsApp lead notifications",
-                desc: "Leads come straight to your WhatsApp the moment a buyer inquires.",
+                title: "WhatsApp alerts",
+                desc: "Instant lead notifications.",
               },
               {
-                icon: Clock,
-                title: "Assisted listing",
-                desc: "No time? WhatsApp our ops team and we&apos;ll list your property within 15 minutes.",
+                title: "Listing assistance",
+                desc: "WhatsApp us your details, we'll list it.",
               },
-            ].map(({ icon: Icon, title, desc }) => (
+            ].map(({ title, desc }) => (
               <div
                 key={title}
-                className="flex items-start gap-3"
+                className="flex items-start gap-3 p-4 border border-border rounded-lg"
               >
-                <div className="rounded-lg bg-primary/10 p-2 shrink-0 mt-0.5">
-                  <Icon className="h-5 w-5 text-primary" />
-                </div>
+                <CheckCircle2 className="h-5 w-5 text-primary shrink-0 mt-0.5" />
                 <div>
-                  <h3 className="font-semibold text-foreground mb-1">
+                  <h3 className="font-semibold text-foreground mb-0.5">
                     {title}
                   </h3>
-                  <p className="text-sm text-muted-foreground leading-relaxed">
+                  <p className="text-sm text-muted-foreground">
                     {desc}
                   </p>
                 </div>
@@ -245,61 +196,60 @@ export default function SellPage() {
       </section>
 
       {/* ── Assisted listing CTA ─────────────────────────────────── */}
-      <section className="border-y border-border bg-gradient-to-r from-primary/5 to-background py-12">
+      <section className="border-y border-border bg-muted/20 py-8">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col items-center text-center gap-4 sm:flex-row sm:text-left sm:justify-between">
-            <div className="max-w-lg">
-              <h2 className="text-xl font-bold text-foreground">
-                Don&apos;t have time to list yourself?
+            <div>
+              <h2 className="text-lg font-bold text-foreground">
+                Need help listing?
               </h2>
               <p className="text-sm text-muted-foreground mt-1">
-                WhatsApp us your property details and our team will list it for
-                you within 15 minutes — for free.
+                WhatsApp your property details, we'll list it in 15 minutes.
               </p>
             </div>
             <a
               href={`https://wa.me/${WHATSAPP_NUMBER}?text=${WHATSAPP_MESSAGE}`}
               target="_blank"
               rel="noopener noreferrer"
-              className={cn(buttonVariants({ size: "lg" }), "gap-2 shrink-0")}
+              className={cn(buttonVariants(), "gap-2 shrink-0")}
             >
               <WhatsAppIcon className="h-4 w-4 fill-white" />
-              WhatsApp us now
+              WhatsApp us
             </a>
           </div>
         </div>
       </section>
 
       {/* ── FAQ ──────────────────────────────────────────────────── */}
-      <section className="py-16 sm:py-20">
+      <section className="py-12 sm:py-16">
         <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-10">
-            <h2 className="text-2xl font-bold text-foreground">
-              Frequently asked questions
+          <div className="mb-8">
+            <h2 className="text-xl font-bold text-foreground sm:text-2xl">
+              Common questions
             </h2>
           </div>
           <div className="flex flex-col gap-4">
             {[
               {
                 q: "Is it really free?",
-                a: "Yes, listing is completely free. Seekers are also free to contact you. We plan to introduce optional premium features in the future, but the core listing and lead generation is always free for founding sellers.",
+                a: "Yes. Listing and lead generation are free. We may introduce optional premium features later.",
               },
               {
                 q: "How do I get leads?",
-                a: "When a seeker clicks &ldquo;Reveal phone number&rdquo; or sends an inquiry, you get an instant WhatsApp notification with their name and mobile number. You can call or WhatsApp them directly — there's no middleman.",
+                a: "When someone contacts you, you get a WhatsApp alert with their name and number. Contact them directly.",
               },
               {
                 q: "What is seller verification?",
-                a: "Verified sellers have submitted a government ID or RERA certificate that our ops team has reviewed. Verified badge builds trust with seekers and improves your listing ranking.",
+                a: "Submit government ID or RERA certificate. Verified badge builds trust and improves ranking.",
               },
             ].map(({ q, a }) => (
               <div
                 key={q}
-                className="rounded-2xl border border-border bg-card p-6"
+                className="border border-border bg-card p-5"
               >
-                <h3 className="font-semibold text-foreground mb-2">{q}</h3>
+                <h3 className="font-semibold text-foreground mb-1.5">{q}</h3>
                 <p
-                  className="text-sm text-muted-foreground leading-relaxed"
+                  className="text-sm text-muted-foreground"
                   dangerouslySetInnerHTML={{ __html: a }}
                 />
               </div>
@@ -309,32 +259,20 @@ export default function SellPage() {
       </section>
 
       {/* ── Final CTA ────────────────────────────────────────────── */}
-      <section className="border-t border-border bg-gradient-to-b from-primary/8 to-background py-16">
+      <section className="border-t border-border py-12">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center">
-          <div className="flex items-center justify-center gap-2 mb-4">
-            <Star className="h-5 w-5 fill-amber-400 text-amber-400" />
-            <Badge
-              variant="secondary"
-              className="text-primary border-primary/20 bg-primary/10"
-            >
-              Founding seller offer
-            </Badge>
-            <Star className="h-5 w-5 fill-amber-400 text-amber-400" />
-          </div>
-          <h2 className="text-2xl font-bold text-foreground sm:text-3xl">
-            Join founding sellers — free until we reach 500 listings
+          <h2 className="text-2xl font-bold text-foreground">
+            Ready to list?
           </h2>
-          <p className="mt-3 text-muted-foreground max-w-lg mx-auto">
-            Early sellers get priority placement, verified badge review, and a
-            dedicated ops contact. No credit card, no commitment.
+          <p className="mt-2 text-muted-foreground">
+            Free for all sellers. No credit card required.
           </p>
-          <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
+          <div className="mt-6">
             <Link
               href="/auth/login?next=/dealer/listings/new"
-              className={cn(buttonVariants({ size: "lg" }), "gap-2")}
+              className={cn(buttonVariants({ size: "lg" }))}
             >
-              Start listing now — it&apos;s free
-              <ArrowRight className="h-4 w-4" />
+              Post property
             </Link>
           </div>
         </div>
