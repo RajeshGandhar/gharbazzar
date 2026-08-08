@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Loader2, ChevronLeft } from "lucide-react";
+import { Loader2, ChevronLeft, Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -145,6 +145,15 @@ export function StepDetails({
       {/* Description */}
       <div>
         <Label htmlFor="description">Description</Label>
+        <div className="flex items-start gap-2 rounded-lg border border-border bg-muted/40 px-3 py-2.5 mt-1 mb-2">
+          <Info className="h-4 w-4 text-muted-foreground shrink-0 mt-px" />
+          <p className="text-xs text-muted-foreground leading-relaxed">
+            <strong className="text-foreground">Content policy:</strong> Do not
+            exclude tenants or buyers based on caste, religion, or community —
+            listings with such language will be rejected. Preferences for
+            family, bachelor, or gender are permitted.
+          </p>
+        </div>
         <Textarea
           id="description"
           value={description}

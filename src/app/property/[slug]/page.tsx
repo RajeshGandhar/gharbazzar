@@ -696,6 +696,7 @@ export default async function PropertyDetailPage({ params }: Props) {
                         "Property no longer available",
                         "Suspected scam or fraud",
                         "Duplicate listing",
+                        "Discriminatory or prejudiced content",
                         "Offensive content",
                         "Other",
                       ].map((reason) => (

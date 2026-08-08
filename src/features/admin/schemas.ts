@@ -6,9 +6,10 @@ export const REJECTION_REASONS = [
   { code: "PRICE_IMPLAUSIBLE",     label: "Price seems wrong",        hint: "Verify the price and update before resubmitting." },
   { code: "LOCATION_MISMATCH",     label: "Location mismatch",        hint: "The pin doesn't match the stated locality." },
   { code: "DUPLICATE",             label: "Duplicate listing",        hint: "This property appears to be already listed." },
-  { code: "CONTENT_POLICY",        label: "Content policy violation", hint: "Remove phone numbers, links, or offensive content from the description." },
-  { code: "INCOMPLETE",            label: "Incomplete listing",       hint: "Fill in all required fields before resubmitting." },
-  { code: "SUSPECTED_FRAUD",       label: "Suspected fraud",          hint: "This listing has been flagged for review by our trust team." },
+  { code: "CONTENT_POLICY",          label: "Content policy violation",   hint: "Remove phone numbers, links, or offensive content from the description." },
+  { code: "DISCRIMINATORY_CONTENT",  label: "Discriminatory content",     hint: "Listings may not exclude tenants or buyers based on caste, religion, or community. Remove this language before resubmitting." },
+  { code: "INCOMPLETE",              label: "Incomplete listing",         hint: "Fill in all required fields before resubmitting." },
+  { code: "SUSPECTED_FRAUD",         label: "Suspected fraud",            hint: "This listing has been flagged for review by our trust team." },
 ] as const;
 
 export type RejectionCode = typeof REJECTION_REASONS[number]["code"];
@@ -23,6 +24,7 @@ export const rejectSchema = z.object({
     "LOCATION_MISMATCH",
     "DUPLICATE",
     "CONTENT_POLICY",
+    "DISCRIMINATORY_CONTENT",
     "INCOMPLETE",
     "SUSPECTED_FRAUD",
   ]),
