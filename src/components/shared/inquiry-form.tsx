@@ -23,10 +23,11 @@ type InquiryFormValues = z.infer<typeof inquiryFormSchema>;
 
 interface InquiryFormProps {
   propertyId: string;
+  sellerName: string;
   onSuccess?: () => void;
 }
 
-export function InquiryForm({ propertyId, onSuccess }: InquiryFormProps) {
+export function InquiryForm({ propertyId, sellerName, onSuccess }: InquiryFormProps) {
   const [submitted, setSubmitted] = useState(false);
 
   const {
@@ -116,6 +117,15 @@ export function InquiryForm({ propertyId, onSuccess }: InquiryFormProps) {
         {errors.message && (
           <p className="text-xs text-destructive">{errors.message.message}</p>
         )}
+      </div>
+
+      <div className="flex items-start gap-2 rounded-lg border border-border bg-muted/40 px-3 py-2.5">
+        <ShieldCheck className="h-4 w-4 text-primary shrink-0 mt-px" />
+        <p className="text-xs text-muted-foreground leading-relaxed">
+          By submitting, your name and mobile number will be shared with{" "}
+          <strong className="text-foreground">{sellerName}</strong> so they can
+          respond to your inquiry. (DPDP Act, 2023)
+        </p>
       </div>
 
       <Button type="submit" disabled={isSubmitting} className="w-full">

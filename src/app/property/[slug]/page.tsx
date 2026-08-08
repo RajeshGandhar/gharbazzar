@@ -199,7 +199,7 @@ function PropertyContactBox({
           <DialogHeader>
             <DialogTitle>Send an inquiry</DialogTitle>
           </DialogHeader>
-          <InquiryForm propertyId={propertyId} />
+          <InquiryForm propertyId={propertyId} sellerName={sellerName} />
         </DialogContent>
       </Dialog>
 
