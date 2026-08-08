@@ -204,11 +204,6 @@ function PropertyContactBox({
       </Dialog>
 
       <ScheduleVisitButton propertyId={propertyId} propertySlug={propertySlug} />
-
-      <p className="text-[11px] text-muted-foreground text-center leading-relaxed">
-        GharBazaar connects buyers and sellers.{" "}
-        <strong>Never pay deposits before visiting.</strong>
-      </p>
     </div>
   );
 }
@@ -670,6 +665,18 @@ export default async function PropertyDetailPage({ params }: Props) {
                   </Card>
                 </section>
               )}
+
+              {/* Platform disclaimer */}
+              <div className="flex items-start gap-2.5 rounded-lg border border-border bg-muted/30 px-4 py-3">
+                <Shield className="h-4 w-4 text-muted-foreground shrink-0 mt-px" />
+                <p className="text-xs text-muted-foreground leading-relaxed">
+                  GharBazaar is a discovery platform, not a party to any
+                  transaction.{" "}
+                  <strong className="text-foreground">
+                    Never pay deposits before visiting the property.
+                  </strong>
+                </p>
+              </div>
 
               {/* Report listing */}
               <div className="flex justify-end">

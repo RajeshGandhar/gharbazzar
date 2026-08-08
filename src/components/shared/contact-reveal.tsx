@@ -115,8 +115,8 @@ export function ContactReveal({
           </a>
         )}
         <p className="text-[11px] text-muted-foreground text-center leading-relaxed">
-          GharBazaar connects buyers and sellers.{" "}
-          <strong>Never pay deposits before visiting.</strong>
+          GharBazaar is a discovery platform, not a party to any transaction.{" "}
+          <strong>Never pay deposits before visiting the property.</strong>
         </p>
       </div>
     );
