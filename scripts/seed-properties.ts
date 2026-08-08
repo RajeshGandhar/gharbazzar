@@ -257,7 +257,7 @@ async function main() {
     if (amenities && amenities.length > 0) {
       const slice = amenities.slice((i * 3) % amenities.length, ((i * 3) % amenities.length) + 3);
       for (const a of slice) {
-        await admin.from("property_amenities").insert({ property_id: propId, amenity_id: a.id }).then(() => {}).catch(() => {});
+        try { await admin.from("property_amenities").insert({ property_id: propId, amenity_id: a.id }); } catch (_) {}
       }
     }
 
