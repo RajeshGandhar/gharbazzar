@@ -136,6 +136,17 @@ export default function ForgotPasswordPage() {
             Sign in
           </Link>
         </p>
+        <p className="mt-3 text-center text-xs text-muted-foreground">
+          Lost access to your email account entirely?{" "}
+          <a
+            href={`https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP_OPS_NUMBER ?? ""}?text=${encodeURIComponent("Hi, I need help recovering my GharBazaar account. I've lost access to my registered email address.")}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-primary hover:underline"
+          >
+            Contact support on WhatsApp
+          </a>
+        </p>
       </div>
     </div>
   );

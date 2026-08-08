@@ -85,7 +85,7 @@ export function ProfileForm({ initialName, initialPhone }: ProfileFormProps) {
         {errors.phone && (
           <p className="text-xs text-destructive">{errors.phone.message}</p>
         )}
-        <p className="text-xs text-muted-foreground">Used to contact you about inquiries. Never shared publicly.</p>
+        <p className="text-xs text-muted-foreground">Used to contact you about inquiries and for account recovery if you lose email access. Never shared publicly.</p>
       </div>
 
       <Button type="submit" disabled={isSubmitting || !isDirty}>

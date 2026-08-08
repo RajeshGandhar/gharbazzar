@@ -193,6 +193,12 @@ function LoginContent() {
             Create one
           </Link>
         </p>
+        <p className="mt-2 text-center text-xs text-muted-foreground">
+          Can&apos;t access your email?{" "}
+          <Link href="/auth/forgot-password" className="text-primary hover:underline">
+            Get help signing in
+          </Link>
+        </p>
       </div>
     </div>
   );
