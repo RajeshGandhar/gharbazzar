@@ -8,7 +8,7 @@ const isRemote = !BASE_URL.includes("localhost") && !BASE_URL.includes("127.0.0.
 // Set VERCEL_AUTOMATION_BYPASS_SECRET in Vercel project env vars, then export it
 // locally before running: export VERCEL_AUTOMATION_BYPASS_SECRET=<secret>
 const bypassSecret = process.env.VERCEL_AUTOMATION_BYPASS_SECRET;
-const extraHeaders = isRemote && bypassSecret
+const extraHeaders: Record<string, string> = isRemote && bypassSecret
   ? { "x-vercel-protection-bypass": bypassSecret }
   : {};
 
