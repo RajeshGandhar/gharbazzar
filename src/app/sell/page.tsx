@@ -16,7 +16,7 @@ export const metadata: Metadata = {
     "List your property for free on GharBazaar. Reach verified buyers and tenants in Mathura, Vrindavan and Delhi NCR. 5 minutes to publish. Zero brokerage.",
 };
 
-const WHATSAPP_NUMBER = process.env.NEXT_PUBLIC_WHATSAPP_OPS_NUMBER || "919999999999";
+const WHATSAPP_NUMBER = process.env.NEXT_PUBLIC_WHATSAPP_OPS_NUMBER ?? "";
 const WHATSAPP_MESSAGE = encodeURIComponent(
   "Hi, I want to list my property on GharBazaar. Can you help me?"
 );
