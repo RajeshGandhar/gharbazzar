@@ -6,7 +6,7 @@ import { useRef, useState } from "react";
 import { MapPin, BedDouble, Square, CheckCircle2, Clock, Heart, ChevronLeft, ChevronRight } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { formatPrice, formatBhk, formatFreshness, formatArea } from "@/lib/utils/format";
-import { resolveOrderedImageUrls } from "@/lib/utils/storage";
+import { resolveOrderedImageUrls, SHIMMER_DATA_URL } from "@/lib/utils/storage";
 import { cn } from "@/lib/utils";
 
 export type PropertyCardData = {
@@ -97,6 +97,8 @@ function ImageCarousel({ urls, title }: { urls: string[]; title: string }) {
               fill
               sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
               className="object-cover"
+              placeholder="blur"
+              blurDataURL={SHIMMER_DATA_URL}
               priority={i === 0}
             />
           </div>

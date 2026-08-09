@@ -59,7 +59,7 @@ import { ContactReveal } from "@/components/shared/contact-reveal";
 import { InquiryForm } from "@/components/shared/inquiry-form";
 import { ScheduleVisitButton } from "@/components/shared/schedule-visit-button";
 import { EmiCalculator } from "@/components/properties/emi-calculator";
-import { getPropertyImageUrl } from "@/lib/utils/storage";
+import { getPropertyImageUrl, SHIMMER_DATA_URL } from "@/lib/utils/storage";
 import { listingSchema } from "@/lib/seo/schema";
 import { ShareButton } from "@/components/shared/share-button";
 import { SimilarProperties } from "@/components/properties/similar-properties";
@@ -404,6 +404,8 @@ export default async function PropertyDetailPage({ params }: Props) {
                         fill
                         sizes="(max-width: 1024px) 100vw, 700px"
                         className="object-cover"
+                        placeholder="blur"
+                        blurDataURL={SHIMMER_DATA_URL}
                         priority
                       />
                       <div className="absolute bottom-3 right-3 rounded-full bg-black/60 backdrop-blur-sm px-2.5 py-1 text-xs text-white font-medium">
@@ -419,6 +421,8 @@ export default async function PropertyDetailPage({ params }: Props) {
                           fill
                           sizes="(max-width: 1024px) 50vw, 350px"
                           className="object-cover"
+                          placeholder="blur"
+                          blurDataURL={SHIMMER_DATA_URL}
                         />
                         {idx === 1 && images.length > 3 && (
                           <div className="absolute inset-0 flex items-center justify-center bg-black/40">
