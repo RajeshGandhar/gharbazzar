@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import type { PaginationParams } from "@/lib/api/pagination";
 import { toRange } from "@/lib/api/pagination";
+import type { PropertyCardData } from "@/components/properties/property-card";
 
 // ---------------------------------------------------------------------------
 // Listing card shape — used by browse / search pages
@@ -134,6 +135,90 @@ export async function getPropertyById(id: string) {
     .eq("id", id)
     .is("deleted_at", null)
     .single();
+}
+
+// ---------------------------------------------------------------------------
+// Similar properties (same city + purpose, ±50% price band, exclude self)
+// ---------------------------------------------------------------------------
+export async function getSimilarProperties(opts: {
+  excludeId: string;
+  cityId: number;
+  purpose: "sale" | "rent" | "lease";
+  price: number;
+  limit?: number;
+}): Promise<PropertyCardData[]> {
+  const supabase = createAdminClient();
+  const band = 0.5;
+  const min = Math.round(opts.price * (1 - band));
+  const max = Math.round(opts.price * (1 + band));
+
+  const { data } = await supabase
+    .from("properties")
+    .select(LISTING_CARD_COLUMNS)
+    .eq("city_id", opts.cityId)
+    .eq("purpose", opts.purpose)
+    .eq("status", "active")
+    .eq("approval_status", "approved")
+    .is("deleted_at", null)
+    .neq("id", opts.excludeId)
+    .gte("price", min)
+    .lte("price", max)
+    .order("is_featured", { ascending: false })
+    .order("published_at", { ascending: false })
+    .limit(opts.limit ?? 4);
+
+  return (data ?? []) as unknown as PropertyCardData[];
+}
+
+// ---------------------------------------------------------------------------
+// Live platform stats for homepage
+// ---------------------------------------------------------------------------
+export async function getPlatformStats() {
+  const supabase = createAdminClient();
+  const [listings, sellers, cities] = await Promise.all([
+    supabase
+      .from("properties")
+      .select("*", { count: "exact", head: true })
+      .eq("status", "active")
+      .eq("approval_status", "approved")
+      .is("deleted_at", null),
+    supabase
+      .from("sellers")
+      .select("*", { count: "exact", head: true })
+      .eq("is_verified", true),
+    supabase
+      .from("cities")
+      .select("*", { count: "exact", head: true })
+      .eq("is_active", true),
+  ]);
+  return {
+    listings: listings.count ?? 0,
+    verifiedSellers: sellers.count ?? 0,
+    cities: cities.count ?? 0,
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Featured properties (for homepage)
+// ---------------------------------------------------------------------------
+export async function getFeaturedProperties(limit = 4): Promise<PropertyCardData[]> {
+  const supabase = createAdminClient();
+  const { data } = await supabase
+    .from("properties")
+    .select(`
+      id, slug, title, price, purpose, city_id, area_id, bedrooms,
+      built_up_area, area_unit, rental_kind, gender_policy, is_featured, is_verified, published_at,
+      cities(name, slug),
+      areas(name, slug),
+      property_images(path, thumbnail_path, is_cover, position)
+    `)
+    .eq("status", "active")
+    .eq("approval_status", "approved")
+    .eq("is_featured", true)
+    .is("deleted_at", null)
+    .order("published_at", { ascending: false })
+    .limit(limit);
+  return (data ?? []) as unknown as PropertyCardData[];
 }
 
 // ---------------------------------------------------------------------------

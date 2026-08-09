@@ -14,6 +14,8 @@ import { cn } from "@/lib/utils";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { PropertyCard, type PropertyCardData } from "@/components/properties/property-card";
 import { SearchBar } from "@/components/shared/search-bar";
+import { getFeaturedProperties, getPlatformStats } from "@/features/properties/server/queries";
+import { TrendingUp } from "lucide-react";
 
 export const revalidate = 600;
 
@@ -54,18 +56,13 @@ async function getLatestProperties(): Promise<PropertyCardData[]> {
   return (data ?? []) as unknown as PropertyCardData[];
 }
 
-const heroStats = [
-  { value: "Free",      label: "For seekers" },
-  { value: "Verified",  label: "Seller KYC" },
-  { value: "< 15 min",  label: "Alert delivery" },
-  { value: "₹0",        label: "Contact fee" },
-];
-
 export default async function HomePage() {
-  const [cities, uniCount, latestProperties] = await Promise.all([
+  const [cities, uniCount, latestProperties, featuredProperties, stats] = await Promise.all([
     getCities(),
     getUniversityCount(),
     getLatestProperties(),
+    getFeaturedProperties(4),
+    getPlatformStats(),
   ]);
 
   const brajCities = cities.filter((c) => c.region_id === 1);
@@ -94,10 +91,15 @@ export default async function HomePage() {
           </div>
 
           {/* Stats */}
-          <div className="flex flex-wrap items-center justify-center gap-6 text-sm">
-            {heroStats.map(({ value, label }) => (
+          <div className="flex flex-wrap items-center justify-center gap-8 text-sm">
+            {[
+              { value: stats.listings > 0 ? `${stats.listings}+` : "Free", label: stats.listings > 0 ? "Active listings" : "For seekers" },
+              { value: stats.verifiedSellers > 0 ? `${stats.verifiedSellers}+` : "Verified", label: stats.verifiedSellers > 0 ? "Verified sellers" : "Seller KYC" },
+              { value: stats.cities > 0 ? `${stats.cities}` : `${uniCount}+`, label: stats.cities > 0 ? "Cities covered" : "Universities" },
+              { value: "₹0", label: "Contact fee" },
+            ].map(({ value, label }) => (
               <div key={label} className="text-center">
-                <p className="font-bold text-foreground tabular-nums">{value}</p>
+                <p className="font-bold text-foreground tabular-nums text-lg">{value}</p>
                 <p className="text-xs text-muted-foreground mt-0.5">{label}</p>
               </div>
             ))}
@@ -135,6 +137,32 @@ export default async function HomePage() {
               View all
               <ArrowRight className="h-4 w-4" />
             </Link>
+          </div>
+        </section>
+      )}
+
+      {/* ── Featured listings ─────────────────────────────────────── */}
+      {featuredProperties.length > 0 && (
+        <section className="mx-auto w-full max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+          <div className="flex items-end justify-between mb-6">
+            <div className="flex items-center gap-2">
+              <div className="rounded-lg bg-amber-100 dark:bg-amber-900/40 p-1.5">
+                <TrendingUp className="h-4 w-4 text-amber-600 dark:text-amber-400" />
+              </div>
+              <h2 className="text-xl font-bold text-foreground sm:text-2xl">Featured listings</h2>
+            </div>
+            <Link
+              href="/search?featured=true"
+              className="hidden sm:flex items-center gap-1 text-sm font-medium text-primary hover:text-primary/80 transition-colors"
+            >
+              View all
+              <ArrowRight className="h-3.5 w-3.5" />
+            </Link>
+          </div>
+          <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {featuredProperties.map((property) => (
+              <PropertyCard key={property.id} property={property} />
+            ))}
           </div>
         </section>
       )}

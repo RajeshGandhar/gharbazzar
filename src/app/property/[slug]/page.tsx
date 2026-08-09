@@ -61,6 +61,9 @@ import { ScheduleVisitButton } from "@/components/shared/schedule-visit-button";
 import { EmiCalculator } from "@/components/properties/emi-calculator";
 import { getPropertyImageUrl } from "@/lib/utils/storage";
 import { listingSchema } from "@/lib/seo/schema";
+import { ShareButton } from "@/components/shared/share-button";
+import { SimilarProperties } from "@/components/properties/similar-properties";
+import { formatFreshness } from "@/lib/utils/format";
 
 export const revalidate = 60;
 
@@ -449,13 +452,26 @@ export default async function PropertyDetailPage({ params }: Props) {
                         <span className="text-sm">{[p.areas?.name, p.cities?.name].filter(Boolean).join(", ")}</span>
                       </div>
                     )}
+                    <div className="flex flex-wrap items-center gap-3 mt-2">
+                      {p.published_at && (
+                        <span className="text-xs text-muted-foreground">
+                          Posted {formatFreshness(p.published_at)}
+                        </span>
+                      )}
+                      {(p.views_count ?? 0) > 0 && (
+                        <span className="text-xs text-muted-foreground">
+                          · {(p.views_count as number).toLocaleString("en-IN")} views
+                        </span>
+                      )}
+                    </div>
                   </div>
-                  <div className="shrink-0 text-right">
+                  <div className="shrink-0 text-right flex flex-col items-end gap-2">
                     <p className="text-3xl font-bold text-primary">{priceDisplay}</p>
-                    {p.is_negotiable && <Badge variant="secondary" className="text-[10px] mt-1">Negotiable</Badge>}
+                    {p.is_negotiable && <Badge variant="secondary" className="text-[10px]">Negotiable</Badge>}
                     {p.price_per_sqft && p.price_per_sqft > 0 && (
-                      <p className="text-xs text-muted-foreground mt-1">₹{p.price_per_sqft.toLocaleString("en-IN")}/sqft</p>
+                      <p className="text-xs text-muted-foreground">₹{p.price_per_sqft.toLocaleString("en-IN")}/sqft</p>
                     )}
+                    <ShareButton url={`/property/${p.slug}`} title={p.title} />
                   </div>
                 </div>
               </section>
@@ -664,6 +680,18 @@ export default async function PropertyDetailPage({ params }: Props) {
                     </CardContent>
                   </Card>
                 </section>
+              )}
+
+              {/* Similar properties */}
+              {p.cities && (
+                <SimilarProperties
+                  excludeId={p.id}
+                  cityId={p.cities.id}
+                  purpose={p.purpose}
+                  price={p.price}
+                  citySlug={p.cities.slug}
+                  purposePath={isSale ? "buy" : isStudentHousing ? "student-housing" : "rent"}
+                />
               )}
 
               {/* Platform disclaimer */}

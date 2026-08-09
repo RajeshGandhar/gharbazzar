@@ -8,6 +8,7 @@ import { Pagination } from "@/components/shared/pagination";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { breadcrumbSchema, itemListSchema } from "@/lib/seo/schema";
 import { formatRent } from "@/lib/utils/format";
+import { NcrWaitlist } from "@/components/shared/ncr-waitlist";
 
 export const revalidate = 300;
 
@@ -21,6 +22,9 @@ const LAUNCH_CITIES = [
   { slug: "faridabad",     name: "Faridabad" },
   { slug: "ghaziabad",     name: "Ghaziabad" },
 ];
+
+// NCR general rent listings are not yet live — show waitlist capture instead
+const NCR_SLUGS = new Set(["delhi", "noida", "greater-noida", "gurgaon", "faridabad", "ghaziabad"]);
 
 export function generateStaticParams() {
   return LAUNCH_CITIES.map((c) => ({ city: c.slug }));
@@ -127,6 +131,13 @@ export async function generateMetadata({ params, searchParams }: Props): Promise
 
 export default async function RentCityPage({ params, searchParams }: Props) {
   const { city: citySlug } = await params;
+
+  if (NCR_SLUGS.has(citySlug)) {
+    const cityEntry = LAUNCH_CITIES.find((c) => c.slug === citySlug);
+    if (!cityEntry) notFound();
+    return <NcrWaitlist city={cityEntry} purpose="rent" />;
+  }
+
   const { bedrooms: bedroomsStr, page: pageStr, rental_kind: rentalKind } = await searchParams;
 
   const bedrooms = bedroomsStr !== undefined ? parseInt(bedroomsStr, 10) : undefined;
@@ -137,6 +148,16 @@ export default async function RentCityPage({ params, searchParams }: Props) {
   if (!result) notFound();
 
   const { city, properties, count } = result;
+
+  // Fetch locality areas for this city (for internal linking)
+  const supabase = createAdminClient();
+  const { data: cityAreas } = await supabase
+    .from("areas")
+    .select("id, name, slug")
+    .eq("city_id", city.id)
+    .eq("is_active", true)
+    .order("name");
+  const areas = cityAreas ?? [];
   // Index only the base (unfiltered) path, and only if ≥3 live listings
   // (blueprint §1). Query-string filter variants (?bedrooms=) are
   // noindex,follow with canonical pointing at the base path above —
@@ -274,8 +295,22 @@ export default async function RentCityPage({ params, searchParams }: Props) {
             </>
           )}
 
-          {/* Internal linking */}
-          <div className="mt-12 border-t border-border pt-8">
+          {/* Internal linking — areas in this city */}
+          {areas.length > 0 && (
+            <div className="mt-8 border-t border-border pt-8">
+              <h2 className="text-base font-semibold text-foreground mb-4">Browse by locality in {city.name}</h2>
+              <div className="flex flex-wrap gap-2">
+                {areas.map((a) => (
+                  <Link key={a.id} href={`/rent/${city.slug}/${a.slug}`} className="rounded-full border border-border px-3 py-1.5 text-xs hover:border-primary hover:text-primary transition-smooth">
+                    {a.name}
+                  </Link>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Internal linking — nearby cities */}
+          <div className="mt-8 border-t border-border pt-8">
             <h2 className="text-base font-semibold text-foreground mb-4">Rent in nearby cities</h2>
             <div className="flex flex-wrap gap-2">
               {LAUNCH_CITIES.filter((c) => c.slug !== city.slug).map((c) => (
