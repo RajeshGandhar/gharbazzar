@@ -25,15 +25,41 @@ export function formatRent(amount: number): string {
 }
 
 /**
- * Format area in sqft with optional gaj conversion
- * 1 gaj = 9 sqft
+ * Format a canonical sqft value for display in the given unit.
+ * The DB always stores area in sqft; unit is a display preference.
+ * Conversions: 1 gaj = 9 sqft · 1 sqm ≈ 10.764 sqft
+ *              1 acre = 43 560 sqft · 1 marla = 272.25 sqft
  */
-export function formatArea(sqft: number, unit: "sqft" | "gaj" = "sqft"): string {
-  if (unit === "gaj") {
-    const gaj = sqft / 9;
-    return `${Math.round(gaj)} gaj`;
+export function formatArea(sqft: number, unit: string = "sqft"): string {
+  switch (unit) {
+    case "gaj":   return `${Math.round(sqft / 9).toLocaleString("en-IN")} gaj`;
+    case "sqm":   return `${Math.round(sqft / 10.764).toLocaleString("en-IN")} sqm`;
+    case "acre":  return `${(sqft / 43560).toFixed(2)} acre`;
+    case "marla": return `${Math.round(sqft / 272.25).toLocaleString("en-IN")} marla`;
+    default:      return `${sqft.toLocaleString("en-IN")} sqft`;
   }
-  return `${sqft.toLocaleString("en-IN")} sqft`;
+}
+
+/** Convert a value entered in `unit` to canonical sqft for DB storage. */
+export function toSqft(value: number, unit: string): number {
+  switch (unit) {
+    case "gaj":   return value * 9;
+    case "sqm":   return value * 10.764;
+    case "acre":  return value * 43560;
+    case "marla": return value * 272.25;
+    default:      return value;
+  }
+}
+
+/** Convert a canonical sqft value back to the given display unit (for form init). */
+export function fromSqft(sqft: number, unit: string): number {
+  switch (unit) {
+    case "gaj":   return Math.round(sqft / 9);
+    case "sqm":   return Math.round((sqft / 10.764) * 100) / 100;
+    case "acre":  return Math.round((sqft / 43560) * 1000) / 1000;
+    case "marla": return Math.round(sqft / 272.25);
+    default:      return sqft;
+  }
 }
 
 /**

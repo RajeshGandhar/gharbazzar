@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Loader2, ChevronLeft, Info } from "lucide-react";
+import { toSqft, fromSqft } from "@/lib/utils/format";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -46,8 +47,25 @@ export function StepDetails({
   const [bedrooms, setBedrooms] = useState((initialData?.bedrooms as string | undefined)?.toString() ?? "");
   const [bathrooms, setBathrooms] = useState((initialData?.bathrooms as string | undefined)?.toString() ?? "");
   const [balconies, setBalconies] = useState((initialData?.balconies as string | undefined)?.toString() ?? "");
-  const [builtUpArea, setBuiltUpArea] = useState((initialData?.built_up_area as string | undefined)?.toString() ?? "");
-  const [carpetArea, setCarpetArea] = useState((initialData?.carpet_area as string | undefined)?.toString() ?? "");
+  const [areaUnit, setAreaUnit] = useState<string>((initialData?.area_unit as string) || "sqft");
+  const [builtUpArea, setBuiltUpArea] = useState(() => {
+    const raw = initialData?.built_up_area as number | undefined;
+    if (!raw) return "";
+    const unit = (initialData?.area_unit as string) || "sqft";
+    return String(fromSqft(raw, unit));
+  });
+  const [carpetArea, setCarpetArea] = useState(() => {
+    const raw = initialData?.carpet_area as number | undefined;
+    if (!raw) return "";
+    const unit = (initialData?.area_unit as string) || "sqft";
+    return String(fromSqft(raw, unit));
+  });
+  const [plotArea, setPlotArea] = useState(() => {
+    const raw = initialData?.plot_area as number | undefined;
+    if (!raw) return "";
+    const unit = (initialData?.area_unit as string) || "sqft";
+    return String(fromSqft(raw, unit));
+  });
   const [floorNumber, setFloorNumber] = useState((initialData?.floor_number as string | undefined)?.toString() ?? "");
   const [totalFloors, setTotalFloors] = useState((initialData?.total_floors as string | undefined)?.toString() ?? "");
   const [parkingSpaces, setParkingSpaces] = useState((initialData?.parking_spaces as string | undefined)?.toString() ?? "0");
@@ -87,8 +105,10 @@ export function StepDetails({
     if (bedrooms) body.bedrooms = parseInt(bedrooms, 10);
     if (bathrooms) body.bathrooms = parseInt(bathrooms, 10);
     if (balconies) body.balconies = parseInt(balconies, 10);
-    if (builtUpArea) body.built_up_area = parseFloat(builtUpArea);
-    if (carpetArea) body.carpet_area = parseFloat(carpetArea);
+    body.area_unit = areaUnit;
+    if (builtUpArea) body.built_up_area = toSqft(parseFloat(builtUpArea), areaUnit);
+    if (carpetArea)  body.carpet_area   = toSqft(parseFloat(carpetArea),  areaUnit);
+    if (plotArea)    body.plot_area      = toSqft(parseFloat(plotArea),    areaUnit);
     if (floorNumber) body.floor_number = parseInt(floorNumber, 10);
     if (totalFloors) body.total_floors = parseInt(totalFloors, 10);
     body.parking_spaces = parseInt(parkingSpaces || "0", 10);
@@ -220,29 +240,65 @@ export function StepDetails({
       </div>
 
       {/* Area */}
-      <div className="grid grid-cols-2 gap-3">
-        <div>
-          <Label htmlFor="built_up_area">Built-up area (sqft)</Label>
-          <Input
-            id="built_up_area"
-            type="number"
-            value={builtUpArea}
-            onChange={(e) => setBuiltUpArea(e.target.value)}
-            placeholder="e.g. 1200"
-            className="mt-1"
-            min={0}
-          />
+      <div className="space-y-3">
+        <div className="flex items-center justify-between">
+          <Label>Area</Label>
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-muted-foreground">Unit:</span>
+            <Select value={areaUnit} onValueChange={(v) => { if (v) setAreaUnit(v); }}>
+              <SelectTrigger className="h-7 w-28 text-xs">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="sqft">sqft</SelectItem>
+                <SelectItem value="gaj">gaj</SelectItem>
+                <SelectItem value="sqm">sqm</SelectItem>
+                <SelectItem value="acre">acre</SelectItem>
+                <SelectItem value="marla">marla</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <Label htmlFor="built_up_area">Built-up area ({areaUnit})</Label>
+            <Input
+              id="built_up_area"
+              type="number"
+              value={builtUpArea}
+              onChange={(e) => setBuiltUpArea(e.target.value)}
+              placeholder="e.g. 1200"
+              className="mt-1"
+              min={0}
+            />
+          </div>
+          <div>
+            <Label htmlFor="carpet_area">
+              Carpet area ({areaUnit}){" "}
+              <span className="text-muted-foreground text-xs">(optional)</span>
+            </Label>
+            <Input
+              id="carpet_area"
+              type="number"
+              value={carpetArea}
+              onChange={(e) => setCarpetArea(e.target.value)}
+              placeholder="e.g. 980"
+              className="mt-1"
+              min={0}
+            />
+          </div>
         </div>
         <div>
-          <Label htmlFor="carpet_area">
-            Carpet area (sqft) <span className="text-muted-foreground text-xs">(optional)</span>
+          <Label htmlFor="plot_area">
+            Plot area ({areaUnit}){" "}
+            <span className="text-muted-foreground text-xs">(optional — for plots &amp; land)</span>
           </Label>
           <Input
-            id="carpet_area"
+            id="plot_area"
             type="number"
-            value={carpetArea}
-            onChange={(e) => setCarpetArea(e.target.value)}
-            placeholder="e.g. 980"
+            value={plotArea}
+            onChange={(e) => setPlotArea(e.target.value)}
+            placeholder="e.g. 200"
             className="mt-1"
             min={0}
           />

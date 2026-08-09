@@ -120,7 +120,7 @@ export default function ComparePage() {
     { label: "Purpose", getValue: (p) => p.purpose.charAt(0).toUpperCase() + p.purpose.slice(1) },
     { label: "Bedrooms", getValue: (p) => p.bedrooms != null ? `${p.bedrooms} BHK` : "—" },
     { label: "Bathrooms", getValue: (p) => p.bathrooms != null ? String(p.bathrooms) : "—" },
-    { label: "Built-up Area", getValue: (p) => p.built_up_area != null ? formatArea(p.built_up_area, p.area_unit as "sqft" | "gaj") : "—" },
+    { label: "Built-up Area", getValue: (p) => p.built_up_area != null ? formatArea(p.built_up_area, p.area_unit) : "—" },
     { label: "Furnishing", getValue: (p) => p.furnishing ? (FURNISHING_LABELS[p.furnishing] ?? p.furnishing) : "—" },
     { label: "City", getValue: (p) => p.cities?.name ?? "—" },
   ];

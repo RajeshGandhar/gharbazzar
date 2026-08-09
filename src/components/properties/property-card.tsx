@@ -5,7 +5,7 @@ import Image from "next/image";
 import { useRef, useState } from "react";
 import { MapPin, BedDouble, Square, CheckCircle2, Clock, Heart, ChevronLeft, ChevronRight } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { formatPrice, formatBhk, formatFreshness } from "@/lib/utils/format";
+import { formatPrice, formatBhk, formatFreshness, formatArea } from "@/lib/utils/format";
 import { resolveOrderedImageUrls } from "@/lib/utils/storage";
 import { cn } from "@/lib/utils";
 
@@ -19,6 +19,7 @@ export type PropertyCardData = {
   area_id: number | null;
   bedrooms: number | null;
   built_up_area: number | null;
+  area_unit?: string | null;
   rental_kind: string | null;
   gender_policy: string | null;
   is_featured: boolean;
@@ -288,7 +289,7 @@ export function PropertyCard({ property: p, className }: PropertyCardProps) {
               {p.built_up_area != null && (
                 <span className="flex items-center gap-1 text-xs text-muted-foreground">
                   <Square className="h-3 w-3 text-muted-foreground/70" />
-                  {p.built_up_area.toLocaleString("en-IN")} sqft
+                  {formatArea(p.built_up_area, p.area_unit ?? "sqft")}
                 </span>
               )}
             </div>

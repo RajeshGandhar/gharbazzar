@@ -472,7 +472,7 @@ export default async function PropertyDetailPage({ params }: Props) {
                   {p.built_up_area && (
                     <div className="flex items-center gap-2 rounded-lg border border-border bg-card px-3 py-2">
                       <Ruler className="h-4 w-4 text-primary" />
-                      <span className="text-sm font-medium">{formatArea(p.built_up_area, (p.area_unit as "sqft" | "gaj") || "sqft")}</span>
+                      <span className="text-sm font-medium">{formatArea(p.built_up_area, p.area_unit ?? "sqft")}</span>
                     </div>
                   )}
                   {p.bathrooms != null && (

@@ -65,7 +65,7 @@ async function getCityWithRentals(
     .from("properties")
     .select(
       `id, slug, title, price, purpose, city_id, area_id, bedrooms,
-       built_up_area, rental_kind, gender_policy, is_featured, published_at,
+       built_up_area, area_unit, rental_kind, gender_policy, is_featured, published_at,
        areas!area_id ( name, slug ),
        cities!city_id ( name, slug ),
        property_images ( path, thumbnail_path, is_cover, position )`,
