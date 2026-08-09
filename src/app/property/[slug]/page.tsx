@@ -127,12 +127,14 @@ function PropertyContactBox({
   propertyId,
   propertyTitle,
   propertySlug,
+  responseLabel,
 }: {
   seller: SellerShape | null | undefined;
   sellerName: string;
   propertyId: string;
   propertyTitle: string;
   propertySlug: string;
+  responseLabel?: string | null;
 }) {
   const waUrl = seller?.whatsapp_number
     ? `https://wa.me/91${seller.whatsapp_number}?text=Hi%2C%20I%27m%20interested%20in%20${encodeURIComponent(propertyTitle)}`
@@ -169,6 +171,12 @@ function PropertyContactBox({
                 <span className="text-xs text-muted-foreground">
                   {seller.avg_rating?.toFixed(1)} ({seller.total_reviews} reviews)
                 </span>
+              </div>
+            )}
+            {responseLabel && (
+              <div className="flex items-center gap-1 mt-1.5">
+                <span className="inline-block h-1.5 w-1.5 rounded-full bg-green-500" />
+                <span className="text-[10px] text-green-600 font-medium">{responseLabel}</span>
               </div>
             )}
           </div>
@@ -301,6 +309,36 @@ export default async function PropertyDetailPage({ params }: Props) {
   const nearbyUniversities = (p.property_universities ?? []).filter((pu) => pu.universities);
   const priceHistory = p.price_history ?? [];
 
+  // Compute seller response time from recent inquiries (lightweight — max 20 rows)
+  let responseLabel: string | null = null;
+  if (seller) {
+    const { createAdminClient } = await import("@/lib/supabase/admin");
+    const admin = createAdminClient();
+    const { data: recentInquiries } = await admin
+      .from("inquiries")
+      .select("created_at, updated_at, status")
+      .eq("seller_id", seller.id)
+      .neq("status", "new")
+      .order("created_at", { ascending: false })
+      .limit(20);
+
+    if (recentInquiries && recentInquiries.length >= 3) {
+      const responseTimes = recentInquiries
+        .map((inq) => new Date(inq.updated_at).getTime() - new Date(inq.created_at).getTime())
+        .filter((ms) => ms > 0)
+        .sort((a, b) => a - b);
+
+      if (responseTimes.length >= 3) {
+        const medianMs = responseTimes[Math.floor(responseTimes.length / 2)];
+        const hours = medianMs / (1000 * 60 * 60);
+        if (hours < 1) responseLabel = "Usually responds within minutes";
+        else if (hours < 4) responseLabel = "Usually responds within hours";
+        else if (hours < 24) responseLabel = "Usually responds within a day";
+        else responseLabel = "Usually responds within a few days";
+      }
+    }
+  }
+
   const isStudentHousing = p.rental_kind === "student";
   const isSale = p.purpose === "sale";
   const priceDisplay = isSale ? formatPrice(p.price) : formatRent(p.price);
@@ -431,9 +469,19 @@ export default async function PropertyDetailPage({ params }: Props) {
                         </span>
                       )}
                       {(p.views_count ?? 0) > 0 && (
-                        <span className="text-xs text-muted-foreground">
-                          · {(p.views_count as number).toLocaleString("en-IN")} views
+                        <span className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
+                          ·
+                          <span className="relative flex h-1.5 w-1.5">
+                            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary/60" />
+                            <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-primary" />
+                          </span>
+                          {(p.views_count as number).toLocaleString("en-IN")} people viewed
                         </span>
+                      )}
+                      {(p.views_count ?? 0) >= 50 && (
+                        <Badge variant="secondary" className="text-[10px] py-0 bg-orange-500/10 text-orange-600 border-orange-500/20">
+                          Popular
+                        </Badge>
                       )}
                     </div>
                   </div>
@@ -673,6 +721,7 @@ export default async function PropertyDetailPage({ params }: Props) {
                         propertyId={p.id}
                         propertyTitle={p.title}
                         propertySlug={p.slug}
+                        responseLabel={responseLabel}
                       />
                     </CardContent>
                   </Card>

@@ -34,7 +34,7 @@ export function GalleryGrid({ images, title }: GalleryGridProps) {
           type="button"
           onClick={() => openAt(0)}
           className={cn(
-            "shadow-elevated relative overflow-hidden rounded-xl bg-muted aspect-[4/3] cursor-pointer group",
+            "shadow-elevated relative overflow-hidden rounded-xl bg-muted aspect-[4/3] cursor-zoom-in group",
             images.length >= 3 ? "row-span-2" : ""
           )}
         >
@@ -43,7 +43,7 @@ export function GalleryGrid({ images, title }: GalleryGridProps) {
             alt={`${title} — main photo`}
             fill
             sizes="(max-width: 1024px) 100vw, 700px"
-            className="object-cover transition-transform duration-300 group-hover:scale-105"
+            className="object-cover transition-transform duration-500 ease-out group-hover:scale-110"
             placeholder="blur"
             blurDataURL={SHIMMER_DATA_URL}
             priority
@@ -65,14 +65,14 @@ export function GalleryGrid({ images, title }: GalleryGridProps) {
             key={img.path}
             type="button"
             onClick={() => openAt(idx + 1)}
-            className="relative aspect-[4/3] overflow-hidden rounded-xl bg-muted cursor-pointer group"
+            className="relative aspect-[4/3] overflow-hidden rounded-xl bg-muted cursor-zoom-in group"
           >
             <Image
               src={img.url}
               alt={`${title} — photo ${idx + 2}`}
               fill
               sizes="(max-width: 1024px) 50vw, 350px"
-              className="object-cover transition-transform duration-300 group-hover:scale-105"
+              className="object-cover transition-transform duration-500 ease-out group-hover:scale-110"
               placeholder="blur"
               blurDataURL={SHIMMER_DATA_URL}
             />
