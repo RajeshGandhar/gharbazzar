@@ -200,6 +200,21 @@ function RegisterContent() {
             Sign in
           </Link>
         </p>
+
+        {/* Trust strip */}
+        <div className="mt-8 flex flex-col gap-2.5 text-xs text-muted-foreground">
+          {[
+            "Verified listings with real photos",
+            "Direct contact with owners — zero brokerage",
+            "Instant alerts for new properties",
+            "Your data is protected under DPDP",
+          ].map((text) => (
+            <div key={text} className="flex items-center gap-2">
+              <span className="flex items-center justify-center h-4 w-4 rounded-full bg-primary/10 text-primary text-[8px] font-bold shrink-0">✓</span>
+              {text}
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );

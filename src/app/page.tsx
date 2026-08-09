@@ -167,6 +167,63 @@ export default async function HomePage() {
         </section>
       )}
 
+      {/* ── How it works ──────────────────────────────────────────── */}
+      <section className="py-12 border-b border-border">
+        <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
+          <h2 className="text-xl font-bold text-foreground sm:text-2xl text-center mb-8">
+            How GharBazaar works
+          </h2>
+          <div className="grid gap-6 sm:grid-cols-3">
+            {[
+              {
+                step: "1",
+                title: "Search & discover",
+                desc: "Browse verified listings with real photos. Filter by budget, location, BHK, and more.",
+              },
+              {
+                step: "2",
+                title: "Connect directly",
+                desc: "Reveal the owner or agent's number instantly. No middlemen, no brokerage for seekers.",
+              },
+              {
+                step: "3",
+                title: "Visit & finalize",
+                desc: "Schedule a visit, negotiate directly, and close the deal — we're never a party to the transaction.",
+              },
+            ].map(({ step, title, desc }) => (
+              <div key={step} className="flex flex-col items-center text-center gap-3">
+                <div className="flex items-center justify-center h-12 w-12 rounded-full bg-primary text-primary-foreground font-bold text-lg">
+                  {step}
+                </div>
+                <h3 className="font-semibold text-foreground">{title}</h3>
+                <p className="text-sm text-muted-foreground max-w-xs">{desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── Trust badges ───────────────────────────────────────────── */}
+      <section className="py-6 border-b border-border bg-muted/20">
+        <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-3">
+            {[
+              { label: "Verified sellers", icon: "✓" },
+              { label: "Zero brokerage for seekers", icon: "₹0" },
+              { label: "DPDP compliant", icon: "🛡" },
+              { label: "Direct contact", icon: "☎" },
+            ].map(({ label, icon }) => (
+              <div key={label} className="flex items-center gap-2 text-sm text-muted-foreground">
+                <span className="flex items-center justify-center h-6 w-6 rounded-full bg-primary/10 text-primary text-xs font-bold">
+                  {icon}
+                </span>
+                {label}
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* ── 3 Intent cards ─────────────────────────────────────────── */}
       <section className="bg-muted/20 border-y border-border py-12">
         <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">

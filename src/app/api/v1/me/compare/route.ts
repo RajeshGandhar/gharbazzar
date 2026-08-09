@@ -25,9 +25,11 @@ export async function GET(req: NextRequest) {
     .from("properties")
     .select(`
       id, title, slug, price, bedrooms, bathrooms, built_up_area, area_unit,
-      purpose, furnishing,
+      purpose, furnishing, parking_spaces, facing, property_age_years,
+      floor_number, total_floors, construction_status,
       property_images ( path, is_cover, position ),
-      cities!city_id ( name )
+      cities!city_id ( name ),
+      property_amenities ( amenities ( name ) )
     `)
     .in("id", ids);
 

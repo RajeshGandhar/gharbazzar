@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Search, Plus, Trash2, ExternalLink } from "lucide-react";
 import { DeleteSavedSearchButton } from "./delete-button";
+import { EditPreferences } from "./edit-preferences";
 
 export const revalidate = 0;
 
@@ -94,12 +95,11 @@ export default async function SavedSearchesPage() {
                           {s.purpose}
                         </Badge>
                       )}
-                      <Badge variant="outline" className="text-[10px]">
-                        {FREQ_LABELS[s.frequency] ?? s.frequency}
-                      </Badge>
-                      {s.email_alerts && (
-                        <Badge variant="outline" className="text-[10px]">Email on</Badge>
-                      )}
+                      <EditPreferences
+                        searchId={s.id}
+                        initialFrequency={s.frequency}
+                        initialEmailAlerts={s.email_alerts}
+                      />
                     </div>
                     <p className="text-xs text-muted-foreground mt-1">{filterSummary(filters)}</p>
                     {s.last_alerted_at && (

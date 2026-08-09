@@ -22,8 +22,15 @@ interface CompareProperty {
   area_unit: string;
   purpose: string;
   furnishing: string | null;
+  parking_spaces: number | null;
+  facing: string | null;
+  property_age_years: number | null;
+  floor_number: number | null;
+  total_floors: number | null;
+  construction_status: string | null;
   property_images: PropertyImage[];
   cities: { name: string } | null;
+  property_amenities?: { amenities: { name: string } | null }[] | null;
 }
 
 const FURNISHING_LABELS: Record<string, string> = {
@@ -122,7 +129,16 @@ export default function ComparePage() {
     { label: "Bathrooms", getValue: (p) => p.bathrooms != null ? String(p.bathrooms) : "—" },
     { label: "Built-up Area", getValue: (p) => p.built_up_area != null ? formatArea(p.built_up_area, p.area_unit) : "—" },
     { label: "Furnishing", getValue: (p) => p.furnishing ? (FURNISHING_LABELS[p.furnishing] ?? p.furnishing) : "—" },
+    { label: "Floor", getValue: (p) => p.floor_number != null ? `${p.floor_number}${p.total_floors ? ` of ${p.total_floors}` : ""}` : "—" },
+    { label: "Parking", getValue: (p) => p.parking_spaces != null && p.parking_spaces > 0 ? `${p.parking_spaces} spaces` : "—" },
+    { label: "Facing", getValue: (p) => p.facing ? p.facing.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()) : "—" },
+    { label: "Property Age", getValue: (p) => p.property_age_years != null ? (p.property_age_years === 0 ? "New" : `${p.property_age_years} yrs`) : "—" },
+    { label: "Status", getValue: (p) => p.construction_status ? p.construction_status.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()) : "—" },
     { label: "City", getValue: (p) => p.cities?.name ?? "—" },
+    { label: "Amenities", getValue: (p) => {
+      const names = (p.property_amenities ?? []).map((a) => a.amenities?.name).filter(Boolean);
+      return names.length > 0 ? names.join(", ") : "—";
+    }},
   ];
 
   return (

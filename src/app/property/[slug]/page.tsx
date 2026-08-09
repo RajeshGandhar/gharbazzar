@@ -584,6 +584,47 @@ export default async function PropertyDetailPage({ params }: Props) {
                 </section>
               )}
 
+              {/* Video tour */}
+              {p.youtube_url && (() => {
+                const match = p.youtube_url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/))([a-zA-Z0-9_-]{11})/);
+                const videoId = match?.[1];
+                return videoId ? (
+                  <section>
+                    <h2 className="text-lg font-semibold text-foreground mb-3">Video tour</h2>
+                    <div className="relative w-full aspect-video rounded-xl overflow-hidden border border-border">
+                      <iframe
+                        src={`https://www.youtube-nocookie.com/embed/${videoId}`}
+                        title={`${p.title} — video tour`}
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                        className="absolute inset-0 w-full h-full"
+                        loading="lazy"
+                      />
+                    </div>
+                  </section>
+                ) : null;
+              })()}
+
+              {/* Virtual tour link */}
+              {p.virtual_tour_url && (
+                <section>
+                  <a
+                    href={p.virtual_tour_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-3 rounded-xl border border-border bg-card p-4 hover:border-primary/40 hover:bg-primary/3 transition-all group"
+                  >
+                    <div className="rounded-lg bg-primary/10 p-2.5">
+                      <Navigation className="h-5 w-5 text-primary" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold text-foreground group-hover:text-primary transition-colors">360° Virtual Tour</p>
+                      <p className="text-xs text-muted-foreground">Explore this property from anywhere</p>
+                    </div>
+                  </a>
+                </section>
+              )}
+
               {/* Amenities */}
               {amenities.length > 0 && (
                 <section>
