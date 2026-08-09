@@ -7,15 +7,14 @@ import {
   Building2,
   MapPin,
   ChevronRight,
+  TrendingUp,
 } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { PropertyCard, type PropertyCardData } from "@/components/properties/property-card";
 import { SearchBar } from "@/components/shared/search-bar";
 import { getFeaturedProperties, getPlatformStats } from "@/features/properties/server/queries";
-import { TrendingUp } from "lucide-react";
 
 export const revalidate = 600;
 
@@ -71,27 +70,23 @@ export default async function HomePage() {
   return (
     <div className="flex flex-col">
 
-      {/* ── Hero ──────────────────────────────────────────────────── */}
-      <section className="border-b border-border py-12 sm:py-16">
-        <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
-          <div className="text-center max-w-2xl mx-auto mb-8">
-            <h1 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl lg:text-5xl mb-4">
+      {/* ── Hero ── */}
+      <section className="py-16 sm:py-24 lg:py-28">
+        <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
+          <div className="text-center max-w-2xl mx-auto mb-10">
+            <h1 className="text-4xl font-semibold tracking-tight text-foreground sm:text-5xl lg:text-6xl mb-5 leading-[1.08]">
               Find property in Braj &amp; NCR
             </h1>
-            <p className="text-base text-muted-foreground">
+            <p className="text-base text-muted-foreground/80 tracking-wide">
               Mathura · Vrindavan · Delhi · Noida · Greater Noida
             </p>
           </div>
 
-          {/* Search bar */}
-          <div className="mx-auto max-w-2xl mb-8">
-            <div className="border border-border bg-card p-2 shadow-sm">
-              <SearchBar />
-            </div>
+          <div className="mx-auto max-w-2xl mb-12">
+            <SearchBar />
           </div>
 
-          {/* Stats */}
-          <div className="flex flex-wrap items-center justify-center gap-8 text-sm">
+          <div className="flex flex-wrap items-center justify-center gap-12 text-sm">
             {[
               { value: stats.listings > 0 ? `${stats.listings}+` : "Free", label: stats.listings > 0 ? "Active listings" : "For seekers" },
               { value: stats.verifiedSellers > 0 ? `${stats.verifiedSellers}+` : "Verified", label: stats.verifiedSellers > 0 ? "Verified sellers" : "Seller KYC" },
@@ -99,7 +94,7 @@ export default async function HomePage() {
               { value: "₹0", label: "Contact fee" },
             ].map(({ value, label }) => (
               <div key={label} className="text-center">
-                <p className="font-bold text-foreground tabular-nums text-lg">{value}</p>
+                <p className="font-semibold text-foreground tabular-nums text-base">{value}</p>
                 <p className="text-xs text-muted-foreground mt-0.5">{label}</p>
               </div>
             ))}
@@ -107,29 +102,29 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* ── Latest properties ─────────────────────────────────────── */}
+      {/* ── Latest properties ── */}
       {latestProperties.length > 0 && (
-        <section className="mx-auto w-full max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
-          <div className="flex items-end justify-between mb-6">
-            <h2 className="text-xl font-bold text-foreground sm:text-2xl">
+        <section className="mx-auto w-full max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
+          <div className="flex items-end justify-between mb-8">
+            <h2 className="text-lg font-semibold text-foreground sm:text-xl">
               Latest listings
             </h2>
             <Link
               href="/search"
-              className="hidden sm:flex items-center gap-1 text-sm font-medium text-primary hover:text-primary/80 transition-colors"
+              className="hidden sm:flex items-center gap-1 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
             >
               View all
               <ArrowRight className="h-3.5 w-3.5" />
             </Link>
           </div>
 
-          <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          <div className="grid gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {latestProperties.map((property) => (
               <PropertyCard key={property.id} property={property} />
             ))}
           </div>
 
-          <div className="mt-6 text-center sm:hidden">
+          <div className="mt-8 text-center sm:hidden">
             <Link
               href="/search"
               className={cn(buttonVariants({ variant: "outline" }), "gap-2")}
@@ -141,25 +136,23 @@ export default async function HomePage() {
         </section>
       )}
 
-      {/* ── Featured listings ─────────────────────────────────────── */}
+      {/* ── Featured listings ── */}
       {featuredProperties.length > 0 && (
-        <section className="mx-auto w-full max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
-          <div className="flex items-end justify-between mb-6">
+        <section className="mx-auto w-full max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+          <div className="flex items-end justify-between mb-8">
             <div className="flex items-center gap-2">
-              <div className="rounded-lg bg-amber-100 dark:bg-amber-900/40 p-1.5">
-                <TrendingUp className="h-4 w-4 text-amber-600 dark:text-amber-400" />
-              </div>
-              <h2 className="text-xl font-bold text-foreground sm:text-2xl">Featured listings</h2>
+              <TrendingUp className="h-4 w-4 text-amber-400" />
+              <h2 className="text-lg font-semibold text-foreground sm:text-xl">Featured listings</h2>
             </div>
             <Link
               href="/search?featured=true"
-              className="hidden sm:flex items-center gap-1 text-sm font-medium text-primary hover:text-primary/80 transition-colors"
+              className="hidden sm:flex items-center gap-1 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
             >
               View all
               <ArrowRight className="h-3.5 w-3.5" />
             </Link>
           </div>
-          <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          <div className="grid gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {featuredProperties.map((property) => (
               <PropertyCard key={property.id} property={property} />
             ))}
@@ -167,35 +160,24 @@ export default async function HomePage() {
         </section>
       )}
 
-      {/* ── How it works ──────────────────────────────────────────── */}
-      <section className="py-12 border-b border-border">
+      {/* ── How it works ── */}
+      <section className="py-16">
         <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
-          <h2 className="text-xl font-bold text-foreground sm:text-2xl text-center mb-8">
-            How GharBazaar works
+          <p className="text-[11px] uppercase tracking-widest font-medium text-muted-foreground text-center mb-3">How it works</p>
+          <h2 className="text-lg font-semibold text-foreground sm:text-xl text-center mb-10">
+            Three steps to your next property
           </h2>
-          <div className="grid gap-6 sm:grid-cols-3">
+          <div className="grid gap-8 sm:grid-cols-3">
             {[
-              {
-                step: "1",
-                title: "Search & discover",
-                desc: "Browse verified listings with real photos. Filter by budget, location, BHK, and more.",
-              },
-              {
-                step: "2",
-                title: "Connect directly",
-                desc: "Reveal the owner or agent's number instantly. No middlemen, no brokerage for seekers.",
-              },
-              {
-                step: "3",
-                title: "Visit & finalize",
-                desc: "Schedule a visit, negotiate directly, and close the deal — we're never a party to the transaction.",
-              },
+              { step: "1", title: "Search & discover", desc: "Browse verified listings with real photos. Filter by budget, location, BHK, and more." },
+              { step: "2", title: "Connect directly", desc: "Reveal the owner or agent's number instantly. No middlemen, no brokerage for seekers." },
+              { step: "3", title: "Visit & finalize", desc: "Schedule a visit, negotiate directly, and close the deal — we're never a party to the transaction." },
             ].map(({ step, title, desc }) => (
               <div key={step} className="flex flex-col items-center text-center gap-3">
-                <div className="flex items-center justify-center h-12 w-12 rounded-full bg-primary text-primary-foreground font-bold text-lg">
+                <div className="flex items-center justify-center h-10 w-10 rounded-lg bg-primary/10 text-primary font-semibold text-sm">
                   {step}
                 </div>
-                <h3 className="font-semibold text-foreground">{title}</h3>
+                <h3 className="font-medium text-foreground">{title}</h3>
                 <p className="text-sm text-muted-foreground max-w-xs">{desc}</p>
               </div>
             ))}
@@ -203,20 +185,18 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* ── Trust badges ───────────────────────────────────────────── */}
-      <section className="py-6 border-b border-border bg-muted/20">
+      {/* ── Trust strip ── */}
+      <section className="py-5">
         <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-3">
+          <div className="flex flex-wrap items-center justify-center gap-x-10 gap-y-3">
             {[
-              { label: "Verified sellers", icon: "✓" },
-              { label: "Zero brokerage for seekers", icon: "₹0" },
-              { label: "DPDP compliant", icon: "🛡" },
-              { label: "Direct contact", icon: "☎" },
-            ].map(({ label, icon }) => (
+              { label: "Verified sellers" },
+              { label: "Zero brokerage for seekers" },
+              { label: "DPDP compliant" },
+              { label: "Direct contact" },
+            ].map(({ label }) => (
               <div key={label} className="flex items-center gap-2 text-sm text-muted-foreground">
-                <span className="flex items-center justify-center h-6 w-6 rounded-full bg-primary/10 text-primary text-xs font-bold">
-                  {icon}
-                </span>
+                <span className="text-primary text-xs">✓</span>
                 {label}
               </div>
             ))}
@@ -224,120 +204,93 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* ── 3 Intent cards ─────────────────────────────────────────── */}
-      <section className="bg-muted/20 border-y border-border py-12">
+      {/* ── Intent cards ── */}
+      <section className="py-16">
         <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="mb-6">
-            <h2 className="text-xl font-bold text-foreground sm:text-2xl">
-              What are you looking for?
-            </h2>
-          </div>
+          <h2 className="text-lg font-semibold text-foreground sm:text-xl mb-8">
+            What are you looking for?
+          </h2>
 
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {/* Buy */}
             <Link
               href="/buy"
-              className="group border border-border bg-card p-6 hover:border-primary/30 transition-colors"
+              className="group rounded-xl border border-white/[0.06] bg-card p-6 hover:border-white/[0.12] transition-all"
             >
-              <div className="flex items-start justify-between mb-3">
-                <div className="w-10 h-10 rounded-lg bg-emerald-100 dark:bg-emerald-900/40 flex items-center justify-center">
-                  <Home className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
-                </div>
-                <ArrowRight className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
+              <div className="flex items-start justify-between mb-4">
+                <Home className="h-5 w-5 text-emerald-400" />
+                <ArrowRight className="h-4 w-4 text-muted-foreground group-hover:text-foreground transition-colors" />
               </div>
-              <h3 className="text-lg font-bold text-foreground mb-2">Buy</h3>
+              <h3 className="text-base font-medium text-foreground mb-2">Buy</h3>
               <p className="text-sm text-muted-foreground mb-3">
                 Apartments, plots, houses and villas. Verified sellers, transparent prices.
               </p>
-              <div className="flex flex-wrap gap-1.5">
+              <div className="flex flex-wrap gap-2">
                 {["Flats", "Plots", "Villas", "Houses"].map((t) => (
-                  <span key={t} className="text-xs text-muted-foreground">
-                    {t}
-                  </span>
+                  <span key={t} className="text-xs text-muted-foreground/70">{t}</span>
                 ))}
               </div>
             </Link>
 
-            {/* Rent */}
             <Link
               href="/rent"
-              className="group border border-border bg-card p-6 hover:border-primary/30 transition-colors"
+              className="group rounded-xl border border-white/[0.06] bg-card p-6 hover:border-white/[0.12] transition-all"
             >
-              <div className="flex items-start justify-between mb-3">
-                <div className="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900/40 flex items-center justify-center">
-                  <Key className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-                </div>
-                <ArrowRight className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
+              <div className="flex items-start justify-between mb-4">
+                <Key className="h-5 w-5 text-blue-400" />
+                <ArrowRight className="h-4 w-4 text-muted-foreground group-hover:text-foreground transition-colors" />
               </div>
-              <h3 className="text-lg font-bold text-foreground mb-2">Rent</h3>
+              <h3 className="text-base font-medium text-foreground mb-2">Rent</h3>
               <p className="text-sm text-muted-foreground mb-3">
                 Flats, PG, co-living. Monthly rent from ₹5,000. No broker fee.
               </p>
-              <div className="flex flex-wrap gap-1.5">
+              <div className="flex flex-wrap gap-2">
                 {["PG", "Shared flat", "Studio", "Furnished"].map((t) => (
-                  <span key={t} className="text-xs text-muted-foreground">
-                    {t}
-                  </span>
+                  <span key={t} className="text-xs text-muted-foreground/70">{t}</span>
                 ))}
               </div>
             </Link>
 
-            {/* List property */}
             <Link
               href="/list-property"
-              className="group border border-dashed border-primary/40 bg-primary/5 p-6 hover:border-primary/60 transition-colors sm:col-span-2 lg:col-span-1"
+              className="group rounded-xl border border-dashed border-white/[0.1] bg-card p-6 hover:border-primary/30 transition-all sm:col-span-2 lg:col-span-1"
             >
-              <div className="flex items-start justify-between mb-3">
-                <div className="w-10 h-10 rounded-lg bg-primary/15 flex items-center justify-center">
-                  <Building2 className="h-5 w-5 text-primary" />
-                </div>
+              <div className="flex items-start justify-between mb-4">
+                <Building2 className="h-5 w-5 text-primary" />
                 <ArrowRight className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
               </div>
-              <h3 className="text-lg font-bold text-foreground mb-2">List property</h3>
+              <h3 className="text-base font-medium text-foreground mb-2">List property</h3>
               <p className="text-sm text-muted-foreground mb-3">
                 Free to list. Reach genuine buyers and tenants. 5 minutes to publish.
               </p>
-              <span className="text-xs font-medium text-primary">
-                Free for sellers
-              </span>
+              <span className="text-xs font-medium text-primary">Free for sellers</span>
             </Link>
           </div>
         </div>
       </section>
 
-      {/* ── Student Housing spotlight ────────────────────────────── */}
+      {/* ── Student Housing ── */}
       <section className="mx-auto w-full max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
-        <div className="border border-violet-200 dark:border-violet-800/40 bg-violet-50/50 dark:bg-violet-950/20 p-6 sm:p-8">
+        <div className="rounded-xl border border-violet-500/15 bg-violet-950/15 p-6 sm:p-8">
           <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-start gap-4">
-              <div className="w-10 h-10 rounded-lg bg-violet-100 dark:bg-violet-900/50 flex items-center justify-center shrink-0">
-                <GraduationCap className="h-5 w-5 text-violet-600 dark:text-violet-400" />
+              <div className="w-10 h-10 rounded-lg bg-violet-900/40 flex items-center justify-center shrink-0">
+                <GraduationCap className="h-5 w-5 text-violet-400" />
               </div>
               <div>
-                <h2 className="text-lg font-bold text-foreground mb-1">
-                  Student Housing
-                </h2>
+                <h2 className="text-base font-medium text-foreground mb-1">Student Housing</h2>
                 <p className="text-sm text-muted-foreground mb-3">
                   PGs and hostels near {uniCount}+ universities. Distances computed from campus locations.
                 </p>
-                <div className="flex flex-wrap gap-1.5">
+                <div className="flex flex-wrap gap-2">
                   {["GLA University", "DU North Campus", "Amity Noida", "Mukherjee Nagar"].map((u) => (
-                    <span
-                      key={u}
-                      className="text-xs text-violet-700 dark:text-violet-300"
-                    >
-                      {u}
-                    </span>
+                    <span key={u} className="text-xs text-violet-300/70">{u}</span>
                   ))}
                 </div>
               </div>
             </div>
             <Link
               href="/student-housing"
-              className={cn(
-                buttonVariants(),
-                "shrink-0 self-start sm:self-center bg-violet-600 hover:bg-violet-700"
-              )}
+              className={cn(buttonVariants(), "shrink-0 self-start sm:self-center bg-violet-600 hover:bg-violet-700")}
             >
               View listings
             </Link>
@@ -345,20 +298,18 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* ── City quick-links ─────────────────────────────────────── */}
+      {/* ── Browse by city ── */}
       {(brajCities.length > 0 || ncrCities.length > 0) && (
-        <section className="border-t border-border bg-muted/20 py-12">
+        <section className="py-16">
           <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div className="mb-6">
-              <h2 className="text-xl font-bold text-foreground sm:text-2xl">
-                Browse by city
-              </h2>
-            </div>
+            <h2 className="text-lg font-semibold text-foreground sm:text-xl mb-8">
+              Browse by city
+            </h2>
 
             {brajCities.length > 0 && (
               <div className="mb-8">
-                <p className="text-sm font-semibold text-muted-foreground mb-3 flex items-center gap-2">
-                  <MapPin className="h-3.5 w-3.5" />
+                <p className="text-xs font-medium text-muted-foreground mb-3 flex items-center gap-2 uppercase tracking-wider">
+                  <MapPin className="h-3 w-3" />
                   Braj Region
                 </p>
                 <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 lg:grid-cols-6">
@@ -366,12 +317,10 @@ export default async function HomePage() {
                     <Link
                       key={city.id}
                       href={`/buy/${city.slug}`}
-                      className="group flex flex-col items-center justify-center gap-1 border border-border bg-card p-4 text-center hover:border-primary/30 transition-colors min-h-[72px]"
+                      className="group flex flex-col items-center justify-center gap-1.5 rounded-lg border border-white/[0.06] bg-card/50 p-4 text-center hover:border-white/[0.12] transition-all min-h-[64px]"
                     >
-                      <MapPin className="h-4 w-4 text-primary" />
-                      <span className="text-sm font-semibold text-foreground">
-                        {city.name}
-                      </span>
+                      <MapPin className="h-3.5 w-3.5 text-primary" />
+                      <span className="text-sm font-medium text-foreground">{city.name}</span>
                     </Link>
                   ))}
                 </div>
@@ -381,13 +330,13 @@ export default async function HomePage() {
             {ncrCities.length > 0 && (
               <div>
                 <div className="flex items-center justify-between mb-3">
-                  <p className="text-sm font-semibold text-muted-foreground flex items-center gap-2">
-                    <GraduationCap className="h-3.5 w-3.5" />
+                  <p className="text-xs font-medium text-muted-foreground flex items-center gap-2 uppercase tracking-wider">
+                    <GraduationCap className="h-3 w-3" />
                     Delhi NCR — Student Housing
                   </p>
                   <Link
                     href="/student-housing"
-                    className="text-xs font-medium text-primary hover:text-primary/80 flex items-center gap-1 transition-colors"
+                    className="text-xs font-medium text-muted-foreground hover:text-foreground flex items-center gap-1 transition-colors"
                   >
                     View all
                     <ChevronRight className="h-3 w-3" />
@@ -398,12 +347,10 @@ export default async function HomePage() {
                     <Link
                       key={city.id}
                       href={`/student-housing/${city.slug}`}
-                      className="group flex flex-col items-center justify-center gap-1 border border-border bg-card p-4 text-center hover:border-violet-300 hover:bg-violet-50/50 dark:hover:bg-violet-950/20 transition-colors min-h-[72px]"
+                      className="group flex flex-col items-center justify-center gap-1.5 rounded-lg border border-white/[0.06] bg-card/50 p-4 text-center hover:border-violet-500/20 transition-all min-h-[64px]"
                     >
-                      <GraduationCap className="h-4 w-4 text-violet-600 dark:text-violet-400" />
-                      <span className="text-sm font-semibold text-foreground">
-                        {city.name}
-                      </span>
+                      <GraduationCap className="h-3.5 w-3.5 text-violet-400" />
+                      <span className="text-sm font-medium text-foreground">{city.name}</span>
                     </Link>
                   ))}
                 </div>
@@ -413,26 +360,26 @@ export default async function HomePage() {
         </section>
       )}
 
-      {/* ── Bottom CTA ────────────────────────────────────────────── */}
+      {/* ── Bottom CTA ── */}
       <section className="mx-auto w-full max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
-        <div className="bg-primary p-8 sm:p-12 text-center">
-          <h2 className="text-2xl font-bold text-white mb-2">
+        <div className="bg-primary/90 rounded-xl p-10 sm:p-14 text-center">
+          <h2 className="text-2xl font-semibold text-white mb-2">
             Have a property to sell or rent?
           </h2>
-          <p className="text-white/90 mb-6">
+          <p className="text-white/80 mb-8">
             List for free. Reach verified buyers and tenants.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <Link
               href="/list-property"
-              className="inline-flex items-center justify-center gap-2 bg-white text-primary font-semibold px-6 py-2.5 hover:bg-white/90 transition-colors"
+              className="inline-flex items-center justify-center gap-2 rounded-lg bg-white text-primary font-medium px-6 py-2.5 hover:bg-white/90 transition-colors"
             >
               <Building2 className="h-4 w-4" />
               Post property
             </Link>
             <Link
               href="/auth/register"
-              className="inline-flex items-center justify-center gap-2 border border-white/30 text-white font-medium px-6 py-2.5 hover:bg-white/10 transition-colors"
+              className="inline-flex items-center justify-center gap-2 rounded-lg border border-white/25 text-white font-medium px-6 py-2.5 hover:bg-white/10 transition-colors"
             >
               Create account
             </Link>
