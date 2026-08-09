@@ -10,7 +10,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { PropertyCard, type PropertyCardData } from "@/components/properties/property-card";
+import type { PropertyCardData } from "@/components/properties/property-card";
 import { Pagination } from "@/components/shared/pagination";
 import { SearchBar } from "@/components/shared/search-bar";
 import { searchProperties } from "@/features/search/server/queries";
@@ -19,6 +19,9 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { cn } from "@/lib/utils";
 import { SearchMapView } from "./map-view";
+import { SearchSplitView } from "./split-view";
+import { RangeFilter } from "./range-filter";
+import { LoadMoreResults } from "./load-more";
 import { SaveSearchButton } from "./save-search-button";
 import { SortSelect } from "./sort-select";
 
@@ -258,6 +261,26 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
           })}
         </div>
       </div>
+
+      {/* Price range slider */}
+      <RangeFilter
+        label={input.purpose === "rent" ? "Rent range" : "Price range"}
+        minParam="min_price"
+        maxParam="max_price"
+        currentMin={input.min_price}
+        currentMax={input.max_price}
+        absoluteMin={input.purpose === "rent" ? 1000 : 100000}
+        absoluteMax={input.purpose === "rent" ? 100000 : 50000000}
+        step={input.purpose === "rent" ? 1000 : 100000}
+        formatValue={(v) =>
+          v >= 10000000
+            ? `₹${(v / 10000000).toFixed(1)}Cr`
+            : v >= 100000
+              ? `₹${(v / 100000).toFixed(0)}L`
+              : `₹${v.toLocaleString("en-IN")}`
+        }
+        baseUrl={baseUrl}
+      />
 
       {types.length > 0 && (
         <div>
@@ -507,18 +530,20 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
         )}
 
         <div className="flex gap-8">
-          {/* Desktop sidebar filters */}
-          <aside className="hidden lg:block w-64 shrink-0">
-            <div className="sticky top-24">
-              <div className="rounded-2xl border border-border bg-card p-5">
-                <div className="flex items-center gap-2 mb-5">
-                  <Filter className="h-4 w-4 text-primary" />
-                  <h2 className="font-semibold text-foreground">Filters</h2>
+          {/* Desktop sidebar filters — hidden in map/split view to give space */}
+          {viewMode !== "map" && (
+            <aside className="hidden lg:block w-64 shrink-0">
+              <div className="sticky top-24">
+                <div className="rounded-2xl border border-border bg-card p-5">
+                  <div className="flex items-center gap-2 mb-5">
+                    <Filter className="h-4 w-4 text-primary" />
+                    <h2 className="font-semibold text-foreground">Filters</h2>
+                  </div>
+                  <FilterPanel />
                 </div>
-                <FilterPanel />
               </div>
-            </div>
-          </aside>
+            </aside>
+          )}
 
           {/* Results */}
           <div className="flex-1 min-w-0">
@@ -547,28 +572,47 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
                 </div>
               </div>
             ) : viewMode === "map" ? (
-              <SearchMapView
-                properties={properties.map((p) => ({
-                  id: p.id,
-                  title: p.title,
-                  slug: p.slug,
-                  price: p.price,
-                  purpose: p.purpose,
-                  latitude: (p as unknown as { latitude?: number | null }).latitude ?? null,
-                  longitude: (p as unknown as { longitude?: number | null }).longitude ?? null,
-                  cities: (p as unknown as { cities?: { name: string } | null }).cities ?? null,
-                }))}
-              />
-            ) : (
               <>
-                <div className="grid gap-5 grid-cols-1 sm:grid-cols-2 xl:grid-cols-3">
-                  {properties.map((p) => (
-                    <PropertyCard key={p.id} property={p} />
-                  ))}
+                {/* Desktop: split view (list + map side by side) */}
+                <div className="hidden lg:block">
+                  <SearchSplitView
+                    properties={properties}
+                    mapProperties={properties.map((p) => ({
+                      id: p.id,
+                      title: p.title,
+                      slug: p.slug,
+                      price: p.price,
+                      purpose: p.purpose,
+                      latitude: (p as unknown as { latitude?: number | null }).latitude ?? null,
+                      longitude: (p as unknown as { longitude?: number | null }).longitude ?? null,
+                      cities: (p as unknown as { cities?: { name: string } | null }).cities ?? null,
+                    }))}
+                  />
                 </div>
-
+                {/* Mobile: map only */}
+                <div className="lg:hidden">
+                  <SearchMapView
+                    properties={properties.map((p) => ({
+                      id: p.id,
+                      title: p.title,
+                      slug: p.slug,
+                      price: p.price,
+                      purpose: p.purpose,
+                      latitude: (p as unknown as { latitude?: number | null }).latitude ?? null,
+                      longitude: (p as unknown as { longitude?: number | null }).longitude ?? null,
+                      cities: (p as unknown as { cities?: { name: string } | null }).cities ?? null,
+                    }))}
+                  />
+                </div>
                 <Pagination page={input.page} perPage={input.per_page} total={count} baseUrl={baseUrl} />
               </>
+            ) : (
+              <LoadMoreResults
+                initialProperties={properties}
+                total={count}
+                perPage={input.per_page}
+                searchUrl={baseUrl}
+              />
             )}
           </div>
         </div>
