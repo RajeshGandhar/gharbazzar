@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
-import Image from "next/image";
 import Link from "next/link";
 import {
   AlertCircle,
@@ -8,10 +7,12 @@ import {
   BedDouble,
   Building2,
   Calendar,
+  Car,
   CheckCircle2,
   ChevronRight,
-  Flag,
+  Compass,
   GraduationCap,
+  History,
   Layers,
   MapPin,
   MessageSquare,
@@ -59,10 +60,13 @@ import { ContactReveal } from "@/components/shared/contact-reveal";
 import { InquiryForm } from "@/components/shared/inquiry-form";
 import { ScheduleVisitButton } from "@/components/shared/schedule-visit-button";
 import { EmiCalculator } from "@/components/properties/emi-calculator";
-import { getPropertyImageUrl, SHIMMER_DATA_URL } from "@/lib/utils/storage";
+import { getPropertyImageUrl } from "@/lib/utils/storage";
 import { listingSchema } from "@/lib/seo/schema";
 import { ShareButton } from "@/components/shared/share-button";
 import { SimilarProperties } from "@/components/properties/similar-properties";
+import { GalleryGrid } from "@/components/properties/gallery-grid";
+import { PriceHistoryChart } from "@/components/properties/price-history-chart";
+import { ReportListingDialog } from "@/components/properties/report-listing-dialog";
 import { formatFreshness } from "@/lib/utils/format";
 
 export const revalidate = 60;
@@ -280,6 +284,7 @@ export default async function PropertyDetailPage({ params }: Props) {
     nearby_places?: NearbyPlace[] | null;
     room_types?: RoomType[] | null;
     property_universities?: PropUni[] | null;
+    price_history?: { old_price: number | null; new_price: number; changed_at: string }[] | null;
   };
 
   const seller = p.sellers;
@@ -294,6 +299,7 @@ export default async function PropertyDetailPage({ params }: Props) {
   const nearbyPlaces = p.nearby_places ?? [];
   const roomTypes = (p.room_types ?? []).filter((r) => r.is_active);
   const nearbyUniversities = (p.property_universities ?? []).filter((pu) => pu.universities);
+  const priceHistory = p.price_history ?? [];
 
   const isStudentHousing = p.rental_kind === "student";
   const isSale = p.purpose === "sale";
@@ -393,45 +399,7 @@ export default async function PropertyDetailPage({ params }: Props) {
                     </div>
                   </div>
                 ) : (
-                  <div className={cn("grid gap-2", images.length === 1 ? "grid-cols-1" : "grid-cols-2")}>
-                    <div className={cn(
-                      "shadow-elevated relative overflow-hidden rounded-xl bg-muted aspect-[4/3]",
-                      images.length >= 3 ? "row-span-2" : ""
-                    )}>
-                      <Image
-                        src={images[0].url}
-                        alt={`${p.title} — main photo`}
-                        fill
-                        sizes="(max-width: 1024px) 100vw, 700px"
-                        className="object-cover"
-                        placeholder="blur"
-                        blurDataURL={SHIMMER_DATA_URL}
-                        priority
-                      />
-                      <div className="absolute bottom-3 right-3 rounded-full bg-black/60 backdrop-blur-sm px-2.5 py-1 text-xs text-white font-medium">
-                        1 / {images.length}
-                      </div>
-                    </div>
-
-                    {images.slice(1, 3).map((img, idx) => (
-                      <div key={img.path} className="relative aspect-[4/3] overflow-hidden rounded-xl bg-muted">
-                        <Image
-                          src={img.url}
-                          alt={`${p.title} — photo ${idx + 2}`}
-                          fill
-                          sizes="(max-width: 1024px) 50vw, 350px"
-                          className="object-cover"
-                          placeholder="blur"
-                          blurDataURL={SHIMMER_DATA_URL}
-                        />
-                        {idx === 1 && images.length > 3 && (
-                          <div className="absolute inset-0 flex items-center justify-center bg-black/40">
-                            <span className="text-white font-semibold text-lg">+{images.length - 3} more</span>
-                          </div>
-                        )}
-                      </div>
-                    ))}
-                  </div>
+                  <GalleryGrid images={images} title={p.title} />
                 )}
               </section>
 
@@ -537,6 +505,26 @@ export default async function PropertyDetailPage({ params }: Props) {
                       </span>
                     </div>
                   )}
+                  {p.parking_spaces != null && p.parking_spaces > 0 && (
+                    <div className="flex items-center gap-2 rounded-lg border border-border bg-card px-3 py-2">
+                      <Car className="h-4 w-4 text-primary" />
+                      <span className="text-sm font-medium">{p.parking_spaces} Parking</span>
+                    </div>
+                  )}
+                  {p.facing && (
+                    <div className="flex items-center gap-2 rounded-lg border border-border bg-card px-3 py-2">
+                      <Compass className="h-4 w-4 text-primary" />
+                      <span className="text-sm font-medium capitalize">{p.facing.replace(/_/g, " ")}</span>
+                    </div>
+                  )}
+                  {p.property_age_years != null && (
+                    <div className="flex items-center gap-2 rounded-lg border border-border bg-card px-3 py-2">
+                      <History className="h-4 w-4 text-primary" />
+                      <span className="text-sm font-medium">
+                        {p.property_age_years === 0 ? "New construction" : `${p.property_age_years} yr${p.property_age_years > 1 ? "s" : ""} old`}
+                      </span>
+                    </div>
+                  )}
                 </div>
               </section>
 
@@ -569,6 +557,11 @@ export default async function PropertyDetailPage({ params }: Props) {
 
               {/* EMI calculator (purchase properties only) */}
               {isSale && <EmiCalculator price={p.price} />}
+
+              {/* Price history */}
+              {priceHistory.length > 0 && (
+                <PriceHistoryChart history={priceHistory} currentPrice={p.price} />
+              )}
 
               {/* Room types (student housing) */}
               {isStudentHousing && roomTypes.length > 0 && (
@@ -712,36 +705,7 @@ export default async function PropertyDetailPage({ params }: Props) {
 
               {/* Report listing */}
               <div className="flex justify-end">
-                <Dialog>
-                  <DialogTrigger className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-destructive transition-smooth">
-                    <Flag className="h-3.5 w-3.5" />
-                    Report this listing
-                  </DialogTrigger>
-                  <DialogContent className="sm:max-w-sm">
-                    <DialogHeader>
-                      <DialogTitle>Report listing</DialogTitle>
-                    </DialogHeader>
-                    <div className="flex flex-col gap-3">
-                      <p className="text-sm text-muted-foreground">Why are you reporting this listing?</p>
-                      {[
-                        "Inaccurate information",
-                        "Property no longer available",
-                        "Suspected scam or fraud",
-                        "Duplicate listing",
-                        "Discriminatory or prejudiced content",
-                        "Offensive content",
-                        "Other",
-                      ].map((reason) => (
-                        <button
-                          key={reason}
-                          className="text-left rounded-lg border border-border px-3 py-2.5 text-sm hover:border-primary/40 hover:bg-accent transition-smooth"
-                        >
-                          {reason}
-                        </button>
-                      ))}
-                    </div>
-                  </DialogContent>
-                </Dialog>
+                <ReportListingDialog propertyId={p.id} />
               </div>
             </div>
 
