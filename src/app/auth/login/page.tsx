@@ -76,10 +76,10 @@ function LoginContent() {
       <div className="w-full max-w-sm">
         {/* Logo / wordmark */}
         <div className="mb-8 text-center">
-          <Link href="/" className="text-2xl font-bold text-primary">
+          <Link href="/" className="text-xl font-semibold text-primary">
             GharBazaar
           </Link>
-          <h1 className="mt-2 text-xl font-semibold text-foreground">
+          <h1 className="mt-2 text-xl font-medium text-foreground">
             Sign in to your account
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">
@@ -88,7 +88,7 @@ function LoginContent() {
         </div>
 
         {status === "sent" ? (
-          <div className="rounded-2xl border border-border bg-card p-6 text-center">
+          <div className="rounded-xl border border-white/[0.06] bg-card p-8 text-center">
             <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-primary/10">
               <Mail className="h-7 w-7 text-primary" />
             </div>
@@ -106,7 +106,7 @@ function LoginContent() {
             </button>
           </div>
         ) : (
-          <div className="rounded-2xl border border-border bg-card p-6">
+          <div className="rounded-xl border border-white/[0.06] bg-card p-8">
             {/* Global error */}
             {errorMsg && (
               <div className="mb-4 rounded-lg border border-destructive/30 bg-destructive/10 px-3 py-2.5">
@@ -209,7 +209,7 @@ function LoginContent() {
             "Your data is protected under DPDP",
           ].map((text) => (
             <div key={text} className="flex items-center gap-2">
-              <span className="flex items-center justify-center h-4 w-4 rounded-full bg-primary/10 text-primary text-[8px] font-bold shrink-0">✓</span>
+              <span className="text-primary text-xs shrink-0">✓</span>
               {text}
             </div>
           ))}

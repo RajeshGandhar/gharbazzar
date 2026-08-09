@@ -63,18 +63,18 @@ export function Footer() {
   const year = new Date().getFullYear();
 
   return (
-    <footer className="border-t border-border bg-muted/30 mt-auto" role="contentinfo">
+    <footer className="border-t border-white/[0.04] bg-card/30 mt-auto" role="contentinfo">
       {/* Trust strip */}
-      <div className="border-b border-border/60">
+      <div className="border-b border-white/[0.04]">
         <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 gap-6 sm:grid-cols-4">
             {trustPoints.map(({ icon: Icon, label, desc }) => (
               <div key={label} className="flex items-start gap-3">
-                <div className="rounded-lg bg-primary/10 p-2 shrink-0">
-                  <Icon className="h-4 w-4 text-primary" aria-hidden />
+                <div className="rounded-md bg-primary/8 p-1.5 shrink-0">
+                  <Icon className="h-3.5 w-3.5 text-primary" aria-hidden />
                 </div>
                 <div>
-                  <p className="text-sm font-semibold text-foreground">{label}</p>
+                  <p className="text-sm font-medium text-foreground">{label}</p>
                   <p className="text-xs text-muted-foreground mt-0.5">{desc}</p>
                 </div>
               </div>
@@ -94,7 +94,7 @@ export function Footer() {
               <Link
                 key={c.href + c.label}
                 href={c.href}
-                className="rounded-full border border-border bg-card px-3.5 py-1.5 text-sm text-muted-foreground transition-all hover:border-primary/40 hover:text-primary hover:bg-primary/5"
+                className="rounded-md border border-white/[0.06] bg-card/60 px-3 py-1.5 text-sm text-muted-foreground transition-all hover:border-white/[0.12] hover:text-foreground"
               >
                 {c.label}
               </Link>
@@ -106,7 +106,7 @@ export function Footer() {
         <div className="grid grid-cols-2 gap-8 sm:grid-cols-4 mb-10">
           {navGroups.map((group) => (
             <div key={group.title}>
-              <h3 className="text-sm font-semibold text-foreground mb-4">{group.title}</h3>
+              <h3 className="text-sm font-medium text-foreground mb-4">{group.title}</h3>
               <ul className="space-y-2.5">
                 {group.links.map((link) => (
                   <li key={link.href + link.label}>
@@ -132,7 +132,7 @@ export function Footer() {
             <div className="h-6 w-6 rounded-md bg-primary flex items-center justify-center">
               <Building2 className="h-3.5 w-3.5 text-primary-foreground" />
             </div>
-            <span className="text-sm font-bold">
+            <span className="text-sm font-semibold">
               <span className="text-primary">Ghar</span>
               <span className="text-foreground">Bazaar</span>
             </span>

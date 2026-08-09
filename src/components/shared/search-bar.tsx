@@ -171,14 +171,14 @@ export function SearchBar({
   return (
     <form
       onSubmit={handleSearch}
-      className={cn("flex flex-col gap-3 sm:flex-row sm:items-center", className)}
+      className={cn("flex flex-col gap-2.5 sm:flex-row sm:items-center", className)}
       role="search"
       aria-label="Property search"
     >
       {/* Query input with typeahead */}
       <div className="relative flex-1">
         <Search
-          className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground z-10"
+          className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/60 z-10"
           aria-hidden
         />
         <Input
@@ -188,7 +188,7 @@ export function SearchBar({
           onKeyDown={handleKeyDown}
           onFocus={() => { if (suggestions.length > 0) setShowSuggestions(true); }}
           placeholder="Search by city, area, or keyword…"
-          className="pl-9"
+          className="pl-9 h-10 bg-card border-white/[0.08] focus-visible:border-primary/40 focus-visible:ring-primary/20"
           aria-label="Search query"
           aria-autocomplete="list"
           aria-expanded={showSuggestions}
@@ -199,7 +199,7 @@ export function SearchBar({
         {showSuggestions && suggestions.length > 0 && (
           <div
             ref={dropdownRef}
-            className="absolute left-0 right-0 top-full mt-1 z-50 rounded-xl border border-border bg-popover shadow-lg overflow-hidden"
+            className="absolute left-0 right-0 top-full mt-2 z-50 rounded-lg border border-white/[0.08] bg-popover shadow-elevated-lg overflow-hidden"
             role="listbox"
           >
             {suggestions.map((s, i) => {
@@ -213,7 +213,7 @@ export function SearchBar({
                   onMouseDown={(e) => { e.preventDefault(); applySuggestion(s); }}
                   className={cn(
                     "w-full flex items-center gap-3 px-4 py-2.5 text-left transition-colors",
-                    i === activeIndex ? "bg-primary/10" : "hover:bg-muted"
+                    i === activeIndex ? "bg-white/[0.06]" : "hover:bg-white/[0.04]"
                   )}
                 >
                   <Icon className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />

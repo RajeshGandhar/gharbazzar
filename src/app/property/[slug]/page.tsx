@@ -399,7 +399,7 @@ export default async function PropertyDetailPage({ params }: Props) {
         )}
 
         {/* Breadcrumb */}
-        <div className="border-b border-border bg-muted/20">
+        <div className="border-b border-white/[0.04]">
           <nav aria-label="Breadcrumb" className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-3">
             <ol className="flex items-center gap-1.5 text-sm text-muted-foreground flex-wrap">
               <li><Link href="/" className="hover:text-primary transition-smooth">Home</Link></li>
@@ -455,7 +455,7 @@ export default async function PropertyDetailPage({ params }: Props) {
                         </Badge>
                       )}
                     </div>
-                    <h1 className="text-2xl font-bold text-foreground sm:text-3xl leading-tight">{p.title}</h1>
+                    <h1 className="text-2xl font-semibold text-foreground sm:text-3xl leading-tight">{p.title}</h1>
                     {(p.cities || p.areas) && (
                       <div className="flex items-center gap-1.5 mt-2 text-muted-foreground">
                         <MapPin className="h-4 w-4 shrink-0" />
@@ -486,7 +486,7 @@ export default async function PropertyDetailPage({ params }: Props) {
                     </div>
                   </div>
                   <div className="shrink-0 text-right flex flex-col items-end gap-2">
-                    <p className="text-3xl font-bold text-primary">{priceDisplay}</p>
+                    <p className="text-2xl font-semibold text-primary">{priceDisplay}</p>
                     {p.is_negotiable && <Badge variant="secondary" className="text-[10px]">Negotiable</Badge>}
                     {p.price_per_sqft && p.price_per_sqft > 0 && (
                       <p className="text-xs text-muted-foreground">₹{p.price_per_sqft.toLocaleString("en-IN")}/sqft</p>
@@ -500,25 +500,25 @@ export default async function PropertyDetailPage({ params }: Props) {
               <section>
                 <div className="flex flex-wrap gap-3">
                   {p.bedrooms != null && (
-                    <div className="flex items-center gap-2 rounded-lg border border-border bg-card px-3 py-2">
+                    <div className="flex items-center gap-2 rounded-md border border-white/[0.06] bg-card/80 px-3 py-2">
                       <BedDouble className="h-4 w-4 text-primary" />
                       <span className="text-sm font-medium">{formatBhk(p.bedrooms)}</span>
                     </div>
                   )}
                   {p.built_up_area && (
-                    <div className="flex items-center gap-2 rounded-lg border border-border bg-card px-3 py-2">
+                    <div className="flex items-center gap-2 rounded-md border border-white/[0.06] bg-card/80 px-3 py-2">
                       <Ruler className="h-4 w-4 text-primary" />
                       <span className="text-sm font-medium">{formatArea(p.built_up_area, p.area_unit ?? "sqft")}</span>
                     </div>
                   )}
                   {p.bathrooms != null && (
-                    <div className="flex items-center gap-2 rounded-lg border border-border bg-card px-3 py-2">
+                    <div className="flex items-center gap-2 rounded-md border border-white/[0.06] bg-card/80 px-3 py-2">
                       <Bath className="h-4 w-4 text-primary" />
                       <span className="text-sm font-medium">{p.bathrooms} Bath</span>
                     </div>
                   )}
                   {p.floor_number != null && (
-                    <div className="flex items-center gap-2 rounded-lg border border-border bg-card px-3 py-2">
+                    <div className="flex items-center gap-2 rounded-md border border-white/[0.06] bg-card/80 px-3 py-2">
                       <Building2 className="h-4 w-4 text-primary" />
                       <span className="text-sm font-medium">
                         Floor {p.floor_number}{p.total_floors ? ` of ${p.total_floors}` : ""}
@@ -526,19 +526,19 @@ export default async function PropertyDetailPage({ params }: Props) {
                     </div>
                   )}
                   {p.furnishing && (
-                    <div className="flex items-center gap-2 rounded-lg border border-border bg-card px-3 py-2">
+                    <div className="flex items-center gap-2 rounded-md border border-white/[0.06] bg-card/80 px-3 py-2">
                       <Wrench className="h-4 w-4 text-primary" />
                       <span className="text-sm font-medium capitalize">{p.furnishing.replace(/_/g, " ")}</span>
                     </div>
                   )}
                   {isSale && p.construction_status && (
-                    <div className="flex items-center gap-2 rounded-lg border border-border bg-card px-3 py-2">
+                    <div className="flex items-center gap-2 rounded-md border border-white/[0.06] bg-card/80 px-3 py-2">
                       <Square className="h-4 w-4 text-primary" />
                       <span className="text-sm font-medium capitalize">{p.construction_status.replace(/_/g, " ")}</span>
                     </div>
                   )}
                   {isSale && p.possession_date && (
-                    <div className="flex items-center gap-2 rounded-lg border border-border bg-card px-3 py-2">
+                    <div className="flex items-center gap-2 rounded-md border border-white/[0.06] bg-card/80 px-3 py-2">
                       <Calendar className="h-4 w-4 text-primary" />
                       <span className="text-sm font-medium">
                         Possession: {new Date(p.possession_date).toLocaleDateString("en-IN", { month: "short", year: "numeric" })}
@@ -546,7 +546,7 @@ export default async function PropertyDetailPage({ params }: Props) {
                     </div>
                   )}
                   {!isSale && p.available_from && (
-                    <div className="flex items-center gap-2 rounded-lg border border-border bg-card px-3 py-2">
+                    <div className="flex items-center gap-2 rounded-md border border-white/[0.06] bg-card/80 px-3 py-2">
                       <Calendar className="h-4 w-4 text-primary" />
                       <span className="text-sm font-medium">
                         Available: {new Date(p.available_from).toLocaleDateString("en-IN", { month: "short", year: "numeric" })}
@@ -554,19 +554,19 @@ export default async function PropertyDetailPage({ params }: Props) {
                     </div>
                   )}
                   {p.parking_spaces != null && p.parking_spaces > 0 && (
-                    <div className="flex items-center gap-2 rounded-lg border border-border bg-card px-3 py-2">
+                    <div className="flex items-center gap-2 rounded-md border border-white/[0.06] bg-card/80 px-3 py-2">
                       <Car className="h-4 w-4 text-primary" />
                       <span className="text-sm font-medium">{p.parking_spaces} Parking</span>
                     </div>
                   )}
                   {p.facing && (
-                    <div className="flex items-center gap-2 rounded-lg border border-border bg-card px-3 py-2">
+                    <div className="flex items-center gap-2 rounded-md border border-white/[0.06] bg-card/80 px-3 py-2">
                       <Compass className="h-4 w-4 text-primary" />
                       <span className="text-sm font-medium capitalize">{p.facing.replace(/_/g, " ")}</span>
                     </div>
                   )}
                   {p.property_age_years != null && (
-                    <div className="flex items-center gap-2 rounded-lg border border-border bg-card px-3 py-2">
+                    <div className="flex items-center gap-2 rounded-md border border-white/[0.06] bg-card/80 px-3 py-2">
                       <History className="h-4 w-4 text-primary" />
                       <span className="text-sm font-medium">
                         {p.property_age_years === 0 ? "New construction" : `${p.property_age_years} yr${p.property_age_years > 1 ? "s" : ""} old`}
@@ -579,7 +579,7 @@ export default async function PropertyDetailPage({ params }: Props) {
               {/* Description */}
               {p.description && (
                 <section>
-                  <h2 className="text-lg font-semibold text-foreground mb-3">About this property</h2>
+                  <h2 className="text-base font-medium text-foreground mb-3">About this property</h2>
                   <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-line">{p.description}</p>
                 </section>
               )}
@@ -590,7 +590,7 @@ export default async function PropertyDetailPage({ params }: Props) {
                 const videoId = match?.[1];
                 return videoId ? (
                   <section>
-                    <h2 className="text-lg font-semibold text-foreground mb-3">Video tour</h2>
+                    <h2 className="text-base font-medium text-foreground mb-3">Video tour</h2>
                     <div className="relative w-full aspect-video rounded-xl overflow-hidden border border-border">
                       <iframe
                         src={`https://www.youtube-nocookie.com/embed/${videoId}`}
@@ -628,7 +628,7 @@ export default async function PropertyDetailPage({ params }: Props) {
               {/* Amenities */}
               {amenities.length > 0 && (
                 <section>
-                  <h2 className="text-lg font-semibold text-foreground mb-4">Amenities</h2>
+                  <h2 className="text-base font-medium text-foreground mb-4">Amenities</h2>
                   <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
                     {amenities.map(({ amenities: amenity }) =>
                       amenity ? (
@@ -655,7 +655,7 @@ export default async function PropertyDetailPage({ params }: Props) {
               {/* Room types (student housing) */}
               {isStudentHousing && roomTypes.length > 0 && (
                 <section>
-                  <h2 className="text-lg font-semibold text-foreground mb-4">Room options &amp; availability</h2>
+                  <h2 className="text-base font-medium text-foreground mb-4">Room options &amp; availability</h2>
                   <div className="grid gap-4 sm:grid-cols-2">
                     {roomTypes.map((room) => (
                       <Card key={room.id} className="border-border hover:border-primary/30 transition-smooth">
@@ -694,7 +694,7 @@ export default async function PropertyDetailPage({ params }: Props) {
               {/* Nearby universities */}
               {nearbyUniversities.length > 0 && (
                 <section>
-                  <h2 className="text-lg font-semibold text-foreground mb-4">Nearby universities</h2>
+                  <h2 className="text-base font-medium text-foreground mb-4">Nearby universities</h2>
                   <div className="flex flex-col gap-2">
                     {nearbyUniversities.map(({ universities: uni, computed_distance_m }) =>
                       uni ? (
@@ -724,7 +724,7 @@ export default async function PropertyDetailPage({ params }: Props) {
               {/* Map */}
               {p.latitude && p.longitude && (
                 <section>
-                  <h2 className="text-lg font-semibold text-foreground mb-4">Location</h2>
+                  <h2 className="text-base font-medium text-foreground mb-4">Location</h2>
                   <PropertyMap latitude={p.latitude} longitude={p.longitude} title={p.title} />
                 </section>
               )}
@@ -732,7 +732,7 @@ export default async function PropertyDetailPage({ params }: Props) {
               {/* Nearby places */}
               {nearbyPlaces.length > 0 && (
                 <section>
-                  <h2 className="text-lg font-semibold text-foreground mb-4">Nearby places</h2>
+                  <h2 className="text-base font-medium text-foreground mb-4">Nearby places</h2>
                   <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
                     {nearbyPlaces.map((place) => (
                       <div key={place.id} className="flex items-center gap-3 rounded-lg border border-border bg-card/50 p-3">
@@ -753,7 +753,7 @@ export default async function PropertyDetailPage({ params }: Props) {
               {/* Seller info — mobile only */}
               {seller && (
                 <section className="lg:hidden">
-                  <h2 className="text-lg font-semibold text-foreground mb-4">Listed by</h2>
+                  <h2 className="text-base font-medium text-foreground mb-4">Listed by</h2>
                   <Card>
                     <CardContent className="pt-5">
                       <PropertyContactBox
@@ -782,7 +782,7 @@ export default async function PropertyDetailPage({ params }: Props) {
               )}
 
               {/* Platform disclaimer */}
-              <div className="flex items-start gap-2.5 rounded-lg border border-border bg-muted/30 px-4 py-3">
+              <div className="flex items-start gap-2.5 rounded-lg border border-white/[0.04] bg-card/40 px-4 py-3">
                 <Shield className="h-4 w-4 text-muted-foreground shrink-0 mt-px" />
                 <p className="text-xs text-muted-foreground leading-relaxed">
                   GharBazaar is a discovery platform, not a party to any
