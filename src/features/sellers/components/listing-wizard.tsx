@@ -38,7 +38,10 @@ interface PropertyData {
   city_id: number;
   area_id: number | null;
   bedrooms: number | null;
+  bathrooms?: number | null;
   built_up_area: number | null;
+  area_unit?: string | null;
+  plot_area?: number | null;
   rental_kind: string | null;
   gender_policy: string | null;
   is_featured: boolean;
