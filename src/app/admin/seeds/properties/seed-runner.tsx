@@ -226,7 +226,7 @@ export function SeedRunner({ cities, areas, amenities, sellers }: Props) {
   }
 
   return (
-    <div className="rounded-2xl border border-border bg-card p-6 shadow-card space-y-6">
+    <div className="rounded-xl border border-border bg-card p-6 shadow-card space-y-6">
       <div className="flex items-start justify-between gap-4">
         <div>
           <h2 className="text-base font-semibold text-foreground flex items-center gap-2">
@@ -291,9 +291,9 @@ export function SeedRunner({ cities, areas, amenities, sellers }: Props) {
                 key={i}
                 className={cn(
                   "text-xs font-mono",
-                  line.startsWith("✓") ? "text-emerald-600 dark:text-emerald-400" :
+                  line.startsWith("✓") ? "text-emerald-400" :
                   line.startsWith("✗") ? "text-red-500" :
-                  line.startsWith("⚠") ? "text-amber-600 dark:text-amber-400" :
+                  line.startsWith("⚠") ? "text-amber-400" :
                   line.startsWith("🎉") ? "text-primary font-semibold" :
                   line.startsWith("💥") ? "text-red-600 font-semibold" :
                   "text-muted-foreground"
@@ -307,7 +307,7 @@ export function SeedRunner({ cities, areas, amenities, sellers }: Props) {
       )}
 
       {status === "done" && (
-        <div className="flex items-center gap-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-700/40 px-4 py-3 text-sm text-emerald-700 dark:text-emerald-400">
+        <div className="flex items-center gap-3 rounded-xl bg-emerald-950/20 border border-emerald-700/40 px-4 py-3 text-sm text-emerald-400">
           <CheckCircle2 className="h-4 w-4 shrink-0" />
           Seed complete! Visit the{" "}
           <a href="/search" className="underline font-medium hover:no-underline">
@@ -322,7 +322,7 @@ export function SeedRunner({ cities, areas, amenities, sellers }: Props) {
       )}
 
       {status === "error" && (
-        <div className="flex items-center gap-3 rounded-xl bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-700/40 px-4 py-3 text-sm text-red-700 dark:text-red-400">
+        <div className="flex items-center gap-3 rounded-xl bg-red-950/20 border border-red-700/40 px-4 py-3 text-sm text-red-400">
           <AlertTriangle className="h-4 w-4 shrink-0" />
           Some errors occurred. Check the log above and ensure the API is running.
         </div>

@@ -30,14 +30,14 @@ export default async function SeedPropertiesPage() {
   return (
     <div className="max-w-3xl space-y-8">
       <div>
-        <h1 className="text-2xl font-bold text-foreground">Property Seed Data</h1>
+        <h1 className="text-2xl font-semibold text-foreground">Property Seed Data</h1>
         <p className="text-sm text-muted-foreground mt-1">
           Generate 50 realistic premium properties for development and demo purposes.
           Requires at least one verified seller to exist.
         </p>
       </div>
 
-      <div className="rounded-2xl border border-border bg-card p-6 shadow-card space-y-4">
+      <div className="rounded-xl border border-border bg-card p-6 shadow-card space-y-4">
         <h2 className="text-sm font-semibold text-foreground">Current database state</h2>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
           {[
@@ -54,7 +54,7 @@ export default async function SeedPropertiesPage() {
         </div>
 
         {(!sellers || sellers.length === 0) && (
-          <div className="rounded-xl border border-amber-200 dark:border-amber-700/40 bg-amber-50 dark:bg-amber-950/20 p-4 text-sm text-amber-700 dark:text-amber-400">
+          <div className="rounded-xl border border-amber-700/40 bg-amber-950/20 p-4 text-sm text-amber-400">
             <strong>No verified sellers found.</strong> You need at least one seller with KYC status
             &quot;verified&quot; before seeding properties. Create a seller account and verify their KYC first.
           </div>

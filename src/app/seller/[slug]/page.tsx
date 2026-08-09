@@ -148,13 +148,13 @@ export default async function SellerProfilePage({ params }: Props) {
           <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:gap-8">
             {/* Avatar / logo */}
             <div className="shrink-0">
-              <Avatar className="h-24 w-24 rounded-2xl border border-border shadow-md">
+              <Avatar className="h-24 w-24 rounded-xl border border-border shadow-md">
                 <AvatarImage
                   src={s.logo_url || s.profiles?.avatar_url || undefined}
                   alt={displayName}
                   className="object-cover"
                 />
-                <AvatarFallback className="rounded-2xl text-2xl font-bold bg-primary/10 text-primary">
+                <AvatarFallback className="rounded-xl text-2xl font-bold bg-primary/10 text-primary">
                   {displayName.slice(0, 2).toUpperCase()}
                 </AvatarFallback>
               </Avatar>
@@ -172,7 +172,7 @@ export default async function SellerProfilePage({ params }: Props) {
                 {s.is_verified && (
                   <Badge
                     variant="outline"
-                    className="border-green-400/40 text-green-700 bg-green-50 dark:text-green-400 dark:bg-green-950"
+                    className="border-green-400/40 text-green-400 bg-green-950"
                   >
                     <CheckCircle2 className="mr-1 h-3 w-3" />
                     Verified
@@ -180,7 +180,7 @@ export default async function SellerProfilePage({ params }: Props) {
                 )}
               </div>
 
-              <h1 className="text-2xl font-bold text-foreground sm:text-3xl">
+              <h1 className="text-2xl font-semibold text-foreground sm:text-3xl">
                 {displayName}
               </h1>
 
@@ -277,7 +277,7 @@ export default async function SellerProfilePage({ params }: Props) {
 
         {listings.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20 text-center gap-4">
-            <div className="rounded-2xl bg-muted p-6">
+            <div className="rounded-xl bg-muted p-6">
               <Building2 className="h-12 w-12 text-muted-foreground" />
             </div>
             <p className="text-muted-foreground text-sm max-w-sm">

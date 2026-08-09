@@ -102,13 +102,13 @@ export function KycUploader({ sellerId }: KycUploaderProps) {
   return (
     <div className="space-y-5">
       {/* Aadhaar disclaimer */}
-      <div className="flex items-start gap-3 rounded-xl border border-amber-200 bg-amber-50 dark:border-amber-800 dark:bg-amber-950/30 p-4">
-        <AlertTriangle className="h-5 w-5 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
+      <div className="flex items-start gap-3 rounded-xl border border-amber-800 bg-amber-950/30 p-4">
+        <AlertTriangle className="h-5 w-5 text-amber-400 shrink-0 mt-0.5" />
         <div>
-          <p className="text-sm font-semibold text-amber-800 dark:text-amber-300">
+          <p className="text-sm font-semibold text-amber-300">
             Important: Do not upload your full Aadhaar
           </p>
-          <p className="text-xs text-amber-700 dark:text-amber-400 mt-1">
+          <p className="text-xs text-amber-400 mt-1">
             Aadhaar numbers are sensitive. Use a <strong>masked copy</strong> showing only the last 4 digits,
             or use an alternative identity document (PAN, Voter ID, Passport, or Driving License).
           </p>
@@ -165,7 +165,7 @@ export function KycUploader({ sellerId }: KycUploaderProps) {
       )}
 
       {success && (
-        <p className="text-sm text-green-700 dark:text-green-400 bg-green-100 dark:bg-green-900/30 rounded-lg px-3 py-2">
+        <p className="text-sm text-green-400 bg-green-900/30 rounded-lg px-3 py-2">
           Document uploaded successfully. Our team will review within 24 hours.
         </p>
       )}

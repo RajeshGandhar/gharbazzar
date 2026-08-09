@@ -125,7 +125,7 @@ export default async function DealerDirectoryPage({ params, searchParams }: Prop
       {/* Hero */}
       <section className="border-b border-border bg-gradient-to-b from-primary/8 to-background py-10">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <h1 className="text-2xl font-bold text-foreground sm:text-3xl">
+          <h1 className="text-2xl font-semibold text-foreground sm:text-3xl">
             Property Dealers in {city.name}
           </h1>
           <p className="mt-2 text-muted-foreground text-sm">
@@ -172,7 +172,7 @@ export default async function DealerDirectoryPage({ params, searchParams }: Prop
 
         {sellerList.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-24 text-center gap-4">
-            <div className="rounded-2xl bg-muted p-6">
+            <div className="rounded-xl bg-muted p-6">
               <Users className="h-12 w-12 text-muted-foreground" />
             </div>
             <h2 className="text-xl font-semibold text-foreground">
@@ -201,7 +201,7 @@ export default async function DealerDirectoryPage({ params, searchParams }: Prop
                   <Link
                     key={s.id}
                     href={`/seller/${s.slug}`}
-                    className="group rounded-2xl border border-border bg-card p-5 transition-smooth hover:border-primary/40 hover:shadow-lg hover:-translate-y-0.5"
+                    className="group rounded-xl border border-border bg-card p-5 transition-smooth hover:border-primary/40 hover:shadow-lg hover:-translate-y-0.5"
                   >
                     <div className="flex items-start gap-4">
                       <Avatar className="h-14 w-14 rounded-xl shrink-0">
@@ -252,7 +252,7 @@ export default async function DealerDirectoryPage({ params, searchParams }: Prop
                           target="_blank"
                           rel="noopener noreferrer"
                           onClick={(e) => e.stopPropagation()}
-                          className="flex items-center gap-1.5 rounded-lg bg-green-50 border border-green-200 px-2.5 py-1 text-xs font-medium text-green-700 hover:bg-green-100 transition-smooth dark:bg-green-950 dark:border-green-800 dark:text-green-400"
+                          className="flex items-center gap-1.5 rounded-lg bg-green-950 border border-green-800 px-2.5 py-1 text-xs font-medium text-green-400 hover:bg-green-900 transition-smooth"
                         >
                           <WhatsAppIcon className="h-3 w-3" />
                           WhatsApp

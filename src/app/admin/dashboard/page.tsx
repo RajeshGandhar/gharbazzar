@@ -36,10 +36,10 @@ function StatCard({
   const content = (
     <div
       className={cn(
-        "rounded-2xl border bg-card p-5 shadow-card transition-all duration-200",
+        "rounded-xl border bg-card p-5 shadow-card transition-all duration-200",
         href && "hover:shadow-elevated hover:-translate-y-0.5 cursor-pointer",
         isWarning
-          ? "border-orange-200 dark:border-orange-700/40 bg-orange-50/50 dark:bg-orange-950/20"
+          ? "border-orange-700/40 bg-orange-950/20"
           : accent
           ? "border-primary/20 bg-primary/3"
           : "border-border"
@@ -49,7 +49,7 @@ function StatCard({
         <div className={cn(
           "rounded-xl p-2",
           isWarning
-            ? "bg-orange-100 dark:bg-orange-900/40 text-orange-600 dark:text-orange-400"
+            ? "bg-orange-900/40 text-orange-400"
             : accent
             ? "bg-primary/15 text-primary"
             : "bg-muted text-muted-foreground"
@@ -65,7 +65,7 @@ function StatCard({
       </div>
       <p className={cn(
         "text-3xl font-bold tabular-nums",
-        isWarning ? "text-orange-600 dark:text-orange-400" : accent ? "text-primary" : "text-foreground"
+        isWarning ? "text-orange-400" : accent ? "text-primary" : "text-foreground"
       )}>
         {value.toLocaleString("en-IN")}
       </p>
@@ -82,7 +82,7 @@ export default async function DashboardPage() {
   return (
     <div className="space-y-8 max-w-6xl">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-foreground">Dashboard</h1>
+        <h1 className="text-2xl font-semibold text-foreground">Dashboard</h1>
         <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
           <Activity className="h-3.5 w-3.5" />
           Live · refreshes every 60s
@@ -91,9 +91,9 @@ export default async function DashboardPage() {
 
       {/* SLA breach alert */}
       {stats.sla_breached_count > 0 && (
-        <div className="flex items-center gap-3 rounded-2xl border border-red-200 dark:border-red-700/40 bg-red-50 dark:bg-red-950/20 px-5 py-4 text-sm text-red-700 dark:text-red-400">
-          <div className="flex-shrink-0 w-8 h-8 rounded-xl bg-red-100 dark:bg-red-900/40 flex items-center justify-center">
-            <AlertTriangle className="h-4 w-4 text-red-600 dark:text-red-400" />
+        <div className="flex items-center gap-3 rounded-xl border border-red-700/40 bg-red-950/20 px-5 py-4 text-sm text-red-400">
+          <div className="flex-shrink-0 w-8 h-8 rounded-xl bg-red-900/40 flex items-center justify-center">
+            <AlertTriangle className="h-4 w-4 text-red-400" />
           </div>
           <div className="flex-1">
             <span className="font-semibold">{stats.sla_breached_count}</span>{" "}
@@ -119,7 +119,7 @@ export default async function DashboardPage() {
       {/* Tables row */}
       <div className="grid gap-6 lg:grid-cols-2">
         {/* Recent approvals */}
-        <div className="rounded-2xl border border-border bg-card shadow-card overflow-hidden">
+        <div className="rounded-xl border border-border bg-card shadow-card overflow-hidden">
           <div className="flex items-center justify-between px-5 py-4 border-b border-border/60">
             <h2 className="text-sm font-semibold text-foreground">Recent approvals</h2>
             <Link href="/admin/approvals" className="text-xs text-primary flex items-center gap-0.5 hover:text-primary/80 transition-colors">
@@ -149,7 +149,7 @@ export default async function DashboardPage() {
         </div>
 
         {/* Recent strikes */}
-        <div className="rounded-2xl border border-border bg-card shadow-card overflow-hidden">
+        <div className="rounded-xl border border-border bg-card shadow-card overflow-hidden">
           <div className="flex items-center justify-between px-5 py-4 border-b border-border/60">
             <h2 className="text-sm font-semibold text-foreground">Recent strikes</h2>
             <Link href="/admin/users" className="text-xs text-primary flex items-center gap-0.5 hover:text-primary/80 transition-colors">
@@ -162,7 +162,7 @@ export default async function DashboardPage() {
             <div className="divide-y divide-border/60">
               {stats.recent_strikes.map((s) => (
                 <div key={s.id} className="flex items-center gap-3 px-5 py-3 hover:bg-muted/30 transition-colors">
-                  <div className="w-7 h-7 rounded-lg bg-red-50 dark:bg-red-950/30 flex items-center justify-center shrink-0">
+                  <div className="w-7 h-7 rounded-lg bg-red-950/30 flex items-center justify-center shrink-0">
                     <Flag className="h-3.5 w-3.5 text-red-500" />
                   </div>
                   <div className="flex-1 min-w-0">

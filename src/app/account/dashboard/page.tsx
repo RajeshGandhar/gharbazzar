@@ -36,7 +36,7 @@ function StatCard({
 }) {
   return (
     <Link href={href} className="group block">
-      <div className="rounded-2xl border border-border bg-card p-5 shadow-card hover:shadow-elevated transition-all duration-200 hover:-translate-y-0.5 text-center">
+      <div className="rounded-xl border border-border bg-card p-5 shadow-card hover:shadow-elevated transition-all duration-200 hover:-translate-y-0.5 text-center">
         <div className={cn("mx-auto w-10 h-10 rounded-xl flex items-center justify-center mb-3 transition-transform group-hover:scale-110", accentClass)}>
           <Icon className="h-5 w-5" />
         </div>
@@ -50,7 +50,7 @@ function StatCard({
 function QuickLink({ label, href, icon: Icon }: { label: string; href: string; icon: React.ElementType }) {
   return (
     <Link href={href} className="group block">
-      <div className="rounded-2xl border border-border bg-card p-4 shadow-card hover:shadow-elevated hover:border-primary/30 transition-all duration-200 hover:-translate-y-0.5 flex items-center gap-3">
+      <div className="rounded-xl border border-border bg-card p-4 shadow-card hover:shadow-elevated hover:border-primary/30 transition-all duration-200 hover:-translate-y-0.5 flex items-center gap-3">
         <div className="w-9 h-9 rounded-xl bg-muted flex items-center justify-center shrink-0 group-hover:bg-primary/10 transition-colors">
           <Icon className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
         </div>
@@ -78,7 +78,7 @@ export default async function DashboardPage() {
       {/* ── Welcome ── */}
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div>
-          <h1 className="text-2xl font-bold text-foreground">Hello, {firstName}</h1>
+          <h1 className="text-2xl font-semibold text-foreground">Hello, {firstName}</h1>
           {memberSince && (
             <p className="text-sm text-muted-foreground mt-1">Member since {memberSince}</p>
           )}
@@ -99,14 +99,14 @@ export default async function DashboardPage() {
           value={data.favoritesCount}
           href="/account/favorites"
           icon={Heart}
-          accentClass="bg-rose-100 text-rose-500 dark:bg-rose-900/30 dark:text-rose-400"
+          accentClass="bg-rose-900/30 text-rose-400"
         />
         <StatCard
           label="Saved Searches"
           value={data.savedSearchesCount}
           href="/account/saved-searches"
           icon={Search}
-          accentClass="bg-blue-100 text-blue-500 dark:bg-blue-900/30 dark:text-blue-400"
+          accentClass="bg-blue-900/30 text-blue-400"
         />
         <StatCard
           label="Unread Alerts"
@@ -115,7 +115,7 @@ export default async function DashboardPage() {
           icon={Bell}
           accentClass={cn(
             data.unreadNotificationsCount > 0
-              ? "bg-amber-100 text-amber-500 dark:bg-amber-900/30 dark:text-amber-400"
+              ? "bg-amber-900/30 text-amber-400"
               : "bg-muted text-muted-foreground"
           )}
         />
@@ -135,7 +135,7 @@ export default async function DashboardPage() {
           </div>
           <div className="space-y-3">
             {data.upcomingVisits.map((v) => (
-              <div key={v.id} className="flex items-start gap-4 rounded-2xl border border-border bg-card p-4 shadow-card">
+              <div key={v.id} className="flex items-start gap-4 rounded-xl border border-border bg-card p-4 shadow-card">
                 <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
                   <Calendar className="h-5 w-5 text-primary" />
                 </div>
@@ -183,7 +183,7 @@ export default async function DashboardPage() {
               const isRent = prop.purpose === "rent" || prop.purpose === "student";
               return (
                 <Link key={rv.property_id} href={`/property/${prop.slug}`} className="group block">
-                  <div className="rounded-2xl border border-border bg-card overflow-hidden shadow-card hover:shadow-elevated hover:-translate-y-0.5 transition-all duration-200">
+                  <div className="rounded-xl border border-border bg-card overflow-hidden shadow-card hover:shadow-elevated hover:-translate-y-0.5 transition-all duration-200">
                     <div className="relative h-28 bg-muted">
                       {imgUrl ? (
                         <Image

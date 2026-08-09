@@ -128,15 +128,15 @@ export default async function DealerLayout({
 
         {/* KYC Banner */}
         {showKycBanner && (
-          <div className="bg-amber-50 dark:bg-amber-950/30 border-b border-amber-200 dark:border-amber-800 px-4 py-2.5 flex items-center gap-3">
-            <AlertCircle className="h-4 w-4 text-amber-600 dark:text-amber-400 shrink-0" />
-            <p className="text-sm text-amber-800 dark:text-amber-300 flex-1">
+          <div className="bg-amber-950/30 border-b border-amber-800 px-4 py-2.5 flex items-center gap-3">
+            <AlertCircle className="h-4 w-4 text-amber-400 shrink-0" />
+            <p className="text-sm text-amber-300 flex-1">
               Complete KYC to get the{" "}
               <span className="font-semibold">Verified</span> badge and build seeker trust.
             </p>
             <Link
               href="/dealer/kyc"
-              className="text-xs font-semibold text-amber-700 dark:text-amber-400 whitespace-nowrap hover:underline"
+              className="text-xs font-semibold text-amber-400 whitespace-nowrap hover:underline"
             >
               Submit KYC →
             </Link>

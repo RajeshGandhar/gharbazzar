@@ -29,12 +29,12 @@ const statusConfig: Record<string, { label: string; dot: string; pill: string }>
   active_approved: {
     label: "Live",
     dot: "bg-emerald-500",
-    pill: "bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400",
+    pill: "bg-emerald-950/40 text-emerald-400",
   },
   pending: {
     label: "In Review",
     dot: "bg-amber-500",
-    pill: "bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-400",
+    pill: "bg-amber-950/40 text-amber-400",
   },
   draft: {
     label: "Draft",
@@ -44,12 +44,12 @@ const statusConfig: Record<string, { label: string; dot: string; pill: string }>
   rejected: {
     label: "Rejected",
     dot: "bg-red-500",
-    pill: "bg-red-50 text-red-700 dark:bg-red-950/40 dark:text-red-400",
+    pill: "bg-red-950/40 text-red-400",
   },
   expired: {
     label: "Expired",
     dot: "bg-orange-500",
-    pill: "bg-orange-50 text-orange-700 dark:bg-orange-950/40 dark:text-orange-400",
+    pill: "bg-orange-950/40 text-orange-400",
   },
 };
 
@@ -71,10 +71,10 @@ const sourceLabels: Record<string, string> = {
 
 const leadStatusConfig: Record<string, { label: string; pill: string }> = {
   new:              { label: "New",           pill: "bg-primary/10 text-primary" },
-  contacted:        { label: "Contacted",     pill: "bg-blue-50 text-blue-700 dark:bg-blue-950/40 dark:text-blue-400" },
-  visit_scheduled:  { label: "Visit",         pill: "bg-purple-50 text-purple-700 dark:bg-purple-950/40 dark:text-purple-400" },
-  negotiating:      { label: "Negotiating",   pill: "bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-400" },
-  closed_won:       { label: "Won",           pill: "bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400" },
+  contacted:        { label: "Contacted",     pill: "bg-blue-950/40 text-blue-400" },
+  visit_scheduled:  { label: "Visit",         pill: "bg-purple-950/40 text-purple-400" },
+  negotiating:      { label: "Negotiating",   pill: "bg-amber-950/40 text-amber-400" },
+  closed_won:       { label: "Won",           pill: "bg-emerald-950/40 text-emerald-400" },
   closed_lost:      { label: "Lost",          pill: "bg-muted text-muted-foreground" },
 };
 
@@ -94,7 +94,7 @@ function StatCard({
   return (
     <Link href={href} className="group block">
       <div className={cn(
-        "rounded-2xl border bg-card p-5 shadow-card hover:shadow-elevated transition-all duration-200 hover:-translate-y-0.5",
+        "rounded-xl border bg-card p-5 shadow-card hover:shadow-elevated transition-all duration-200 hover:-translate-y-0.5",
         accent ? "border-primary/20 bg-primary/3" : "border-border"
       )}>
         <div className="flex items-start justify-between mb-3">
@@ -150,7 +150,7 @@ export default async function DashboardPage() {
       {/* ── Header ── */}
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div>
-          <h1 className="text-2xl font-bold text-foreground">
+          <h1 className="text-2xl font-semibold text-foreground">
             Welcome back, {firstName}
           </h1>
           <div className="flex items-center gap-2 mt-2 flex-wrap">
@@ -160,12 +160,12 @@ export default async function DashboardPage() {
               </Badge>
             )}
             {seller.is_verified ? (
-              <Badge className="gap-1 bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border-0 text-xs">
+              <Badge className="gap-1 bg-emerald-950/40 text-emerald-400 border-0 text-xs">
                 <CheckCircle2 className="h-3 w-3" />
                 Verified seller
               </Badge>
             ) : seller.kyc_status === "submitted" ? (
-              <Badge className="gap-1 bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-400 border-0 text-xs">
+              <Badge className="gap-1 bg-amber-950/40 text-amber-400 border-0 text-xs">
                 KYC under review
               </Badge>
             ) : (
@@ -183,7 +183,7 @@ export default async function DashboardPage() {
 
       {/* ── Onboarding checklist — new sellers ── */}
       {isNewSeller && !allDone && (
-        <div className="rounded-2xl border border-primary/20 bg-primary/5 p-6">
+        <div className="rounded-xl border border-primary/20 bg-primary/5 p-6">
           <div className="flex items-center gap-2 mb-4">
             <Sparkles className="h-4 w-4 text-primary" />
             <h2 className="text-sm font-semibold text-foreground">Complete your setup to start receiving leads</h2>
@@ -200,7 +200,7 @@ export default async function DashboardPage() {
                   {label}
                 </span>
                 {done && (
-                  <span className="ml-auto text-xs text-emerald-600 dark:text-emerald-400 font-medium">Done</span>
+                  <span className="ml-auto text-xs text-emerald-400 font-medium">Done</span>
                 )}
               </div>
             ))}
@@ -230,7 +230,7 @@ export default async function DashboardPage() {
 
       <div className="grid lg:grid-cols-2 gap-6">
         {/* ── Recent leads ── */}
-        <div className="rounded-2xl border border-border bg-card shadow-card">
+        <div className="rounded-xl border border-border bg-card shadow-card">
           <div className="flex items-center justify-between px-5 py-4 border-b border-border/60">
             <div className="flex items-center gap-2">
               <MessageSquare className="h-4 w-4 text-primary" />
@@ -288,7 +288,7 @@ export default async function DashboardPage() {
         </div>
 
         {/* ── Recent listings ── */}
-        <div className="rounded-2xl border border-border bg-card shadow-card">
+        <div className="rounded-xl border border-border bg-card shadow-card">
           <div className="flex items-center justify-between px-5 py-4 border-b border-border/60">
             <div className="flex items-center gap-2">
               <Building2 className="h-4 w-4 text-primary" />

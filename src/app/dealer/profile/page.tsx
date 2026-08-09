@@ -72,7 +72,7 @@ export default async function ProfilePage() {
   return (
     <div className="space-y-6 max-w-2xl">
       <div>
-        <h1 className="text-2xl font-bold">My Profile</h1>
+        <h1 className="text-2xl font-semibold">My Profile</h1>
         <p className="text-sm text-muted-foreground mt-0.5">
           Update your personal and business details.
         </p>
@@ -96,7 +96,7 @@ export default async function ProfilePage() {
               </Badge>
             )}
             {sellerData.is_verified && (
-              <Badge className="bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400 gap-1 text-xs">
+              <Badge className="bg-green-900/30 text-green-400 gap-1 text-xs">
                 <CheckCircle2 className="h-3 w-3" />
                 Verified
               </Badge>

@@ -160,7 +160,7 @@ export function LeadStatusUpdater({ inquiryId, currentStatus, currentNotes }: Le
       )}
 
       {saved && (
-        <p className="text-sm text-green-700 dark:text-green-400 bg-green-100 dark:bg-green-900/30 rounded-lg px-3 py-2">
+        <p className="text-sm text-green-400 bg-green-900/30 rounded-lg px-3 py-2">
           Saved successfully.
         </p>
       )}

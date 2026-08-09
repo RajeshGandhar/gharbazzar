@@ -115,11 +115,11 @@ export function StepPreview({ propertyId, property, onBack }: StepPreviewProps) 
   if (submitted) {
     return (
       <div className="text-center py-10 space-y-4">
-        <div className="inline-flex items-center justify-center h-14 w-14 rounded-full bg-green-100 dark:bg-green-900/30 mb-2">
-          <CheckCircle2 className="h-7 w-7 text-green-600 dark:text-green-400" />
+        <div className="inline-flex items-center justify-center h-14 w-14 rounded-full bg-green-900/30 mb-2">
+          <CheckCircle2 className="h-7 w-7 text-green-400" />
         </div>
         <div>
-          <h2 className="text-xl font-bold">Submitted for review!</h2>
+          <h2 className="text-xl font-semibold">Submitted for review!</h2>
           <p className="text-sm text-muted-foreground mt-1.5">
             We&apos;ll review your listing within 4 hours and notify you once it&apos;s live.
           </p>

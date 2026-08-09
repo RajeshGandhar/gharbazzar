@@ -33,37 +33,37 @@ const kycStatusConfig = {
     title: "Under review",
     description: "Your documents are being reviewed. This usually takes less than 24 hours.",
     icon: Clock,
-    iconClass: "text-amber-600 dark:text-amber-400",
-    bannerClass: "bg-amber-50 dark:bg-amber-950/30 border-amber-200 dark:border-amber-800",
+    iconClass: "text-amber-400",
+    bannerClass: "bg-amber-950/30 border-amber-800",
   },
   verified: {
     title: "Verified",
     description: "Your KYC is approved. The Verified badge is now live on your listings.",
     icon: CheckCircle2,
-    iconClass: "text-green-600 dark:text-green-400",
-    bannerClass: "bg-green-50 dark:bg-green-950/30 border-green-200 dark:border-green-800",
+    iconClass: "text-green-400",
+    bannerClass: "bg-green-950/30 border-green-800",
   },
   rejected: {
     title: "Documents rejected",
     description: "Please review the remarks below and resubmit the correct documents.",
     icon: AlertCircle,
     iconClass: "text-destructive",
-    bannerClass: "bg-red-50 dark:bg-red-950/30 border-red-200 dark:border-red-800",
+    bannerClass: "bg-red-950/30 border-red-800",
   },
 };
 
 const docStatusConfig: Record<string, { label: string; className: string }> = {
   pending: {
     label: "Under Review",
-    className: "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400",
+    className: "bg-amber-900/30 text-amber-400",
   },
   approved: {
     label: "Approved",
-    className: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400",
+    className: "bg-green-900/30 text-green-400",
   },
   rejected: {
     label: "Rejected",
-    className: "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400",
+    className: "bg-red-900/30 text-red-400",
   },
 };
 
@@ -92,7 +92,7 @@ export default async function KycPage() {
   return (
     <div className="space-y-6 max-w-2xl">
       <div>
-        <h1 className="text-2xl font-bold">KYC Verification</h1>
+        <h1 className="text-2xl font-semibold">KYC Verification</h1>
         <p className="text-sm text-muted-foreground mt-0.5">
           Verify your identity to build trust with seekers.
         </p>

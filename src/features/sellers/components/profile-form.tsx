@@ -218,7 +218,7 @@ export function ProfileForm({ userId, profile, seller, cities }: ProfileFormProp
           </p>
         )}
         {personalSaved && (
-          <p className="text-sm text-green-700 dark:text-green-400 bg-green-100 dark:bg-green-900/30 rounded-lg px-3 py-2">
+          <p className="text-sm text-green-400 bg-green-900/30 rounded-lg px-3 py-2">
             Personal details saved.
           </p>
         )}
@@ -360,7 +360,7 @@ export function ProfileForm({ userId, profile, seller, cities }: ProfileFormProp
           </p>
         )}
         {businessSaved && (
-          <p className="text-sm text-green-700 dark:text-green-400 bg-green-100 dark:bg-green-900/30 rounded-lg px-3 py-2">
+          <p className="text-sm text-green-400 bg-green-900/30 rounded-lg px-3 py-2">
             Business details saved.
           </p>
         )}

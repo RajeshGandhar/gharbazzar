@@ -30,11 +30,11 @@ const STATUS_TABS = [
 const statusConfig: Record<string, { label: string; className: string }> = {
   active_approved: {
     label: "Live",
-    className: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400",
+    className: "bg-green-900/30 text-green-400",
   },
   pending: {
     label: "In Review",
-    className: "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400",
+    className: "bg-amber-900/30 text-amber-400",
   },
   draft: {
     label: "Draft",
@@ -42,11 +42,11 @@ const statusConfig: Record<string, { label: string; className: string }> = {
   },
   rejected: {
     label: "Rejected",
-    className: "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400",
+    className: "bg-red-900/30 text-red-400",
   },
   expired: {
     label: "Expired",
-    className: "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400",
+    className: "bg-orange-900/30 text-orange-400",
   },
 };
 
@@ -103,7 +103,7 @@ export default async function ListingsPage({
       {/* Header */}
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
-          <h1 className="text-2xl font-bold">My Listings</h1>
+          <h1 className="text-2xl font-semibold">My Listings</h1>
           <p className="text-sm text-muted-foreground mt-0.5">{count ?? 0} total</p>
         </div>
         <Link href="/dealer/listings/new" className={buttonVariants()}>
