@@ -11,6 +11,7 @@ import {
   DropdownMenu,
   DropdownMenuTrigger,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuLabel,
@@ -211,21 +212,23 @@ export function Navbar() {
                     </Avatar>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" sideOffset={8} className="w-56">
-                    <DropdownMenuLabel>
-                      <p className="text-sm font-medium text-foreground truncate">{displayName}</p>
-                      {profile?.full_name && user?.email && (
-                        <p className="text-xs text-muted-foreground truncate">{user.email}</p>
-                      )}
-                    </DropdownMenuLabel>
+                    <DropdownMenuGroup>
+                      <DropdownMenuLabel>
+                        <p className="text-sm font-medium text-foreground truncate">{displayName}</p>
+                        {profile?.full_name && user?.email && (
+                          <p className="text-xs text-muted-foreground truncate">{user.email}</p>
+                        )}
+                      </DropdownMenuLabel>
+                    </DropdownMenuGroup>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem
-                      onSelect={() => router.push(dashboardHref)}
+                      onClick={() => router.push(dashboardHref)}
                     >
                       <LayoutDashboard className="h-4 w-4" />
                       Dashboard
                     </DropdownMenuItem>
                     <DropdownMenuItem
-                      onSelect={() => router.push("/account/profile")}
+                      onClick={() => router.push("/account/profile")}
                     >
                       <User className="h-4 w-4" />
                       Profile
@@ -233,7 +236,7 @@ export function Navbar() {
                     <DropdownMenuSeparator />
                     <DropdownMenuItem
                       variant="destructive"
-                      onSelect={handleSignOut}
+                      onClick={handleSignOut}
                     >
                       <LogOut className="h-4 w-4" />
                       Sign out
