@@ -1,12 +1,23 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
-import { Menu, X, Home, Key, GraduationCap, Building2, ChevronRight } from "lucide-react";
+import { Menu, X, Home, Key, GraduationCap, Building2, ChevronRight, User, LogOut, LayoutDashboard } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button, buttonVariants } from "@/components/ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuLabel,
+} from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
+import { createClient } from "@/lib/supabase/client";
+import type { User as SupabaseUser } from "@supabase/supabase-js";
 
 const journeys = [
   { href: "/buy",             label: "Buy",             icon: Home,          desc: "Find your home" },
@@ -14,10 +25,32 @@ const journeys = [
   { href: "/student-housing", label: "Student Housing", icon: GraduationCap, desc: "Near campus" },
 ] as const;
 
+interface UserProfile {
+  full_name: string | null;
+  avatar_url: string | null;
+  email: string | null;
+  role: string;
+}
+
+function getInitials(name?: string | null, email?: string | null): string {
+  if (name) {
+    return name
+      .split(" ")
+      .map((n) => n[0])
+      .slice(0, 2)
+      .join("")
+      .toUpperCase();
+  }
+  return email ? email[0].toUpperCase() : "?";
+}
+
 export function Navbar() {
   const pathname = usePathname();
+  const router = useRouter();
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [user, setUser] = useState<SupabaseUser | null>(null);
+  const [profile, setProfile] = useState<UserProfile | null>(null);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 12);
@@ -27,7 +60,62 @@ export function Navbar() {
 
   useEffect(() => { setOpen(false); }, [pathname]);
 
+  // Check auth state on mount and listen for changes
+  useEffect(() => {
+    const supabase = createClient();
+
+    async function loadUser() {
+      const { data: { user: authUser } } = await supabase.auth.getUser();
+      setUser(authUser);
+      if (authUser) {
+        const { data } = await supabase
+          .from("profiles")
+          .select("full_name, avatar_url, email, role")
+          .eq("id", authUser.id)
+          .single();
+        setProfile(data);
+      } else {
+        setProfile(null);
+      }
+    }
+
+    loadUser();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      const authUser = session?.user ?? null;
+      setUser(authUser);
+      if (authUser) {
+        supabase
+          .from("profiles")
+          .select("full_name, avatar_url, email, role")
+          .eq("id", authUser.id)
+          .single()
+          .then(({ data }) => setProfile(data));
+      } else {
+        setProfile(null);
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  async function handleSignOut() {
+    const supabase = createClient();
+    await supabase.auth.signOut();
+    setUser(null);
+    setProfile(null);
+    router.push("/");
+  }
+
   const activeJourney = journeys.find((j) => pathname.startsWith(j.href));
+  const isAuthenticated = !!user;
+  const displayName = profile?.full_name || user?.email || "";
+  const initials = getInitials(profile?.full_name, user?.email);
+  const dashboardHref = profile?.role === "dealer" || profile?.role === "seller"
+    ? "/dealer/dashboard"
+    : profile?.role === "super_admin"
+      ? "/admin"
+      : "/account/dashboard";
 
   return (
     <>
@@ -96,28 +184,89 @@ export function Navbar() {
           )}
 
           <div className="ml-auto flex items-center gap-2">
-            {/* Sign in */}
-            <Link
-              href="/auth/login"
-              className={cn(
-                buttonVariants({ variant: "ghost", size: "sm" }),
-                "hidden sm:flex text-muted-foreground hover:text-foreground font-medium"
-              )}
-            >
-              Sign in
-            </Link>
+            {isAuthenticated ? (
+              <>
+                {/* List property — primary CTA */}
+                <Link
+                  href="/list-property"
+                  className={cn(
+                    buttonVariants({ size: "sm" }),
+                    "hidden sm:flex gap-1.5 font-medium"
+                  )}
+                >
+                  <Building2 className="h-3.5 w-3.5" aria-hidden />
+                  Post property
+                </Link>
 
-            {/* List property — primary CTA */}
-            <Link
-              href="/list-property"
-              className={cn(
-                buttonVariants({ size: "sm" }),
-                "hidden sm:flex gap-1.5 font-medium"
-              )}
-            >
-              <Building2 className="h-3.5 w-3.5" aria-hidden />
-              Post property
-            </Link>
+                {/* User avatar dropdown — desktop */}
+                <DropdownMenu>
+                  <DropdownMenuTrigger
+                    className="hidden sm:flex items-center gap-2 rounded-full outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                  >
+                    <Avatar size="sm">
+                      {profile?.avatar_url && (
+                        <AvatarImage src={profile.avatar_url} alt={displayName} />
+                      )}
+                      <AvatarFallback>{initials}</AvatarFallback>
+                    </Avatar>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" sideOffset={8} className="w-56">
+                    <DropdownMenuLabel>
+                      <p className="text-sm font-medium text-foreground truncate">{displayName}</p>
+                      {profile?.full_name && user?.email && (
+                        <p className="text-xs text-muted-foreground truncate">{user.email}</p>
+                      )}
+                    </DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem
+                      onSelect={() => router.push(dashboardHref)}
+                    >
+                      <LayoutDashboard className="h-4 w-4" />
+                      Dashboard
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onSelect={() => router.push("/account/profile")}
+                    >
+                      <User className="h-4 w-4" />
+                      Profile
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem
+                      variant="destructive"
+                      onSelect={handleSignOut}
+                    >
+                      <LogOut className="h-4 w-4" />
+                      Sign out
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </>
+            ) : (
+              <>
+                {/* Sign in */}
+                <Link
+                  href="/auth/login"
+                  className={cn(
+                    buttonVariants({ variant: "ghost", size: "sm" }),
+                    "hidden sm:flex text-muted-foreground hover:text-foreground font-medium"
+                  )}
+                >
+                  Sign in
+                </Link>
+
+                {/* List property — primary CTA */}
+                <Link
+                  href="/list-property"
+                  className={cn(
+                    buttonVariants({ size: "sm" }),
+                    "hidden sm:flex gap-1.5 font-medium"
+                  )}
+                >
+                  <Building2 className="h-3.5 w-3.5" aria-hidden />
+                  Post property
+                </Link>
+              </>
+            )}
 
             {/* Mobile menu toggle */}
             <Button
@@ -212,22 +361,68 @@ export function Navbar() {
                 })}
               </div>
 
-              <div className="border-t border-white/[0.06] pt-4 grid grid-cols-2 gap-2">
-                <Link
-                  href="/auth/login"
-                  onClick={() => setOpen(false)}
-                  className={cn(buttonVariants({ variant: "outline" }), "w-full justify-center font-medium")}
-                >
-                  Sign in
-                </Link>
-                <Link
-                  href="/list-property"
-                  onClick={() => setOpen(false)}
-                  className={cn(buttonVariants(), "w-full justify-center gap-1.5 font-medium")}
-                >
-                  <Building2 className="h-3.5 w-3.5" aria-hidden />
-                  Post property
-                </Link>
+              <div className="border-t border-white/[0.06] pt-4">
+                {isAuthenticated ? (
+                  <div className="flex flex-col gap-2">
+                    <div className="flex items-center gap-3 px-2 pb-2">
+                      <Avatar size="sm">
+                        {profile?.avatar_url && (
+                          <AvatarImage src={profile.avatar_url} alt={displayName} />
+                        )}
+                        <AvatarFallback>{initials}</AvatarFallback>
+                      </Avatar>
+                      <div className="min-w-0">
+                        <p className="text-sm font-medium text-foreground truncate">{displayName}</p>
+                        {profile?.full_name && user?.email && (
+                          <p className="text-xs text-muted-foreground truncate">{user.email}</p>
+                        )}
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-2">
+                      <Link
+                        href={dashboardHref}
+                        onClick={() => setOpen(false)}
+                        className={cn(buttonVariants({ variant: "outline" }), "w-full justify-center gap-1.5 font-medium")}
+                      >
+                        <LayoutDashboard className="h-3.5 w-3.5" aria-hidden />
+                        Dashboard
+                      </Link>
+                      <Link
+                        href="/list-property"
+                        onClick={() => setOpen(false)}
+                        className={cn(buttonVariants(), "w-full justify-center gap-1.5 font-medium")}
+                      >
+                        <Building2 className="h-3.5 w-3.5" aria-hidden />
+                        Post property
+                      </Link>
+                    </div>
+                    <button
+                      onClick={() => { setOpen(false); handleSignOut(); }}
+                      className="flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm text-muted-foreground hover:text-destructive hover:bg-white/[0.04] transition-colors"
+                    >
+                      <LogOut className="h-4 w-4" />
+                      Sign out
+                    </button>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-2 gap-2">
+                    <Link
+                      href="/auth/login"
+                      onClick={() => setOpen(false)}
+                      className={cn(buttonVariants({ variant: "outline" }), "w-full justify-center font-medium")}
+                    >
+                      Sign in
+                    </Link>
+                    <Link
+                      href="/list-property"
+                      onClick={() => setOpen(false)}
+                      className={cn(buttonVariants(), "w-full justify-center gap-1.5 font-medium")}
+                    >
+                      <Building2 className="h-3.5 w-3.5" aria-hidden />
+                      Post property
+                    </Link>
+                  </div>
+                )}
               </div>
             </motion.div>
           </>
