@@ -18,7 +18,9 @@ export async function GET(request: NextRequest) {
       type: type as EmailOtpType,
       token_hash: tokenHash,
     });
-    if (!error) {
+    if (error) {
+      console.error("[auth/callback] OTP verify failed:", error.message);
+    } else {
       return NextResponse.redirect(`${origin}${safeNext}`);
     }
   }
@@ -26,9 +28,15 @@ export async function GET(request: NextRequest) {
   // Google OAuth / PKCE code exchange
   if (code) {
     const { error } = await supabase.auth.exchangeCodeForSession(code);
-    if (!error) {
+    if (error) {
+      console.error("[auth/callback] Code exchange failed:", error.message);
+    } else {
       return NextResponse.redirect(`${origin}${safeNext}`);
     }
+  }
+
+  if (!code && !tokenHash) {
+    console.error("[auth/callback] No code or token_hash in URL params:", Object.fromEntries(searchParams));
   }
 
   return NextResponse.redirect(`${origin}/auth/login?error=auth_failed`);
