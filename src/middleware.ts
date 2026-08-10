@@ -24,7 +24,7 @@ function isForgedCrossOriginRequest(request: NextRequest): boolean {
   return origin !== request.nextUrl.origin;
 }
 
-export async function proxy(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   if (isForgedCrossOriginRequest(request)) {
     return NextResponse.json(
       { error: { code: "FORBIDDEN", message: "Cross-origin request rejected" } },
