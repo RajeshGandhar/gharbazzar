@@ -37,7 +37,7 @@ export default function SellPage() {
             </p>
             <div className="mt-6 flex flex-col sm:flex-row gap-3">
               <Link
-                href="/auth/login?next=/dealer/listings/new"
+                href="/list-property"
                 className={cn(buttonVariants({ size: "lg" }))}
               >
                 Post property
@@ -269,7 +269,7 @@ export default function SellPage() {
           </p>
           <div className="mt-6">
             <Link
-              href="/auth/login?next=/dealer/listings/new"
+              href="/list-property"
               className={cn(buttonVariants({ size: "lg" }))}
             >
               Post property

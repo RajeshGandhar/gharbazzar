@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useState, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   User,
   Briefcase,
@@ -64,8 +64,10 @@ interface Step3Data {
   rera_number: string;
 }
 
-export default function OnboardPage() {
+function OnboardContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const next = searchParams.get("next") ?? "/dealer/dashboard";
   const [step, setStep] = useState(1);
   const [sellerType, setSellerType] = useState<SellerType | null>(null);
   const [step2, setStep2] = useState<Step2Data>({
@@ -127,7 +129,7 @@ export default function OnboardPage() {
         return;
       }
 
-      router.push("/dealer/dashboard");
+      router.push(next.startsWith("/") ? next : "/dealer/dashboard");
     } catch {
       setServerError("Network error. Please try again.");
     } finally {
@@ -331,5 +333,13 @@ export default function OnboardPage() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function OnboardPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen" />}>
+      <OnboardContent />
+    </Suspense>
   );
 }

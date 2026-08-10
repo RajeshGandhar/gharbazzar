@@ -233,6 +233,12 @@ export function Navbar() {
                       <User className="h-4 w-4" />
                       Profile
                     </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => router.push("/list-property")}
+                    >
+                      <Building2 className="h-4 w-4" />
+                      Post property
+                    </DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem
                       variant="destructive"

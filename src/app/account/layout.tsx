@@ -27,7 +27,7 @@ export default async function AccountLayout({
     redirect("/auth/login?next=/account/dashboard");
   }
 
-  const [profileRes, favCountRes, unreadCountRes] = await Promise.all([
+  const [profileRes, favCountRes, unreadCountRes, sellerRes] = await Promise.all([
     supabase
       .from("profiles")
       .select("full_name, avatar_url, email")
@@ -42,11 +42,17 @@ export default async function AccountLayout({
       .select("*", { count: "exact", head: true })
       .eq("user_id", user.id)
       .is("read_at", null),
+    supabase
+      .from("sellers")
+      .select("id")
+      .eq("id", user.id)
+      .single(),
   ]);
 
   const profile = profileRes.data;
   const favoritesCount = favCountRes.count ?? 0;
   const unreadCount = unreadCountRes.count ?? 0;
+  const isSeller = !!sellerRes.data;
   const displayName = profile?.full_name ?? user.email ?? "Account";
   const initials = displayName
     .split(" ")
@@ -79,6 +85,7 @@ export default async function AccountLayout({
         <AccountNav
           favoritesCount={favoritesCount}
           unreadCount={unreadCount}
+          isSeller={isSeller}
         />
       </div>
 

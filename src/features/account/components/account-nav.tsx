@@ -11,6 +11,9 @@ import {
   Calendar,
   Bell,
   User,
+  Building2,
+  ClipboardList,
+  Plus,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
@@ -26,9 +29,10 @@ interface NavItem {
 interface AccountNavProps {
   favoritesCount: number;
   unreadCount: number;
+  isSeller?: boolean;
 }
 
-export function AccountNav({ favoritesCount, unreadCount }: AccountNavProps) {
+export function AccountNav({ favoritesCount, unreadCount, isSeller }: AccountNavProps) {
   const pathname = usePathname();
 
   const navItems: NavItem[] = [
@@ -78,6 +82,32 @@ export function AccountNav({ favoritesCount, unreadCount }: AccountNavProps) {
     },
   ];
 
+  const sellerItems: NavItem[] = isSeller
+    ? [
+        {
+          label: "My Properties",
+          href: "/dealer/listings",
+          icon: Building2,
+        },
+        {
+          label: "Post Property",
+          href: "/list-property",
+          icon: Plus,
+        },
+        {
+          label: "Leads",
+          href: "/dealer/leads",
+          icon: ClipboardList,
+        },
+      ]
+    : [
+        {
+          label: "Post Property",
+          href: "/list-property",
+          icon: Plus,
+        },
+      ];
+
   return (
     <nav className="flex flex-col gap-1">
       {navItems.map((item) => {
@@ -105,6 +135,33 @@ export function AccountNav({ favoritesCount, unreadCount }: AccountNavProps) {
                 {item.badge > 99 ? "99+" : item.badge}
               </Badge>
             )}
+          </Link>
+        );
+      })}
+
+      {/* Property Management */}
+      <div className="mt-4 mb-1 px-3">
+        <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+          Property Management
+        </p>
+      </div>
+      {sellerItems.map((item) => {
+        const isActive =
+          pathname === item.href || pathname.startsWith(item.href + "/");
+        const Icon = item.icon;
+        return (
+          <Link
+            key={item.href}
+            href={item.href}
+            className={cn(
+              "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
+              isActive
+                ? "bg-primary text-primary-foreground"
+                : "text-muted-foreground hover:bg-muted hover:text-foreground"
+            )}
+          >
+            <Icon className="size-4 shrink-0" />
+            <span className="flex-1">{item.label}</span>
           </Link>
         );
       })}
