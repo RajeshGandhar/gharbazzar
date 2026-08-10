@@ -123,7 +123,7 @@ export default async function RentAreaPage({ params, searchParams }: Props) {
 
       <div className="flex flex-col">
         {/* Breadcrumb */}
-        <div className="border-b border-border bg-muted/20">
+        <div className="border-b border-white/[0.06]">
           <nav aria-label="Breadcrumb" className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-3">
             <ol className="flex items-center gap-1.5 text-sm text-muted-foreground flex-wrap">
               <li><Link href="/" className="hover:text-primary transition-smooth">Home</Link></li>
@@ -138,13 +138,13 @@ export default async function RentAreaPage({ params, searchParams }: Props) {
         </div>
 
         {/* Hero */}
-        <section className="border-b border-border bg-gradient-to-b from-primary/8 to-background py-10">
+        <section className="border-b border-white/[0.06] py-10">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="flex items-center gap-3 mb-3">
-              <div className="rounded-lg bg-primary/10 p-2">
+              <div className="rounded-md bg-primary/8 p-2">
                 <Building2 className="h-6 w-6 text-primary" />
               </div>
-              <h1 className="text-2xl sm:text-3xl font-bold text-foreground">
+              <h1 className="text-2xl sm:text-3xl font-semibold text-foreground">
                 Rentals in {area.name}
               </h1>
             </div>
@@ -159,7 +159,7 @@ export default async function RentAreaPage({ params, searchParams }: Props) {
         <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
           {properties.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-24 text-center gap-4">
-              <div className="rounded-2xl bg-muted p-6">
+              <div className="rounded-xl bg-muted p-6">
                 <Search className="h-12 w-12 text-muted-foreground" />
               </div>
               <h2 className="text-xl font-semibold">No rentals found in {area.name}</h2>
@@ -182,7 +182,7 @@ export default async function RentAreaPage({ params, searchParams }: Props) {
           )}
 
           {/* Internal linking */}
-          <div className="mt-12 border-t border-border pt-8">
+          <div className="mt-12 border-t border-white/[0.06] pt-8">
             <Link href={`/rent/${city.slug}`} className="text-sm font-medium text-primary hover:text-primary/80">
               ← All rentals in {city.name}
             </Link>

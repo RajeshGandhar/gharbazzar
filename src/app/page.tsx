@@ -13,6 +13,7 @@ import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { PropertyCard, type PropertyCardData } from "@/components/properties/property-card";
+import { ScrollReveal } from "@/components/shared/scroll-reveal";
 import { SearchBar } from "@/components/shared/search-bar";
 import { getFeaturedProperties, getPlatformStats } from "@/features/properties/server/queries";
 
@@ -104,6 +105,7 @@ export default async function HomePage() {
 
       {/* ── Latest properties ── */}
       {latestProperties.length > 0 && (
+        <ScrollReveal>
         <section className="mx-auto w-full max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
           <div className="flex items-end justify-between mb-8">
             <h2 className="text-lg font-semibold text-foreground sm:text-xl">
@@ -134,6 +136,7 @@ export default async function HomePage() {
             </Link>
           </div>
         </section>
+        </ScrollReveal>
       )}
 
       {/* ── Featured listings ── */}
@@ -161,6 +164,7 @@ export default async function HomePage() {
       )}
 
       {/* ── How it works ── */}
+      <ScrollReveal>
       <section className="py-16">
         <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
           <p className="text-[11px] uppercase tracking-widest font-medium text-muted-foreground text-center mb-3">How it works</p>
@@ -184,6 +188,7 @@ export default async function HomePage() {
           </div>
         </div>
       </section>
+      </ScrollReveal>
 
       {/* ── Trust strip ── */}
       <section className="py-5">
@@ -205,6 +210,7 @@ export default async function HomePage() {
       </section>
 
       {/* ── Intent cards ── */}
+      <ScrollReveal>
       <section className="py-16">
         <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
           <h2 className="text-lg font-semibold text-foreground sm:text-xl mb-8">
@@ -267,6 +273,7 @@ export default async function HomePage() {
           </div>
         </div>
       </section>
+      </ScrollReveal>
 
       {/* ── Student Housing ── */}
       <section className="mx-auto w-full max-w-7xl px-4 py-12 sm:px-6 lg:px-8">

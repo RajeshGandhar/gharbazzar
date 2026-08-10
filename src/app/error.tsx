@@ -26,12 +26,12 @@ export default function GlobalError({
         </div>
       </div>
 
-      <h1 className="text-2xl font-bold text-foreground mb-2">Something went wrong</h1>
+      <h1 className="text-2xl font-semibold text-foreground mb-2">Something went wrong</h1>
       <p className="max-w-sm text-sm text-muted-foreground mb-2 leading-relaxed">
         We hit an unexpected error loading this page. This has been logged and we&apos;ll look into it.
       </p>
       {error.digest && (
-        <p className="mb-8 font-mono text-[11px] text-muted-foreground/60 bg-muted rounded-lg px-3 py-1">
+        <p className="mb-8 font-mono text-[11px] text-muted-foreground/60 bg-card rounded-md px-3 py-1">
           Error ID: {error.digest}
         </p>
       )}

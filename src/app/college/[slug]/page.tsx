@@ -129,7 +129,7 @@ export default async function UniversityPage({ params, searchParams }: Props) {
 
       <div className="flex flex-col">
         {/* Hero */}
-        <section className="border-b border-border bg-gradient-to-b from-primary/8 to-background py-12">
+        <section className="border-b border-white/[0.06] py-12">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             {/* Breadcrumb */}
             <nav
@@ -150,7 +150,7 @@ export default async function UniversityPage({ params, searchParams }: Props) {
             </nav>
 
             <div className="flex items-start gap-5">
-              <div className="rounded-2xl border border-border bg-card p-3 shrink-0">
+              <div className="rounded-xl border border-white/[0.06] bg-card p-3 shrink-0">
                 {uni.logo_url ? (
                   <Image
                     src={uni.logo_url}
@@ -170,7 +170,7 @@ export default async function UniversityPage({ params, searchParams }: Props) {
                     {institutionLabel[uni.institution_type] ?? uni.institution_type}
                   </Badge>
                 </div>
-                <h1 className="text-2xl font-bold text-foreground sm:text-3xl leading-tight">{uni.name}</h1>
+                <h1 className="text-2xl font-semibold text-foreground sm:text-3xl leading-tight">{uni.name}</h1>
                 {city && (
                   <div className="flex items-center gap-1.5 mt-2 text-muted-foreground">
                     <MapPin className="h-4 w-4 shrink-0" />
@@ -219,7 +219,7 @@ export default async function UniversityPage({ params, searchParams }: Props) {
                       "rounded-full border px-4 py-1.5 text-sm font-medium transition-smooth",
                       isActive
                         ? "border-primary bg-primary text-primary-foreground"
-                        : "border-border hover:border-primary hover:text-primary"
+                        : "border-white/[0.06] hover:border-white/[0.12] hover:text-foreground"
                     )}
                   >
                     {label}
@@ -243,10 +243,10 @@ export default async function UniversityPage({ params, searchParams }: Props) {
 
           {properties.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-24 text-center gap-4">
-              <div className="rounded-2xl bg-muted p-6">
+              <div className="rounded-xl bg-muted p-6">
                 <GraduationCap className="h-12 w-12 text-muted-foreground" />
               </div>
-              <h2 className="text-xl font-semibold text-foreground">
+              <h2 className="text-xl font-medium text-foreground">
                 No listings near {uni.name} yet
               </h2>
               <p className="text-muted-foreground max-w-sm text-sm">

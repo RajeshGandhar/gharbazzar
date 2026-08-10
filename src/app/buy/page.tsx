@@ -41,10 +41,10 @@ export default async function BuyPage() {
   return (
     <div className="flex flex-col">
       {/* Hero */}
-      <section className="border-b border-border py-10">
+      <section className="border-b border-white/[0.06] py-10">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex items-center gap-3 mb-3">
-            <div className="rounded-lg bg-primary/10 p-2">
+            <div className="rounded-md bg-primary/8 p-2">
               <Home className="h-5 w-5 text-primary" />
             </div>
             <nav aria-label="Breadcrumb" className="text-sm text-muted-foreground">
@@ -53,7 +53,7 @@ export default async function BuyPage() {
               <span className="font-medium text-foreground">Buy</span>
             </nav>
           </div>
-          <h1 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
+          <h1 className="text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
             Properties for Sale
           </h1>
           <p className="mt-1.5 text-sm text-muted-foreground">
@@ -71,7 +71,7 @@ export default async function BuyPage() {
               <Link
                 key={href}
                 href={href}
-                className="border border-border bg-background px-3 py-1.5 text-sm font-medium transition-colors hover:border-primary hover:text-primary aria-[current=page]:bg-primary aria-[current=page]:text-primary-foreground aria-[current=page]:border-primary"
+                className="rounded-md border border-white/[0.06] bg-background px-3 py-1.5 text-sm font-medium transition-colors hover:border-white/[0.12] hover:text-foreground aria-[current=page]:bg-primary aria-[current=page]:text-primary-foreground aria-[current=page]:border-primary"
               >
                 {label}
               </Link>
@@ -111,7 +111,7 @@ function EmptyState({ purpose }: { purpose: "sale" | "rent" }) {
   const label = purpose === "sale" ? "sale" : "rent";
   return (
     <div className="flex flex-col items-center justify-center py-24 text-center gap-4">
-      <div className="rounded-2xl bg-muted p-6">
+      <div className="rounded-xl bg-muted p-6">
         <Home className="h-12 w-12 text-muted-foreground" />
       </div>
       <h2 className="text-xl font-semibold text-foreground">

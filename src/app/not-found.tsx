@@ -6,19 +6,18 @@ import { cn } from "@/lib/utils";
 export default function NotFound() {
   return (
     <div className="flex flex-1 flex-col items-center justify-center px-4 py-24 text-center">
-      {/* Decorative number */}
       <div className="relative mb-8">
-        <span className="text-[120px] sm:text-[160px] font-black text-muted/50 select-none leading-none">
+        <span className="text-[120px] sm:text-[160px] font-black text-white/[0.03] select-none leading-none">
           404
         </span>
         <div className="absolute inset-0 flex items-center justify-center">
-          <div className="rounded-3xl bg-muted/80 p-5 backdrop-blur-sm shadow-card">
+          <div className="rounded-xl bg-card p-5">
             <MapPinOff className="h-10 w-10 text-muted-foreground" />
           </div>
         </div>
       </div>
 
-      <h1 className="text-2xl font-bold text-foreground mb-2">Page not found</h1>
+      <h1 className="text-2xl font-semibold text-foreground mb-2">Page not found</h1>
       <p className="max-w-sm text-sm text-muted-foreground mb-8 leading-relaxed">
         The page you&apos;re looking for doesn&apos;t exist or may have moved.
         Let&apos;s get you back on track.
@@ -35,7 +34,6 @@ export default function NotFound() {
         </Link>
       </div>
 
-      {/* Quick links */}
       <div className="mt-12 grid grid-cols-1 sm:grid-cols-3 gap-3 w-full max-w-lg">
         {[
           { label: "Buy property",    href: "/buy" },
@@ -45,7 +43,7 @@ export default function NotFound() {
           <Link
             key={link.href}
             href={link.href}
-            className="flex items-center justify-between rounded-xl border border-border bg-card px-4 py-3 text-sm font-medium text-foreground hover:border-primary/40 hover:text-primary hover:bg-primary/3 transition-all shadow-card"
+            className="flex items-center justify-between rounded-lg border border-white/[0.06] bg-card px-4 py-3 text-sm font-medium text-foreground hover:border-white/[0.12] transition-all"
           >
             {link.label}
             <ArrowRight className="h-3.5 w-3.5" />

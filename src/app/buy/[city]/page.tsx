@@ -183,7 +183,7 @@ export default async function BuyCityPage({ params, searchParams }: Props) {
 
       <div className="flex flex-col">
         {/* Breadcrumb */}
-        <div className="border-b border-border bg-muted/20">
+        <div className="border-b border-white/[0.06]">
           <nav aria-label="Breadcrumb" className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-3">
             <ol className="flex items-center gap-1.5 text-sm text-muted-foreground flex-wrap">
               <li><Link href="/" className="hover:text-primary transition-smooth">Home</Link></li>
@@ -196,13 +196,13 @@ export default async function BuyCityPage({ params, searchParams }: Props) {
         </div>
 
         {/* Hero */}
-        <section className="border-b border-border bg-gradient-to-b from-primary/8 to-background py-10">
+        <section className="border-b border-white/[0.06] py-10">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="flex items-center gap-3 mb-3">
-              <div className="rounded-lg bg-primary/10 p-2">
+              <div className="rounded-md bg-primary/8 p-2">
                 <Home className="h-6 w-6 text-primary" />
               </div>
-              <h1 className="text-2xl sm:text-3xl font-bold text-foreground">
+              <h1 className="text-2xl sm:text-3xl font-semibold text-foreground">
                 Property for Sale in {city.name}
               </h1>
             </div>
@@ -216,7 +216,7 @@ export default async function BuyCityPage({ params, searchParams }: Props) {
             <div className="flex flex-wrap gap-2 mt-5">
               <Link
                 href={`/buy/${city.slug}`}
-                className={`rounded-full border px-3 py-1.5 text-xs font-medium transition-smooth ${bedrooms === undefined ? "border-primary bg-primary text-primary-foreground" : "border-border hover:border-primary hover:text-primary"}`}
+                className={`rounded-full border px-3 py-1.5 text-xs font-medium transition-smooth ${bedrooms === undefined ? "border-primary bg-primary text-primary-foreground" : "border-white/[0.06] hover:border-white/[0.12] hover:text-foreground"}`}
               >
                 All types
               </Link>
@@ -224,7 +224,7 @@ export default async function BuyCityPage({ params, searchParams }: Props) {
                 <Link
                   key={value}
                   href={`/buy/${city.slug}?bedrooms=${value}`}
-                  className={`rounded-full border px-3 py-1.5 text-xs font-medium transition-smooth ${String(bedrooms) === value ? "border-primary bg-primary text-primary-foreground" : "border-border hover:border-primary hover:text-primary"}`}
+                  className={`rounded-full border px-3 py-1.5 text-xs font-medium transition-smooth ${String(bedrooms) === value ? "border-primary bg-primary text-primary-foreground" : "border-white/[0.06] hover:border-white/[0.12] hover:text-foreground"}`}
                 >
                   {label}
                 </Link>
@@ -236,7 +236,7 @@ export default async function BuyCityPage({ params, searchParams }: Props) {
         <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
           {properties.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-24 text-center gap-4">
-              <div className="rounded-2xl bg-muted p-6">
+              <div className="rounded-xl bg-muted p-6">
                 <Search className="h-12 w-12 text-muted-foreground" />
               </div>
               <h2 className="text-xl font-semibold">No properties found</h2>
@@ -260,11 +260,11 @@ export default async function BuyCityPage({ params, searchParams }: Props) {
 
           {/* Internal linking — areas in this city */}
           {areas.length > 0 && (
-            <div className="mt-8 border-t border-border pt-8">
+            <div className="mt-8 border-t border-white/[0.06] pt-8">
               <h2 className="text-base font-semibold text-foreground mb-4">Browse by locality in {city.name}</h2>
               <div className="flex flex-wrap gap-2">
                 {areas.map((a) => (
-                  <Link key={a.id} href={`/buy/${city.slug}/${a.slug}`} className="rounded-full border border-border px-3 py-1.5 text-xs hover:border-primary hover:text-primary transition-smooth">
+                  <Link key={a.id} href={`/buy/${city.slug}/${a.slug}`} className="rounded-md border border-white/[0.06] px-3 py-1.5 text-xs hover:border-white/[0.12] hover:text-foreground transition-smooth">
                     {a.name}
                   </Link>
                 ))}
@@ -273,11 +273,11 @@ export default async function BuyCityPage({ params, searchParams }: Props) {
           )}
 
           {/* Internal linking — nearby cities */}
-          <div className="mt-8 border-t border-border pt-8">
+          <div className="mt-8 border-t border-white/[0.06] pt-8">
             <h2 className="text-base font-semibold text-foreground mb-4">Also browse in nearby cities</h2>
             <div className="flex flex-wrap gap-2">
               {LAUNCH_CITIES.filter((c) => c.slug !== city.slug).map((c) => (
-                <Link key={c.slug} href={`/buy/${c.slug}`} className="rounded-full border border-border px-3 py-1.5 text-xs hover:border-primary hover:text-primary transition-smooth">
+                <Link key={c.slug} href={`/buy/${c.slug}`} className="rounded-md border border-white/[0.06] px-3 py-1.5 text-xs hover:border-white/[0.12] hover:text-foreground transition-smooth">
                   Buy in {c.name}
                 </Link>
               ))}

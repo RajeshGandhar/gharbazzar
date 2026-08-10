@@ -86,10 +86,10 @@ export default async function StudentHousingPage({ searchParams }: Props) {
   return (
     <div className="flex flex-col">
       {/* Hero */}
-      <section className="border-b border-border bg-gradient-to-b from-primary/8 to-background py-12">
+      <section className="border-b border-white/[0.06] py-12">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex items-center gap-3 mb-4">
-            <div className="rounded-lg bg-primary/10 p-2">
+            <div className="rounded-md bg-primary/8 p-2">
               <GraduationCap className="h-6 w-6 text-primary" />
             </div>
             <nav aria-label="Breadcrumb" className="text-sm text-muted-foreground">
@@ -98,7 +98,7 @@ export default async function StudentHousingPage({ searchParams }: Props) {
               <span className="font-medium text-foreground">Student Housing</span>
             </nav>
           </div>
-          <h1 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
+          <h1 className="text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
             Student Housing
           </h1>
           <p className="mt-2 text-muted-foreground max-w-xl">
@@ -115,7 +115,7 @@ export default async function StudentHousingPage({ searchParams }: Props) {
                 type="text"
                 placeholder="Search university or college..."
                 defaultValue={searchQuery}
-                className="w-full rounded-lg border border-border bg-background pl-9 pr-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary"
+                className="w-full rounded-lg border border-white/[0.06] bg-background pl-9 pr-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary"
               />
             </div>
             <button type="submit" className={cn(buttonVariants({ size: "default" }))}>
@@ -138,7 +138,7 @@ export default async function StudentHousingPage({ searchParams }: Props) {
                     "rounded-full border px-3 py-1.5 text-xs font-medium transition-smooth",
                     genderFilter === value
                       ? "border-primary bg-primary text-primary-foreground"
-                      : "border-border hover:border-primary hover:text-primary"
+                      : "border-white/[0.06] hover:border-white/[0.12] hover:text-foreground"
                   )}
                 >
                   {label}
@@ -151,9 +151,9 @@ export default async function StudentHousingPage({ searchParams }: Props) {
 
       {/* University grid */}
       {filteredUnis.length > 0 && (
-        <section className="border-b border-border bg-muted/20 py-10">
+        <section className="border-b border-white/[0.06] py-10">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <h2 className="text-lg font-semibold text-foreground mb-5">
+            <h2 className="text-lg font-medium text-foreground mb-5">
               Browse by university
             </h2>
             <div className="grid gap-3 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
@@ -163,9 +163,9 @@ export default async function StudentHousingPage({ searchParams }: Props) {
                   <Link
                     key={u.id}
                     href={`/college/${u.slug}`}
-                    className="group flex items-start gap-3 rounded-xl border border-border bg-card p-4 transition-smooth hover:border-primary/40 hover:shadow-md hover:-translate-y-0.5"
+                    className="group flex items-start gap-3 rounded-xl border border-white/[0.06] bg-card p-4 transition-smooth hover:border-white/[0.12] hover:-translate-y-0.5"
                   >
-                    <div className="rounded-lg bg-primary/10 p-2 shrink-0">
+                    <div className="rounded-md bg-primary/8 p-2 shrink-0">
                       <GraduationCap className="h-5 w-5 text-primary" />
                     </div>
                     <div className="min-w-0">
@@ -194,13 +194,13 @@ export default async function StudentHousingPage({ searchParams }: Props) {
 
       {/* Listings */}
       <section className="mx-auto w-full max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
-        <h2 className="text-lg font-semibold text-foreground mb-5">
+        <h2 className="text-lg font-medium text-foreground mb-5">
           All student housing
         </h2>
 
         {filteredProperties.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20 text-center gap-4">
-            <div className="rounded-2xl bg-muted p-6">
+            <div className="rounded-xl bg-muted p-6">
               <GraduationCap className="h-12 w-12 text-muted-foreground" />
             </div>
             <h3 className="text-xl font-semibold text-foreground">

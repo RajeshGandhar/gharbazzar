@@ -34,7 +34,7 @@ export function GalleryGrid({ images, title }: GalleryGridProps) {
           type="button"
           onClick={() => openAt(0)}
           className={cn(
-            "shadow-elevated relative overflow-hidden rounded-xl bg-muted aspect-[4/3] cursor-zoom-in group",
+            "relative overflow-hidden rounded-lg bg-muted aspect-[4/3] cursor-zoom-in group",
             images.length >= 3 ? "row-span-2" : ""
           )}
         >
@@ -65,7 +65,7 @@ export function GalleryGrid({ images, title }: GalleryGridProps) {
             key={img.path}
             type="button"
             onClick={() => openAt(idx + 1)}
-            className="relative aspect-[4/3] overflow-hidden rounded-xl bg-muted cursor-zoom-in group"
+            className="relative aspect-[4/3] overflow-hidden rounded-lg bg-muted cursor-zoom-in group"
           >
             <Image
               src={img.url}
@@ -91,7 +91,7 @@ export function GalleryGrid({ images, title }: GalleryGridProps) {
         <button
           type="button"
           onClick={() => openAt(0)}
-          className="mt-2 w-full rounded-xl border border-border py-2 text-sm font-medium text-foreground hover:bg-muted transition-colors"
+          className="mt-2 w-full rounded-lg border border-white/[0.06] py-2 text-sm font-medium text-foreground hover:bg-white/[0.04] transition-colors"
         >
           View all {images.length} photos
         </button>

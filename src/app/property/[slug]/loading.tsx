@@ -6,40 +6,42 @@ export default function PropertyDetailLoading() {
         <div className="flex flex-col gap-8 min-w-0">
           {/* Gallery skeleton */}
           <div className="grid grid-cols-2 gap-2">
-            <div className="row-span-2 rounded-xl bg-muted animate-pulse aspect-[4/3]" />
-            <div className="rounded-xl bg-muted animate-pulse aspect-[4/3]" />
-            <div className="rounded-xl bg-muted animate-pulse aspect-[4/3]" />
+            <div className="row-span-2 rounded-xl skeleton-shimmer aspect-[4/3]" />
+            <div className="rounded-xl skeleton-shimmer aspect-[4/3]" />
+            <div className="rounded-xl skeleton-shimmer aspect-[4/3]" />
           </div>
 
-          {/* Title / price block */}
+          {/* Title / price */}
           <div className="space-y-3">
-            <div className="h-4 w-24 rounded bg-muted animate-pulse" />
-            <div className="h-8 w-3/4 rounded bg-muted animate-pulse" />
-            <div className="h-5 w-1/2 rounded bg-muted animate-pulse" />
-            <div className="h-7 w-40 rounded bg-muted animate-pulse" />
+            <div className="h-4 w-24 rounded-md skeleton-shimmer" />
+            <div className="h-7 w-3/4 rounded-md skeleton-shimmer" />
+            <div className="h-4 w-1/2 rounded-md skeleton-shimmer" />
+            <div className="h-6 w-40 rounded-md skeleton-shimmer" />
           </div>
 
           {/* Details grid */}
-          <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-            {Array.from({ length: 4 }).map((_, i) => (
-              <div key={i} className="h-16 rounded-lg bg-muted animate-pulse" />
+          <div className="flex flex-wrap gap-3">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <div key={i} className="h-10 w-28 rounded-md skeleton-shimmer" />
             ))}
           </div>
 
           {/* Description */}
           <div className="space-y-2">
-            <div className="h-5 w-32 rounded bg-muted animate-pulse" />
-            <div className="h-4 w-full rounded bg-muted animate-pulse" />
-            <div className="h-4 w-full rounded bg-muted animate-pulse" />
-            <div className="h-4 w-2/3 rounded bg-muted animate-pulse" />
+            <div className="h-4 w-32 rounded-md skeleton-shimmer" />
+            <div className="h-3 w-full rounded-md skeleton-shimmer" />
+            <div className="h-3 w-full rounded-md skeleton-shimmer" />
+            <div className="h-3 w-2/3 rounded-md skeleton-shimmer" />
           </div>
         </div>
 
-        {/* Sidebar (contact box) */}
-        <div className="rounded-2xl border border-border p-5 space-y-4 h-fit">
-          <div className="h-5 w-2/3 rounded bg-muted animate-pulse" />
-          <div className="h-10 w-full rounded-lg bg-muted animate-pulse" />
-          <div className="h-10 w-full rounded-lg bg-muted animate-pulse" />
+        {/* Sidebar */}
+        <div className="hidden lg:block">
+          <div className="rounded-xl border border-white/[0.06] p-5 space-y-4">
+            <div className="h-4 w-2/3 rounded-md skeleton-shimmer" />
+            <div className="h-10 w-full rounded-md skeleton-shimmer" />
+            <div className="h-10 w-full rounded-md skeleton-shimmer" />
+          </div>
         </div>
       </div>
     </div>

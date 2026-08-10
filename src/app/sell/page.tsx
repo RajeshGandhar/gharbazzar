@@ -25,10 +25,10 @@ export default function SellPage() {
   return (
     <div className="flex flex-col">
       {/* ── Hero ─────────────────────────────────────────────────── */}
-      <section className="border-b border-border py-12 sm:py-16">
+      <section className="border-b border-white/[0.06] py-12 sm:py-16">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="max-w-2xl">
-            <h1 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
+            <h1 className="text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
               List your property for free
             </h1>
             <p className="mt-3 text-base text-muted-foreground">
@@ -63,7 +63,7 @@ export default function SellPage() {
       <section className="py-12 sm:py-16">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mb-8">
-            <h2 className="text-xl font-bold text-foreground sm:text-2xl">
+            <h2 className="text-xl font-semibold text-foreground sm:text-2xl">
               How it works
             </h2>
           </div>
@@ -87,10 +87,10 @@ export default function SellPage() {
             ].map(({ step, title, desc }) => (
               <div
                 key={step}
-                className="border border-border rounded-lg p-5"
+                className="border border-white/[0.06] rounded-lg p-5"
               >
                 <div className="flex items-start gap-3">
-                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary font-bold">
+                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-primary/8 text-primary font-semibold">
                     {step}
                   </div>
                   <div>
@@ -109,10 +109,10 @@ export default function SellPage() {
       </section>
 
       {/* ── Seller types ─────────────────────────────────────────── */}
-      <section className="border-y border-border bg-muted/30 py-12 sm:py-16">
+      <section className="border-y border-white/[0.06] bg-card/30 py-12 sm:py-16">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mb-8">
-            <h2 className="text-xl font-bold text-foreground sm:text-2xl">
+            <h2 className="text-xl font-semibold text-foreground sm:text-2xl">
               Who can list
             </h2>
           </div>
@@ -137,9 +137,9 @@ export default function SellPage() {
             ].map(({ title, desc }) => (
               <div
                 key={title}
-                className="border border-border bg-card p-4"
+                className="border border-white/[0.06] bg-card p-4"
               >
-                <h3 className="font-semibold text-foreground mb-1">{title}</h3>
+                <h3 className="font-medium text-foreground mb-1">{title}</h3>
                 <p className="text-sm text-muted-foreground">
                   {desc}
                 </p>
@@ -153,7 +153,7 @@ export default function SellPage() {
       <section className="py-12 sm:py-16">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mb-8">
-            <h2 className="text-xl font-bold text-foreground sm:text-2xl">
+            <h2 className="text-xl font-semibold text-foreground sm:text-2xl">
               Why list here
             </h2>
           </div>
@@ -178,7 +178,7 @@ export default function SellPage() {
             ].map(({ title, desc }) => (
               <div
                 key={title}
-                className="flex items-start gap-3 p-4 border border-border rounded-lg"
+                className="flex items-start gap-3 p-4 border border-white/[0.06] rounded-lg"
               >
                 <CheckCircle2 className="h-5 w-5 text-primary shrink-0 mt-0.5" />
                 <div>
@@ -196,11 +196,11 @@ export default function SellPage() {
       </section>
 
       {/* ── Assisted listing CTA ─────────────────────────────────── */}
-      <section className="border-y border-border bg-muted/20 py-8">
+      <section className="border-y border-white/[0.06] py-8">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col items-center text-center gap-4 sm:flex-row sm:text-left sm:justify-between">
             <div>
-              <h2 className="text-lg font-bold text-foreground">
+              <h2 className="text-lg font-semibold text-foreground">
                 Need help listing?
               </h2>
               <p className="text-sm text-muted-foreground mt-1">
@@ -224,7 +224,7 @@ export default function SellPage() {
       <section className="py-12 sm:py-16">
         <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
           <div className="mb-8">
-            <h2 className="text-xl font-bold text-foreground sm:text-2xl">
+            <h2 className="text-xl font-semibold text-foreground sm:text-2xl">
               Common questions
             </h2>
           </div>
@@ -245,7 +245,7 @@ export default function SellPage() {
             ].map(({ q, a }) => (
               <div
                 key={q}
-                className="border border-border bg-card p-5"
+                className="border border-white/[0.06] bg-card p-5"
               >
                 <h3 className="font-semibold text-foreground mb-1.5">{q}</h3>
                 <p
@@ -259,9 +259,9 @@ export default function SellPage() {
       </section>
 
       {/* ── Final CTA ────────────────────────────────────────────── */}
-      <section className="border-t border-border py-12">
+      <section className="border-t border-white/[0.06] py-12">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-2xl font-bold text-foreground">
+          <h2 className="text-2xl font-semibold text-foreground">
             Ready to list?
           </h2>
           <p className="mt-2 text-muted-foreground">

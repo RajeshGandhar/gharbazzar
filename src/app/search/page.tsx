@@ -233,14 +233,14 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
   const FilterPanel = () => (
     <div className="flex flex-col gap-6">
       <div>
-        <p className="text-sm font-semibold text-foreground mb-3">Purpose</p>
+        <p className="text-sm font-medium text-foreground mb-3">Purpose</p>
         <div className="flex flex-wrap gap-2">
           {[{ value: "", label: "All" }, { value: "sale", label: "Buy" }, { value: "rent", label: "Rent" }].map(({ value, label }) => {
             const active = (input.purpose ?? "") === value;
             return (
               <Link key={label} href={filterUrl("purpose", value)} className={cn(
                 "rounded-full border px-3 py-1.5 text-xs font-medium transition-smooth",
-                active ? "border-primary bg-primary text-primary-foreground" : "border-border hover:border-primary hover:text-primary"
+                active ? "border-primary bg-primary text-primary-foreground" : "border-white/[0.06] hover:border-white/[0.12] hover:text-foreground"
               )}>{label}</Link>
             );
           })}
@@ -248,14 +248,14 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
       </div>
 
       <div>
-        <p className="text-sm font-semibold text-foreground mb-3">BHK type</p>
+        <p className="text-sm font-medium text-foreground mb-3">BHK type</p>
         <div className="flex flex-wrap gap-2">
           {bhkOptions.map(({ value, label }) => {
             const active = String(input.bedrooms ?? "") === value;
             return (
               <Link key={value} href={filterUrl("bedrooms", active ? "" : value)} className={cn(
                 "rounded-full border px-3 py-1.5 text-xs font-medium transition-smooth",
-                active ? "border-primary bg-primary text-primary-foreground" : "border-border hover:border-primary hover:text-primary"
+                active ? "border-primary bg-primary text-primary-foreground" : "border-white/[0.06] hover:border-white/[0.12] hover:text-foreground"
               )}>{label}</Link>
             );
           })}
@@ -284,14 +284,14 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
 
       {types.length > 0 && (
         <div>
-          <p className="text-sm font-semibold text-foreground mb-3">Property type</p>
+          <p className="text-sm font-medium text-foreground mb-3">Property type</p>
           <div className="flex flex-wrap gap-2">
             {types.map((t) => {
               const active = input.property_type === t.slug;
               return (
                 <Link key={t.slug} href={filterUrl("property_type", active ? "" : t.slug)} className={cn(
                   "rounded-full border px-3 py-1.5 text-xs font-medium transition-smooth",
-                  active ? "border-primary bg-primary text-primary-foreground" : "border-border hover:border-primary hover:text-primary"
+                  active ? "border-primary bg-primary text-primary-foreground" : "border-white/[0.06] hover:border-white/[0.12] hover:text-foreground"
                 )}>{t.name}</Link>
               );
             })}
@@ -300,7 +300,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
       )}
 
       <div>
-        <p className="text-sm font-semibold text-foreground mb-3">Furnishing</p>
+        <p className="text-sm font-medium text-foreground mb-3">Furnishing</p>
         <div className="flex flex-wrap gap-2">
           {[
             { value: "unfurnished", label: "Unfurnished" },
@@ -311,7 +311,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
             return (
               <Link key={value} href={filterUrl("furnishing", active ? "" : value)} className={cn(
                 "rounded-full border px-3 py-1.5 text-xs font-medium transition-smooth",
-                active ? "border-primary bg-primary text-primary-foreground" : "border-border hover:border-primary hover:text-primary"
+                active ? "border-primary bg-primary text-primary-foreground" : "border-white/[0.06] hover:border-white/[0.12] hover:text-foreground"
               )}>{label}</Link>
             );
           })}
@@ -320,7 +320,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
 
       {amenities.length > 0 && (
         <div>
-          <p className="text-sm font-semibold text-foreground mb-3">Amenities</p>
+          <p className="text-sm font-medium text-foreground mb-3">Amenities</p>
           <div className="flex flex-wrap gap-2">
             {amenities.map((a) => {
               const active = selectedAmenitySlugs.has(a.slug);
@@ -331,7 +331,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
                   aria-pressed={active}
                   className={cn(
                     "rounded-full border px-3 py-1.5 text-xs font-medium transition-smooth",
-                    active ? "border-primary bg-primary text-primary-foreground" : "border-border hover:border-primary hover:text-primary"
+                    active ? "border-primary bg-primary text-primary-foreground" : "border-white/[0.06] hover:border-white/[0.12] hover:text-foreground"
                   )}
                 >
                   {a.name}
@@ -343,7 +343,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
       )}
 
       <div>
-        <p className="text-sm font-semibold text-foreground mb-3">For students</p>
+        <p className="text-sm font-medium text-foreground mb-3">For students</p>
         <div className="flex flex-wrap gap-2">
           {[
             { value: "boys_only", label: "Boys" },
@@ -358,7 +358,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
             return (
               <Link key={value} href={`/search?${p.toString()}`} className={cn(
                 "rounded-full border px-3 py-1.5 text-xs font-medium transition-smooth",
-                active ? "border-primary bg-primary text-primary-foreground" : "border-border hover:border-primary hover:text-primary"
+                active ? "border-primary bg-primary text-primary-foreground" : "border-white/[0.06] hover:border-white/[0.12] hover:text-foreground"
               )}>{label}</Link>
             );
           })}
@@ -368,7 +368,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
       {/* University proximity — only shown when a city is selected */}
       {input.city && universities.length > 0 && (
         <div>
-          <p className="text-sm font-semibold text-foreground mb-3">Near college / university</p>
+          <p className="text-sm font-medium text-foreground mb-3">Near college / university</p>
           <div className="flex flex-col gap-2">
             <div className="flex flex-wrap gap-2">
               {universities.slice(0, 6).map((u) => {
@@ -376,7 +376,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
                 return (
                   <Link key={u.slug} href={filterUrl("university", active ? "" : u.slug)} className={cn(
                     "rounded-full border px-3 py-1.5 text-xs font-medium transition-smooth",
-                    active ? "border-primary bg-primary text-primary-foreground" : "border-border hover:border-primary hover:text-primary"
+                    active ? "border-primary bg-primary text-primary-foreground" : "border-white/[0.06] hover:border-white/[0.12] hover:text-foreground"
                   )}>{u.name}</Link>
                 );
               })}
@@ -390,7 +390,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
                     return (
                       <Link key={value} href={filterUrl("max_distance", value)} className={cn(
                         "rounded-full border px-3 py-1.5 text-xs font-medium transition-smooth",
-                        active ? "border-primary bg-primary text-primary-foreground" : "border-border hover:border-primary hover:text-primary"
+                        active ? "border-primary bg-primary text-primary-foreground" : "border-white/[0.06] hover:border-white/[0.12] hover:text-foreground"
                       )}>{label}</Link>
                     );
                   })}
@@ -406,7 +406,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
   return (
     <div className="flex flex-col">
       {/* Search bar */}
-      <div className="border-b border-border bg-muted/20 py-4">
+      <div className="border-b border-white/[0.04] py-4">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <SearchBar
             initialQ={input.q ?? ""}
@@ -420,7 +420,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
         {/* Header row */}
         <div className="flex items-center justify-between gap-4 mb-4 flex-wrap">
           <div>
-            <h1 className="text-xl font-bold text-foreground">
+            <h1 className="text-xl font-semibold text-foreground">
               {input.q ? <>Results for &ldquo;{input.q}&rdquo;</> : "Property search results"}
             </h1>
             <p className="text-sm text-muted-foreground mt-0.5">
@@ -500,8 +500,8 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
               className={cn(
                 "rounded-full border px-3 py-1 text-xs font-medium transition-smooth",
                 (input.sort ?? "newest") === value
-                  ? "border-primary bg-primary/10 text-primary"
-                  : "border-border text-muted-foreground hover:border-primary hover:text-primary"
+                  ? "border-primary/30 bg-primary/8 text-primary"
+                  : "border-white/[0.06] text-muted-foreground hover:border-white/[0.12] hover:text-foreground"
               )}
             >
               {label}
@@ -516,14 +516,14 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
               <Link
                 key={removeKey}
                 href={removeFilterUrl(removeKey)}
-                className="flex items-center gap-1.5 rounded-full border border-primary/30 bg-primary/8 px-3 py-1 text-xs font-medium text-primary hover:bg-primary/15 transition-smooth"
+                className="flex items-center gap-1.5 rounded-full border border-primary/20 bg-primary/8 px-3 py-1 text-xs font-medium text-primary hover:bg-primary/12 transition-smooth"
                 aria-label={`Remove filter: ${label}`}
               >
                 {label}
                 <X className="h-3 w-3" />
               </Link>
             ))}
-            <Link href="/search" className="flex items-center gap-1 rounded-full border border-border px-3 py-1 text-xs text-muted-foreground hover:border-primary hover:text-primary transition-smooth">
+            <Link href="/search" className="flex items-center gap-1 rounded-full border border-white/[0.06] px-3 py-1 text-xs text-muted-foreground hover:border-white/[0.12] hover:text-foreground transition-smooth">
               Clear all
             </Link>
           </div>
@@ -534,10 +534,10 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
           {viewMode !== "map" && (
             <aside className="hidden lg:block w-64 shrink-0">
               <div className="sticky top-24">
-                <div className="rounded-2xl border border-border bg-card p-5">
+                <div className="rounded-xl border border-white/[0.06] bg-card p-5">
                   <div className="flex items-center gap-2 mb-5">
                     <Filter className="h-4 w-4 text-primary" />
-                    <h2 className="font-semibold text-foreground">Filters</h2>
+                    <h2 className="font-medium text-foreground">Filters</h2>
                   </div>
                   <FilterPanel />
                 </div>
@@ -549,10 +549,10 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
           <div className="flex-1 min-w-0">
             {properties.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-24 text-center gap-4">
-                <div className="rounded-2xl bg-muted p-6">
+                <div className="rounded-xl bg-card p-6">
                   <Search className="h-12 w-12 text-muted-foreground" />
                 </div>
-                <h2 className="text-xl font-semibold text-foreground">No properties found</h2>
+                <h2 className="text-xl font-medium text-foreground">No properties found</h2>
                 <p className="text-muted-foreground max-w-sm text-sm">
                   Try adjusting your filters or search term. Save this search and we&apos;ll alert you when a matching listing goes live.
                 </p>

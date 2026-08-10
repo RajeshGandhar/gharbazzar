@@ -14,7 +14,7 @@ export function NcrWaitlist({ city, purpose }: NcrWaitlistProps) {
   return (
     <div className="flex flex-col">
       {/* Breadcrumb */}
-      <div className="border-b border-border bg-muted/20">
+      <div className="border-b border-white/[0.06]">
         <nav aria-label="Breadcrumb" className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-3">
           <ol className="flex items-center gap-1.5 text-sm text-muted-foreground flex-wrap">
             <li>
@@ -43,11 +43,11 @@ export function NcrWaitlist({ city, purpose }: NcrWaitlistProps) {
 
       {/* Main content */}
       <div className="mx-auto w-full max-w-2xl px-4 sm:px-6 py-16 text-center">
-        <div className="inline-flex items-center justify-center h-16 w-16 rounded-2xl bg-primary/10 mb-6">
+        <div className="inline-flex items-center justify-center h-16 w-16 rounded-xl bg-primary/8 mb-6">
           <Clock className="h-8 w-8 text-primary" />
         </div>
 
-        <h1 className="text-2xl sm:text-3xl font-bold mb-3">
+        <h1 className="text-2xl sm:text-3xl font-semibold mb-3">
           {purpose === "sale" ? "Properties for Sale" : "Rentals"} in {city.name}
         </h1>
         <p className="text-lg font-medium text-primary mb-4">Launching soon</p>
@@ -82,9 +82,9 @@ export function NcrWaitlist({ city, purpose }: NcrWaitlistProps) {
         </div>
 
         {/* Seller CTA */}
-        <div className="rounded-xl border border-border bg-muted/30 p-5 text-left max-w-md mx-auto">
+        <div className="rounded-xl border border-white/[0.06] bg-card/30 p-5 text-left max-w-md mx-auto">
           <div className="flex items-start gap-3">
-            <div className="rounded-lg bg-primary/10 p-2 shrink-0">
+            <div className="rounded-md bg-primary/8 p-2 shrink-0">
               <Building2 className="h-5 w-5 text-primary" />
             </div>
             <div>
