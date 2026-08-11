@@ -27,7 +27,9 @@ export const getCachedPropertyTypes = unstable_cache(
     const supabase = createAdminClient();
     const { data } = await supabase
       .from("property_types")
-      .select("id, name, slug")
+      // `category` lets callers group types (residential / commercial / land)
+      // without a second round trip. Existing consumers ignore the extra field.
+      .select("id, name, slug, category")
       .eq("is_active", true)
       .order("name");
     return data ?? [];

@@ -4,6 +4,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import type { PaginationParams } from "@/lib/api/pagination";
 import { toRange } from "@/lib/api/pagination";
 import type { PropertyCardData } from "@/components/properties/property-card";
+import type { LandingPropertyData } from "@/features/properties/adapters/to-premium-card";
 
 // ---------------------------------------------------------------------------
 // Listing card shape — used by browse / search pages
@@ -224,6 +225,31 @@ export async function getCityListingCounts(
 }
 
 // ---------------------------------------------------------------------------
+// Live listing counts per property type (for the homepage category rail).
+// Same contract as getCityListingCounts: counts are only ever rendered when
+// greater than zero, so an empty catalogue shows no number rather than "0".
+// ---------------------------------------------------------------------------
+export async function getPropertyTypeCounts(
+  typeIds: number[]
+): Promise<Record<number, number>> {
+  if (typeIds.length === 0) return {};
+  const supabase = createAdminClient();
+  const results = await Promise.all(
+    typeIds.map(async (typeId) => {
+      const { count } = await supabase
+        .from("properties")
+        .select("*", { count: "exact", head: true })
+        .eq("property_type_id", typeId)
+        .eq("status", "active")
+        .eq("approval_status", "approved")
+        .is("deleted_at", null);
+      return [typeId, count ?? 0] as const;
+    })
+  );
+  return Object.fromEntries(results);
+}
+
+// ---------------------------------------------------------------------------
 // Hero spotlight — newest live listing that actually has a photo.
 // The inner join on property_images guarantees the hero never renders an
 // empty frame; callers fall back to the designed composition when null.
@@ -247,6 +273,36 @@ export async function getSpotlightProperty(): Promise<PropertyCardData | null> {
     .limit(1)
     .maybeSingle();
   return (data as unknown as PropertyCardData) ?? null;
+}
+
+// ---------------------------------------------------------------------------
+// Landing-page listings.
+// Same filters as getFeaturedProperties, but also selects bathrooms and the
+// property-type name that the premium card displays. Kept separate so the
+// existing callers of getFeaturedProperties keep their narrower payload.
+// Featured first, then newest — so a curated listing leads when one exists.
+// ---------------------------------------------------------------------------
+export async function getLandingProperties(
+  limit = 6
+): Promise<LandingPropertyData[]> {
+  const supabase = createAdminClient();
+  const { data } = await supabase
+    .from("properties")
+    .select(`
+      id, slug, title, price, purpose, city_id, area_id, bedrooms, bathrooms,
+      built_up_area, area_unit, rental_kind, gender_policy, is_featured, is_verified, published_at,
+      cities(name, slug),
+      areas(name, slug),
+      property_types(name),
+      property_images(path, thumbnail_path, is_cover, position)
+    `)
+    .eq("status", "active")
+    .eq("approval_status", "approved")
+    .is("deleted_at", null)
+    .order("is_featured", { ascending: false })
+    .order("published_at", { ascending: false })
+    .limit(limit);
+  return (data ?? []) as unknown as LandingPropertyData[];
 }
 
 // ---------------------------------------------------------------------------

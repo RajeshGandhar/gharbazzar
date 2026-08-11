@@ -32,7 +32,10 @@ const securityHeaders = [
       "default-src 'self'",
       // Scripts: self + inline (JSON-LD, React) + Google Maps
       // 'unsafe-eval' is needed by React dev mode for call stack reconstruction; omitted in production
-      `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""} https://maps.googleapis.com https://maps.gstatic.com`,
+      // va.vercel-scripts.com serves @vercel/analytics and @vercel/speed-insights,
+      // both mounted in the root layout. Without it the CSP blocks them and
+      // neither product collects anything in production.
+      `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""} https://maps.googleapis.com https://maps.gstatic.com https://va.vercel-scripts.com`,
       // Styles: self + inline (Tailwind/shadcn, Google Maps UI)
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
       // Images: self + Supabase storage + Google Maps tiles + data URIs

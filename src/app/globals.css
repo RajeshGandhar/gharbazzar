@@ -54,6 +54,19 @@
   --color-brand:          var(--brand);
   --color-brand-foreground: var(--brand-foreground);
   --color-brand-muted:    var(--brand-muted);
+
+  /* Landing surfaces — raised planes above --background, used by the
+     homepage sections. Distinct from --card so section chrome and card
+     chrome can diverge without one dragging the other. */
+  --color-surface:        var(--surface);
+  --color-surface-2:      var(--surface-2);
+  --color-primary-soft:   var(--primary-soft);
+  --color-success:        var(--success);
+
+  /* Display face. Sora is loaded by the landing page and scoped to its
+     own subtree, so --font-sora is undefined everywhere else and the
+     rest of the app falls back to Geist untouched. */
+  --font-display:         var(--font-sora, var(--font-geist-sans));
 }
 
 /* ── Permanent dark theme ── */
@@ -79,6 +92,16 @@
   --muted-foreground: oklch(0.55 0.008 280);
   --accent:           oklch(0.20 0.02 152);
   --accent-foreground: oklch(0.93 0 0);
+
+  /* Raised planes, stepped off --background (0.13) on the same violet
+     axis so they read as one material under the green brand. */
+  --surface:          oklch(0.165 0.005 280);
+  --surface-2:        oklch(0.205 0.007 280);
+  /* Lifted green for hover on primary fills. */
+  --primary-soft:     oklch(0.72 0.13 152);
+  /* Verification green — nudged toward teal so it is legible as a
+     distinct signal next to --primary rather than reading as a repeat. */
+  --success:          oklch(0.74 0.13 162);
   --destructive:      oklch(0.65 0.20 25);
   --border:           oklch(1 0 0 / 7%);
   --input:            oklch(1 0 0 / 10%);
@@ -121,6 +144,30 @@
 }
 
 @layer utilities {
+  /* ── Landing page shell ──
+     Wider than the app's max-w-7xl (80rem) so the homepage grids breathe
+     the way the design intends. Scoped to the landing sections; the rest
+     of the app keeps its own container width. */
+  .container-page {
+    margin-inline: auto;
+    width: 100%;
+    max-width: 84rem;
+    padding-inline: 1rem;
+  }
+  @media (min-width: 768px) {
+    .container-page {
+      padding-inline: 2rem;
+    }
+  }
+
+  /* Horizontal scrollers (category rail, search tabs) without a visible bar. */
+  .no-scrollbar {
+    scrollbar-width: none;
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
   /* ── Glass — navbar / overlays ── */
   .glass {
     background: oklch(0.14 0.004 280 / 80%);
