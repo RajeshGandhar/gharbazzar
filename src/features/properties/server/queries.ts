@@ -199,6 +199,57 @@ export async function getPlatformStats() {
 }
 
 // ---------------------------------------------------------------------------
+// Live listing counts per city (for homepage city tiles)
+// One indexed COUNT per city — cheap, and the homepage caches for 10 minutes.
+// Counts are only ever rendered when > 0; we never invent inventory.
+// ---------------------------------------------------------------------------
+export async function getCityListingCounts(
+  cityIds: number[]
+): Promise<Record<number, number>> {
+  if (cityIds.length === 0) return {};
+  const supabase = createAdminClient();
+  const results = await Promise.all(
+    cityIds.map(async (cityId) => {
+      const { count } = await supabase
+        .from("properties")
+        .select("*", { count: "exact", head: true })
+        .eq("city_id", cityId)
+        .eq("status", "active")
+        .eq("approval_status", "approved")
+        .is("deleted_at", null);
+      return [cityId, count ?? 0] as const;
+    })
+  );
+  return Object.fromEntries(results);
+}
+
+// ---------------------------------------------------------------------------
+// Hero spotlight — newest live listing that actually has a photo.
+// The inner join on property_images guarantees the hero never renders an
+// empty frame; callers fall back to the designed composition when null.
+// ---------------------------------------------------------------------------
+export async function getSpotlightProperty(): Promise<PropertyCardData | null> {
+  const supabase = createAdminClient();
+  const { data } = await supabase
+    .from("properties")
+    .select(`
+      id, slug, title, price, purpose, city_id, area_id, bedrooms,
+      built_up_area, area_unit, rental_kind, gender_policy, is_featured, is_verified, published_at,
+      cities(name, slug),
+      areas(name, slug),
+      property_images!inner(path, thumbnail_path, is_cover, position)
+    `)
+    .eq("status", "active")
+    .eq("approval_status", "approved")
+    .is("deleted_at", null)
+    .order("is_featured", { ascending: false })
+    .order("published_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  return (data as unknown as PropertyCardData) ?? null;
+}
+
+// ---------------------------------------------------------------------------
 // Featured properties (for homepage)
 // ---------------------------------------------------------------------------
 export async function getFeaturedProperties(limit = 4): Promise<PropertyCardData[]> {

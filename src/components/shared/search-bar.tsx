@@ -232,7 +232,11 @@ export function SearchBar({
 
       <Select value={purpose} onValueChange={(v) => { if (v != null) setPurpose(v); }}>
         <SelectTrigger className="w-full sm:w-40" aria-label="Property purpose">
-          <SelectValue placeholder="Purpose" />
+          <SelectValue>
+            {(value: string | null) =>
+              PURPOSES.find((p) => p.value === value)?.label ?? "Purpose"
+            }
+          </SelectValue>
         </SelectTrigger>
         <SelectContent>
           {PURPOSES.map((p) => (
@@ -245,7 +249,11 @@ export function SearchBar({
 
       <Select value={city} onValueChange={(v) => { if (v != null) setCity(v); }}>
         <SelectTrigger className="w-full sm:w-40" aria-label="City filter">
-          <SelectValue placeholder="Any city" />
+          <SelectValue>
+            {(value: string | null) =>
+              CITIES.find((c) => c.value === value)?.label ?? "Any city"
+            }
+          </SelectValue>
         </SelectTrigger>
         <SelectContent>
           <SelectItem value="">Any city</SelectItem>

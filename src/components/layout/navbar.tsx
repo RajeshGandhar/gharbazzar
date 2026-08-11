@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
-import { Menu, X, Home, Key, GraduationCap, Building2, ChevronRight, User, LogOut, LayoutDashboard } from "lucide-react";
+import { Menu, X, Home, Key, GraduationCap, Building2, Bell, Plus, ChevronRight, ChevronDown, Heart, User, LogOut, LayoutDashboard } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -52,6 +52,7 @@ export function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [user, setUser] = useState<SupabaseUser | null>(null);
   const [profile, setProfile] = useState<UserProfile | null>(null);
+  const [unreadAlerts, setUnreadAlerts] = useState(0);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 12);
@@ -77,6 +78,7 @@ export function Navbar() {
         setProfile(data);
       } else {
         setProfile(null);
+        setUnreadAlerts(0);
       }
     }
 
@@ -94,17 +96,39 @@ export function Navbar() {
           .then(({ data }) => setProfile(data));
       } else {
         setProfile(null);
+        setUnreadAlerts(0);
       }
     });
 
     return () => subscription.unsubscribe();
   }, []);
 
+  // Unread alert count. RLS ("notifications: own read") scopes this to the
+  // signed-in user, so a HEAD count is safe from the browser — no row data
+  // crosses the wire, only the integer. Re-runs on navigation so the badge
+  // clears once the user has actually read them.
+  useEffect(() => {
+    const userId = user?.id;
+    if (!userId) return;
+    let cancelled = false;
+    const supabase = createClient();
+    supabase
+      .from("notifications")
+      .select("id", { count: "exact", head: true })
+      .eq("user_id", userId)
+      .is("read_at", null)
+      .then(({ count }) => {
+        if (!cancelled) setUnreadAlerts(count ?? 0);
+      });
+    return () => { cancelled = true; };
+  }, [user?.id, pathname]);
+
   async function handleSignOut() {
     const supabase = createClient();
     await supabase.auth.signOut();
     setUser(null);
     setProfile(null);
+    setUnreadAlerts(0);
     router.push("/");
   }
 
@@ -187,6 +211,41 @@ export function Navbar() {
           <div className="ml-auto flex items-center gap-2">
             {isAuthenticated ? (
               <>
+                {/* Saved listings — quick access */}
+                <Link
+                  href="/account/favorites"
+                  className={cn(
+                    buttonVariants({ variant: "ghost", size: "sm" }),
+                    "hidden md:flex gap-1.5 font-medium text-muted-foreground hover:text-foreground"
+                  )}
+                >
+                  <Heart className="h-3.5 w-3.5" aria-hidden />
+                  Saved
+                </Link>
+
+                {/* Alerts — saved-search matches and account activity */}
+                <Link
+                  href="/account/notifications"
+                  aria-label={
+                    unreadAlerts > 0 ? `Alerts, ${unreadAlerts} unread` : "Alerts"
+                  }
+                  className={cn(
+                    buttonVariants({ variant: "ghost", size: "sm" }),
+                    "relative hidden md:flex gap-1.5 font-medium text-muted-foreground hover:text-foreground"
+                  )}
+                >
+                  <Bell className="h-3.5 w-3.5" aria-hidden />
+                  Alerts
+                  {unreadAlerts > 0 && (
+                    <span
+                      className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-semibold leading-none text-primary-foreground"
+                      aria-hidden
+                    >
+                      {unreadAlerts > 9 ? "9+" : unreadAlerts}
+                    </span>
+                  )}
+                </Link>
+
                 {/* List property — primary CTA */}
                 <Link
                   href="/list-property"
@@ -195,14 +254,14 @@ export function Navbar() {
                     "hidden sm:flex gap-1.5 font-medium"
                   )}
                 >
-                  <Building2 className="h-3.5 w-3.5" aria-hidden />
                   Post property
+                  <Plus className="h-3.5 w-3.5" aria-hidden />
                 </Link>
 
                 {/* User avatar dropdown — desktop */}
                 <DropdownMenu>
                   <DropdownMenuTrigger
-                    className="hidden sm:flex items-center gap-2 rounded-full outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                    className="hidden sm:flex items-center gap-1.5 rounded-full pl-0.5 pr-1.5 py-0.5 outline-none transition-colors hover:bg-white/[0.04] focus-visible:ring-2 focus-visible:ring-primary"
                   >
                     <Avatar size="sm">
                       {profile?.avatar_url && (
@@ -210,6 +269,12 @@ export function Navbar() {
                       )}
                       <AvatarFallback>{initials}</AvatarFallback>
                     </Avatar>
+                    {profile?.full_name && (
+                      <span className="hidden lg:block max-w-[9rem] truncate text-[13px] font-medium text-foreground">
+                        {profile.full_name.split(" ")[0]}
+                      </span>
+                    )}
+                    <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" aria-hidden />
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" sideOffset={8} className="w-56">
                     <DropdownMenuGroup>
@@ -226,6 +291,12 @@ export function Navbar() {
                     >
                       <LayoutDashboard className="h-4 w-4" />
                       Dashboard
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => router.push("/account/favorites")}
+                    >
+                      <Heart className="h-4 w-4" />
+                      Saved properties
                     </DropdownMenuItem>
                     <DropdownMenuItem
                       onClick={() => router.push("/account/profile")}
@@ -271,8 +342,8 @@ export function Navbar() {
                     "hidden sm:flex gap-1.5 font-medium"
                   )}
                 >
-                  <Building2 className="h-3.5 w-3.5" aria-hidden />
                   Post property
+                  <Plus className="h-3.5 w-3.5" aria-hidden />
                 </Link>
               </>
             )}
@@ -405,6 +476,27 @@ export function Navbar() {
                         Post property
                       </Link>
                     </div>
+                    <Link
+                      href="/account/favorites"
+                      onClick={() => setOpen(false)}
+                      className="flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm text-muted-foreground hover:text-foreground hover:bg-white/[0.04] transition-colors"
+                    >
+                      <Heart className="h-4 w-4" aria-hidden />
+                      Saved properties
+                    </Link>
+                    <Link
+                      href="/account/notifications"
+                      onClick={() => setOpen(false)}
+                      className="flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm text-muted-foreground hover:text-foreground hover:bg-white/[0.04] transition-colors"
+                    >
+                      <Bell className="h-4 w-4" aria-hidden />
+                      Alerts
+                      {unreadAlerts > 0 && (
+                        <span className="ml-auto flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1.5 text-[11px] font-semibold leading-none text-primary-foreground">
+                          {unreadAlerts > 9 ? "9+" : unreadAlerts}
+                        </span>
+                      )}
+                    </Link>
                     <button
                       onClick={() => { setOpen(false); handleSignOut(); }}
                       className="flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm text-muted-foreground hover:text-destructive hover:bg-white/[0.04] transition-colors"

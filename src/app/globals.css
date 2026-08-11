@@ -175,6 +175,36 @@
     background-clip: text;
   }
 
+  /* ── Blueprint grid — architectural texture behind hero/empty surfaces ── */
+  .blueprint-grid {
+    background-image:
+      linear-gradient(to right, oklch(1 0 0 / 100%) 1px, transparent 1px),
+      linear-gradient(to bottom, oklch(1 0 0 / 100%) 1px, transparent 1px);
+    background-size: 44px 44px;
+  }
+
+  /* ── Section rhythm — one vertical scale across the marketing surfaces ── */
+  .section-y {
+    padding-block: 4rem;
+  }
+  @media (min-width: 640px) {
+    .section-y {
+      padding-block: 5rem;
+    }
+  }
+  @media (min-width: 1024px) {
+    .section-y {
+      padding-block: 6rem;
+    }
+  }
+
+  /* ── Hairline panel — flat card surface used across marketing sections ── */
+  .panel {
+    border-radius: var(--radius-2xl);
+    border: 1px solid oklch(1 0 0 / 6%);
+    background: color-mix(in oklch, var(--card) 55%, transparent);
+  }
+
   /* ── Skeleton shimmer ── */
   .skeleton-shimmer {
     background: linear-gradient(

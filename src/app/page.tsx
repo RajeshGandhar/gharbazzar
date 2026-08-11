@@ -1,49 +1,62 @@
 import Link from "next/link";
 import {
   ArrowRight,
+  BadgeCheck,
+  Building2,
+  Eye,
   GraduationCap,
+  Handshake,
   Home,
   Key,
-  Building2,
-  MapPin,
-  ChevronRight,
-  TrendingUp,
-  Shield,
-  UserCheck,
-  Handshake,
-  Eye,
-  Sparkles,
-  BadgeCheck,
-  Phone,
   Lock,
+  MapPin,
+  Phone,
+  Search,
+  Shield,
+  Sparkles,
+  TrendingUp,
+  UserCheck,
 } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { PropertyCard, type PropertyCardData } from "@/components/properties/property-card";
 import { ScrollReveal } from "@/components/shared/scroll-reveal";
-import { SearchBar } from "@/components/shared/search-bar";
-import { getFeaturedProperties, getPlatformStats } from "@/features/properties/server/queries";
+import { HeroSearch } from "@/components/home/hero-search";
+import { HeroVisual } from "@/components/home/hero-visual";
+import { CityTile } from "@/components/home/city-tile";
+import { SectionHeading } from "@/components/home/section-heading";
+import { getCachedPropertyTypes } from "@/lib/cache/master-data";
+import {
+  getCityListingCounts,
+  getFeaturedProperties,
+  getPlatformStats,
+  getSpotlightProperty,
+} from "@/features/properties/server/queries";
 
 export const revalidate = 600;
+
+const CONTAINER = "mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8";
 
 async function getCities() {
   const supabase = createAdminClient();
   const { data } = await supabase
     .from("cities")
-    .select("id, name, slug, region_id")
+    .select("id, name, slug, region_id, image_url, latitude, longitude")
     .eq("is_active", true)
     .order("position");
   return data ?? [];
 }
 
-async function getUniversityCount() {
+async function getUniversities() {
   const supabase = createAdminClient();
-  const { count } = await supabase
+  const { data, count } = await supabase
     .from("universities")
-    .select("*", { count: "exact", head: true })
-    .eq("is_active", true);
-  return count ?? 0;
+    .select("id, name, slug", { count: "exact" })
+    .eq("is_active", true)
+    .order("name")
+    .limit(6);
+  return { universities: data ?? [], count: count ?? 0 };
 }
 
 async function getLatestProperties(): Promise<PropertyCardData[]> {
@@ -59,549 +72,552 @@ async function getLatestProperties(): Promise<PropertyCardData[]> {
     `)
     .eq("status", "active")
     .eq("approval_status", "approved")
+    .is("deleted_at", null)
     .order("published_at", { ascending: false })
     .limit(8);
   return (data ?? []) as unknown as PropertyCardData[];
 }
 
 export default async function HomePage() {
-  const [cities, uniCount, latestProperties, featuredProperties, stats] = await Promise.all([
+  const [
+    cities,
+    { universities, count: uniCount },
+    latestProperties,
+    featuredProperties,
+    stats,
+    spotlight,
+    propertyTypes,
+  ] = await Promise.all([
     getCities(),
-    getUniversityCount(),
+    getUniversities(),
     getLatestProperties(),
     getFeaturedProperties(4),
     getPlatformStats(),
+    getSpotlightProperty(),
+    getCachedPropertyTypes(),
   ]);
+
+  // Only pay for per-city counts once there is inventory to count.
+  const cityCounts =
+    stats.listings > 0 ? await getCityListingCounts(cities.map((c) => c.id)) : {};
 
   const brajCities = cities.filter((c) => c.region_id === 1);
   const ncrCities = cities.filter((c) => c.region_id === 2);
 
   return (
     <div className="flex flex-col">
-
-      {/* ── Hero ─────────────────────────────────────────────────── */}
+      {/* ══ Hero ══════════════════════════════════════════════════ */}
       <section className="relative overflow-hidden">
-        {/* Decorative glow */}
-        <div className="pointer-events-none absolute -top-40 left-1/2 -translate-x-1/2 h-[500px] w-[800px] rounded-full bg-primary/[0.04] blur-[120px]" />
-        <div className="pointer-events-none absolute top-20 right-0 h-[300px] w-[400px] rounded-full bg-primary/[0.03] blur-[100px]" />
+        <div className="pointer-events-none absolute -top-48 left-1/4 h-[520px] w-[720px] -translate-x-1/2 rounded-full bg-primary/[0.05] blur-[130px]" />
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/[0.06] to-transparent" />
 
-        <div className="relative mx-auto max-w-7xl px-4 pt-16 pb-20 sm:px-6 sm:pt-24 sm:pb-28 lg:px-8 lg:pt-28 lg:pb-32">
-          <div className="grid gap-12 lg:grid-cols-2 lg:gap-16 items-center">
-            {/* Left — Copy + Search */}
-            <div>
-              {/* Trust badge */}
-              <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/[0.06] px-4 py-1.5">
-                <BadgeCheck className="h-3.5 w-3.5 text-primary" />
-                <span className="text-xs font-medium text-primary tracking-wide">
-                  VERIFIED LISTINGS &middot; DIRECT OWNERS &middot; ZERO BROKERAGE
+        <div className={cn(CONTAINER, "relative pb-12 pt-12 sm:pb-16 sm:pt-16 lg:pb-20 lg:pt-20")}>
+          <div className="grid items-stretch gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:gap-14">
+            {/* Copy + search */}
+            <div className="flex flex-col justify-center">
+              <div className="mb-6 inline-flex w-fit items-center gap-2 rounded-full border border-primary/20 bg-primary/[0.06] py-1.5 pl-3 pr-4">
+                <BadgeCheck className="h-3.5 w-3.5 text-primary" aria-hidden />
+                <span className="text-[11px] font-medium tracking-[0.12em] text-primary">
+                  VERIFIED PROPERTIES · DIRECT OWNERS · ZERO BROKERAGE
                 </span>
               </div>
 
-              <h1 className="text-4xl font-semibold tracking-tight text-foreground sm:text-5xl lg:text-[3.5rem] leading-[1.08] mb-5">
-                Find the right{"\n"}property.{" "}
+              <h1 className="mb-5 text-balance text-4xl font-semibold leading-[1.06] tracking-tight text-foreground sm:text-5xl lg:text-[3.4rem]">
+                Find the right property.{" "}
                 <span className="text-gradient">Right here.</span>
               </h1>
 
-              <p className="text-base text-muted-foreground mb-8 max-w-lg">
-                <span className="text-foreground/80">Mathura</span>
-                {" · "}
-                <span className="text-foreground/80">Vrindavan</span>
-                {" · "}
-                <span className="text-foreground/80">Delhi</span>
-                {" · "}
-                <span className="text-foreground/80">Noida</span>
-                {" · "}
-                <span className="text-foreground/80">Greater Noida</span>
+              <p className="mb-8 max-w-lg text-pretty text-[15px] leading-relaxed text-muted-foreground">
+                Verified listings across Braj and Delhi NCR — talk to the owner directly,
+                pay no brokerage, and see the real price before you call.
               </p>
 
-              {/* Search */}
-              <div className="rounded-xl border border-white/[0.06] bg-card/60 backdrop-blur-sm p-4 sm:p-5 mb-8">
-                <SearchBar />
-              </div>
+              <HeroSearch cities={cities} propertyTypes={propertyTypes} className="mb-7" />
 
-              {/* Stats */}
-              <div className="flex flex-wrap gap-8 sm:gap-10">
+              {/* Proof row — every figure below is live platform data */}
+              <dl className="flex flex-wrap gap-x-10 gap-y-4">
                 {[
-                  { value: stats.listings > 0 ? `${stats.listings}+` : "Free", label: stats.listings > 0 ? "Active listings" : "For seekers" },
-                  { value: stats.verifiedSellers > 0 ? `${stats.verifiedSellers}+` : "Verified", label: stats.verifiedSellers > 0 ? "Verified sellers" : "Seller KYC" },
-                  { value: stats.cities > 0 ? `${stats.cities}` : `${uniCount}+`, label: stats.cities > 0 ? "Cities" : "Universities" },
-                  { value: "₹0", label: "Contact fee" },
+                  ...(stats.listings > 0
+                    ? [{ value: `${stats.listings}`, label: "Live listings" }]
+                    : []),
+                  { value: `${stats.cities}`, label: "Cities live" },
+                  { value: `${uniCount}`, label: "Campuses mapped" },
+                  { value: "₹0", label: "Brokerage on contacts" },
                 ].map(({ value, label }) => (
                   <div key={label}>
-                    <p className="font-semibold text-foreground tabular-nums text-lg">{value}</p>
-                    <p className="text-xs text-muted-foreground mt-0.5">{label}</p>
+                    <dt className="sr-only">{label}</dt>
+                    <dd className="text-lg font-semibold tabular-nums text-foreground">{value}</dd>
+                    <p className="mt-0.5 text-xs text-muted-foreground">{label}</p>
                   </div>
                 ))}
-              </div>
+              </dl>
             </div>
 
-            {/* Right — Featured property card */}
-            <div className="relative hidden lg:block">
-              {/* Abstract property visual */}
-              <div className="relative aspect-[4/3] rounded-2xl overflow-hidden border border-white/[0.06]">
-                {/* Gradient background simulating premium property */}
-                <div className="absolute inset-0 bg-gradient-to-br from-card via-muted/50 to-card" />
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_40%,oklch(0.65_0.12_152/0.06),transparent_60%)]" />
-
-                {/* Grid pattern */}
-                <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: "linear-gradient(to right, white 1px, transparent 1px), linear-gradient(to bottom, white 1px, transparent 1px)", backgroundSize: "40px 40px" }} />
-
-                {/* Property icon cluster */}
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="flex flex-col items-center gap-4">
-                    <div className="h-20 w-20 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center">
-                      <Building2 className="h-10 w-10 text-primary/60" />
-                    </div>
-                    <div className="flex gap-3">
-                      <div className="h-12 w-12 rounded-xl bg-white/[0.04] border border-white/[0.06] flex items-center justify-center">
-                        <Home className="h-5 w-5 text-muted-foreground/40" />
-                      </div>
-                      <div className="h-12 w-12 rounded-xl bg-white/[0.04] border border-white/[0.06] flex items-center justify-center">
-                        <Key className="h-5 w-5 text-muted-foreground/40" />
-                      </div>
-                      <div className="h-12 w-12 rounded-xl bg-white/[0.04] border border-white/[0.06] flex items-center justify-center">
-                        <GraduationCap className="h-5 w-5 text-muted-foreground/40" />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Floating featured property card */}
-              {featuredProperties.length > 0 && (() => {
-                const p = featuredProperties[0];
-                const cityName = (p as unknown as { cities?: { name?: string } }).cities?.name;
-                const price = p.price;
-                const formattedPrice = price >= 10000000
-                  ? `₹${(price / 10000000).toFixed(1)} Cr`
-                  : price >= 100000
-                    ? `₹${(price / 100000).toFixed(0)} L`
-                    : `₹${price.toLocaleString("en-IN")}`;
-                return (
-                  <div className="absolute -bottom-4 -left-6 w-72 rounded-xl border border-white/[0.08] bg-card/90 backdrop-blur-xl p-4 shadow-elevated-lg">
-                    <div className="flex items-center gap-2 mb-3">
-                      <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-primary bg-primary/10 rounded-md px-2 py-0.5">
-                        <BadgeCheck className="h-3 w-3" />
-                        VERIFIED
-                      </span>
-                      {p.is_featured && (
-                        <span className="text-[10px] font-semibold text-amber-400 bg-amber-400/10 rounded-md px-2 py-0.5">
-                          FEATURED
-                        </span>
-                      )}
-                    </div>
-                    <h3 className="text-sm font-semibold text-foreground mb-1 truncate">{p.title}</h3>
-                    {cityName && (
-                      <p className="text-xs text-muted-foreground mb-2 flex items-center gap-1">
-                        <MapPin className="h-3 w-3" />
-                        {cityName}
-                      </p>
-                    )}
-                    <p className="text-lg font-bold text-foreground mb-3">{formattedPrice}{p.purpose === "rent" ? "/mo" : ""}</p>
-                    <div className="flex items-center gap-3 text-xs text-muted-foreground mb-3">
-                      {p.bedrooms && <span>{p.bedrooms} Beds</span>}
-                      {p.built_up_area && <span>{p.built_up_area} {p.area_unit === "sqm" ? "sq.m." : "sq.ft."}</span>}
-                    </div>
-                    <Link
-                      href={`/property/${p.slug}`}
-                      className="text-xs font-medium text-primary hover:underline flex items-center gap-1"
-                    >
-                      View details
-                      <ArrowRight className="h-3 w-3" />
-                    </Link>
-                  </div>
-                );
-              })()}
-            </div>
+            {/* Photography */}
+            <HeroVisual property={spotlight} coverage={cities} />
           </div>
         </div>
       </section>
 
-      {/* ── Trust indicators ─────────────────────────────────────── */}
-      <section className="border-y border-white/[0.04] bg-card/30">
-        <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-2 gap-6 sm:grid-cols-3 lg:grid-cols-6">
+      {/* ══ Trust strip ═══════════════════════════════════════════ */}
+      <section className="border-y border-white/[0.05] bg-card/30">
+        <div className={cn(CONTAINER, "py-7")}>
+          <ul className="grid grid-cols-2 gap-x-6 gap-y-5 sm:grid-cols-3 lg:grid-cols-6">
             {[
-              { icon: Sparkles, title: "Free", desc: "For seekers" },
-              { icon: BadgeCheck, title: "Verified", desc: "Seller KYC" },
-              { icon: Phone, title: "Direct Contact", desc: "With owners" },
-              { icon: Handshake, title: "Zero Brokerage", desc: "No hidden fees" },
-              { icon: MapPin, title: `${stats.cities > 0 ? stats.cities : "12"} Cities`, desc: "Covered" },
-              { icon: Lock, title: "100% Safe", desc: "Secure & trusted" },
+              { icon: Sparkles, title: "Free for seekers", desc: "No contact fees" },
+              { icon: BadgeCheck, title: "Verified sellers", desc: "Identity KYC checked" },
+              { icon: Phone, title: "Direct contact", desc: "Owner, not an agent" },
+              { icon: Handshake, title: "Zero brokerage", desc: "No hidden charges" },
+              { icon: MapPin, title: `${stats.cities} cities`, desc: "Braj & Delhi NCR" },
+              { icon: Lock, title: "Data protected", desc: "DPDP compliant" },
             ].map(({ icon: Icon, title, desc }) => (
-              <div key={title} className="flex items-center gap-3">
-                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary/[0.06] border border-primary/10">
-                  <Icon className="h-4 w-4 text-primary" />
+              <li key={title} className="flex items-center gap-3">
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-primary/10 bg-primary/[0.06]">
+                  <Icon className="h-4 w-4 text-primary" aria-hidden />
                 </div>
-                <div>
-                  <p className="text-sm font-semibold text-foreground leading-tight">{title}</p>
-                  <p className="text-[11px] text-muted-foreground">{desc}</p>
+                <div className="min-w-0">
+                  <p className="truncate text-[13px] font-semibold leading-tight text-foreground">
+                    {title}
+                  </p>
+                  <p className="truncate text-[11px] text-muted-foreground">{desc}</p>
                 </div>
-              </div>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+
+      {/* ══ Journeys ══════════════════════════════════════════════ */}
+      <ScrollReveal>
+        <section className={cn(CONTAINER, "section-y")}>
+          <SectionHeading
+            eyebrow="Choose your journey"
+            title="What brings you to GharBazaar?"
+            description="Buying, renting and student housing are separate experiences here — each one tuned to how that search actually works."
+          />
+
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {[
+              {
+                href: "/buy",
+                icon: Home,
+                title: "Buy",
+                desc: "Flats, plots, houses and villas with the price stated up front.",
+                chips: ["Flats", "Plots", "Villas", "Houses"],
+                tint: "text-emerald-400 bg-emerald-500/10 border-emerald-500/15",
+                hover: "hover:border-emerald-500/25",
+              },
+              {
+                href: "/rent",
+                icon: Key,
+                title: "Rent",
+                desc: "Monthly homes with no broker standing between you and the owner.",
+                chips: ["Flats", "PG", "Studio", "Furnished"],
+                tint: "text-blue-400 bg-blue-500/10 border-blue-500/15",
+                hover: "hover:border-blue-500/25",
+              },
+              {
+                href: "/student-housing",
+                icon: GraduationCap,
+                title: "Student housing",
+                desc: `Per-bed pricing near ${uniCount} campuses, with distances computed from the campus pin.`,
+                chips: ["PG", "Hostel", "Sharing", "Girls / Boys"],
+                tint: "text-violet-400 bg-violet-500/10 border-violet-500/15",
+                hover: "hover:border-violet-500/25",
+              },
+              {
+                href: "/list-property",
+                icon: Building2,
+                title: "Post a property",
+                desc: "Free to list. Reach genuine seekers directly — about five minutes to publish.",
+                chips: ["Owners", "Agents", "Builders", "Managers"],
+                tint: "text-primary bg-primary/10 border-primary/15",
+                hover: "hover:border-primary/25",
+              },
+            ].map(({ href, icon: Icon, title, desc, chips, tint, hover }) => (
+              <Link
+                key={href}
+                href={href}
+                className={cn(
+                  "group flex flex-col rounded-2xl border border-white/[0.06] bg-card/50 p-5 transition-all duration-300 hover:-translate-y-0.5",
+                  hover
+                )}
+              >
+                <div className="mb-4 flex items-start justify-between">
+                  <div
+                    className={cn(
+                      "flex h-10 w-10 items-center justify-center rounded-xl border",
+                      tint
+                    )}
+                  >
+                    <Icon className="h-5 w-5" aria-hidden />
+                  </div>
+                  <ArrowRight
+                    className="h-4 w-4 text-muted-foreground transition-all duration-200 group-hover:translate-x-0.5 group-hover:text-foreground"
+                    aria-hidden
+                  />
+                </div>
+                <h3 className="mb-2 text-base font-semibold text-foreground">{title}</h3>
+                <p className="mb-4 flex-1 text-[13px] leading-relaxed text-muted-foreground">
+                  {desc}
+                </p>
+                <div className="flex flex-wrap gap-1.5">
+                  {chips.map((chip) => (
+                    <span
+                      key={chip}
+                      className="rounded-md bg-white/[0.04] px-2 py-0.5 text-[11px] text-muted-foreground/80"
+                    >
+                      {chip}
+                    </span>
+                  ))}
+                </div>
+              </Link>
             ))}
           </div>
-        </div>
-      </section>
+        </section>
+      </ScrollReveal>
 
-      {/* ── Latest properties ─────────────────────────────────────── */}
-      {latestProperties.length > 0 && (
-        <ScrollReveal>
-          <section className="mx-auto w-full max-w-7xl px-4 py-16 sm:px-6 lg:px-8 sm:py-20">
-            <div className="flex items-end justify-between mb-8">
-              <div>
-                <p className="text-[11px] uppercase tracking-widest font-medium text-muted-foreground mb-2">Browse</p>
-                <h2 className="text-xl font-semibold text-foreground sm:text-2xl">
-                  Latest listings
-                </h2>
-              </div>
-              <Link
-                href="/search"
-                className="hidden sm:flex items-center gap-1 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-              >
-                View all
-                <ArrowRight className="h-3.5 w-3.5" />
-              </Link>
-            </div>
+      {/* ══ Live inventory ════════════════════════════════════════ */}
+      <ScrollReveal>
+        <section className={cn(CONTAINER, "section-y pt-0")}>
+          <SectionHeading
+            eyebrow="Fresh on GharBazaar"
+            title="Latest verified listings"
+            description="Newest first, straight from verified sellers."
+            action={latestProperties.length > 0 ? { href: "/search", label: "View all" } : undefined}
+          />
 
-            <div className="grid gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          {latestProperties.length > 0 ? (
+            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {latestProperties.map((property) => (
                 <PropertyCard key={property.id} property={property} />
               ))}
             </div>
+          ) : (
+            <div className="panel flex flex-col items-center px-6 py-14 text-center">
+              <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-xl border border-primary/15 bg-primary/[0.07]">
+                <Building2 className="h-5 w-5 text-primary" aria-hidden />
+              </div>
+              <h3 className="mb-2 text-lg font-semibold text-foreground">
+                Listings are going live city by city
+              </h3>
+              <p className="mb-7 max-w-md text-sm leading-relaxed text-muted-foreground">
+                Every seller is identity-checked before their property appears, so this page
+                only ever shows real, approved listings. Be the first in your city — or search
+                the cities we have already opened.
+              </p>
+              <div className="flex flex-col gap-3 sm:flex-row">
+                <Link href="/list-property" className={cn(buttonVariants({ size: "lg" }), "gap-2")}>
+                  <Building2 className="h-4 w-4" aria-hidden />
+                  Post your property
+                </Link>
+                <Link
+                  href="/search"
+                  className={cn(buttonVariants({ variant: "outline", size: "lg" }), "gap-2")}
+                >
+                  <Search className="h-4 w-4" aria-hidden />
+                  Browse listings
+                </Link>
+              </div>
+            </div>
+          )}
+        </section>
+      </ScrollReveal>
 
-            <div className="mt-8 text-center sm:hidden">
+      {/* ══ Featured ══════════════════════════════════════════════ */}
+      {featuredProperties.length > 0 && (
+        <ScrollReveal>
+          <section className={cn(CONTAINER, "section-y pt-0")}>
+            <div className="mb-8 flex items-end justify-between gap-4">
+              <div className="flex items-center gap-2">
+                <TrendingUp className="h-4 w-4 text-gold" aria-hidden />
+                <h2 className="text-2xl font-semibold text-foreground sm:text-[1.75rem]">
+                  Featured
+                </h2>
+              </div>
               <Link
-                href="/search"
-                className={cn(buttonVariants({ variant: "outline" }), "gap-2")}
+                href="/search?featured=true"
+                className="group hidden shrink-0 items-center gap-1.5 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground sm:inline-flex"
               >
                 View all
-                <ArrowRight className="h-4 w-4" />
+                <ArrowRight
+                  className="h-3.5 w-3.5 transition-transform duration-200 group-hover:translate-x-0.5"
+                  aria-hidden
+                />
               </Link>
+            </div>
+            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              {featuredProperties.map((property) => (
+                <PropertyCard key={property.id} property={property} />
+              ))}
             </div>
           </section>
         </ScrollReveal>
       )}
 
-      {/* ── Featured listings ─────────────────────────────────────── */}
-      {featuredProperties.length > 0 && (
-        <section className="mx-auto w-full max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
-          <div className="flex items-end justify-between mb-8">
-            <div className="flex items-center gap-2">
-              <TrendingUp className="h-4 w-4 text-amber-400" />
-              <h2 className="text-xl font-semibold text-foreground sm:text-2xl">Featured</h2>
-            </div>
-            <Link
-              href="/search?featured=true"
-              className="hidden sm:flex items-center gap-1 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-            >
-              View all
-              <ArrowRight className="h-3.5 w-3.5" />
-            </Link>
-          </div>
-          <div className="grid gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {featuredProperties.map((property) => (
-              <PropertyCard key={property.id} property={property} />
-            ))}
-          </div>
-        </section>
-      )}
-
-      {/* ── Safety / Trust ─────────────────────────────────────────── */}
+      {/* ══ How it works + Popular cities ═════════════════════════ */}
       <ScrollReveal>
-        <section className="py-16 sm:py-20">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div className="text-center mb-12">
-              <p className="text-[11px] uppercase tracking-widest font-medium text-primary mb-3">Trust & Safety</p>
-              <h2 className="text-xl font-semibold text-foreground sm:text-2xl mb-3">
-                Safety you can trust
-              </h2>
-              <p className="text-sm text-muted-foreground max-w-md mx-auto">
-                Every listing is verified. Every owner is KYC verified.
-              </p>
-            </div>
+        <section className="border-y border-white/[0.05] bg-card/20">
+          <div className={cn(CONTAINER, "section-y")}>
+            <div className="grid gap-12 lg:grid-cols-12 lg:gap-14">
+              {/* How it works */}
+              <div className="lg:col-span-5">
+                <SectionHeading
+                  eyebrow="How it works"
+                  title="Three steps to your next home"
+                  className="mb-8"
+                />
 
-            <div className="grid gap-4 sm:grid-cols-3">
-              {[
-                {
-                  icon: Shield,
-                  title: "Secure Transactions",
-                  desc: "Your data is encrypted and protected under DPDP.",
-                },
-                {
-                  icon: UserCheck,
-                  title: "No Middlemen",
-                  desc: "Deal directly with property owners. Zero brokerage for seekers.",
-                },
-                {
-                  icon: Eye,
-                  title: "Transparent Process",
-                  desc: "Clear pricing, real photos, verified seller profiles.",
-                },
-              ].map(({ icon: Icon, title, desc }) => (
-                <div
-                  key={title}
-                  className="rounded-xl border border-white/[0.06] bg-card/50 p-6 hover:border-white/[0.1] transition-all group"
-                >
-                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/[0.08] border border-primary/10 mb-4 group-hover:bg-primary/[0.12] transition-colors">
-                    <Icon className="h-5 w-5 text-primary" />
-                  </div>
-                  <h3 className="text-base font-semibold text-foreground mb-2">{title}</h3>
-                  <p className="text-sm text-muted-foreground leading-relaxed">{desc}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-      </ScrollReveal>
-
-      {/* ── How it works ─────────────────────────────────────────── */}
-      <ScrollReveal>
-        <section className="py-16 sm:py-20 border-y border-white/[0.04]">
-          <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div className="text-center mb-12">
-              <p className="text-[11px] uppercase tracking-widest font-medium text-muted-foreground mb-3">How it works</p>
-              <h2 className="text-xl font-semibold text-foreground sm:text-2xl">
-                Three simple steps to your next property
-              </h2>
-            </div>
-
-            <div className="grid gap-6 sm:grid-cols-3">
-              {[
-                {
-                  step: "01",
-                  title: "Search & Discover",
-                  desc: "Browse verified properties with advanced filters and real photos.",
-                },
-                {
-                  step: "02",
-                  title: "Connect Directly",
-                  desc: "Contact owners instantly. No middlemen, no brokerage.",
-                },
-                {
-                  step: "03",
-                  title: "Visit & Finalize",
-                  desc: "Schedule a visit, negotiate directly, and close the deal.",
-                },
-              ].map(({ step, title, desc }, i) => (
-                <div
-                  key={step}
-                  className="relative rounded-xl border border-white/[0.06] bg-card/50 p-6 hover:border-white/[0.1] transition-all"
-                >
-                  <span className="text-3xl font-bold text-primary/15 absolute top-4 right-5">{step}</span>
-                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-primary font-bold text-sm mb-4">
-                    {i + 1}
-                  </div>
-                  <h3 className="text-base font-semibold text-foreground mb-2">{title}</h3>
-                  <p className="text-sm text-muted-foreground leading-relaxed">{desc}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-      </ScrollReveal>
-
-      {/* ── Intent cards ─────────────────────────────────────────── */}
-      <ScrollReveal>
-        <section className="py-16 sm:py-20">
-          <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div className="mb-8">
-              <p className="text-[11px] uppercase tracking-widest font-medium text-muted-foreground mb-2">Explore</p>
-              <h2 className="text-xl font-semibold text-foreground sm:text-2xl">
-                What are you looking for?
-              </h2>
-            </div>
-
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              <Link
-                href="/buy"
-                className="group rounded-xl border border-white/[0.06] bg-card/50 p-6 hover:border-emerald-500/20 transition-all"
-              >
-                <div className="flex items-start justify-between mb-4">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-500/10 border border-emerald-500/15">
-                    <Home className="h-5 w-5 text-emerald-400" />
-                  </div>
-                  <ArrowRight className="h-4 w-4 text-muted-foreground group-hover:text-foreground transition-colors" />
-                </div>
-                <h3 className="text-base font-semibold text-foreground mb-2">Buy</h3>
-                <p className="text-sm text-muted-foreground mb-3">
-                  Apartments, plots, houses and villas. Verified sellers, transparent prices.
-                </p>
-                <div className="flex flex-wrap gap-2">
-                  {["Flats", "Plots", "Villas", "Houses"].map((t) => (
-                    <span key={t} className="text-[11px] text-muted-foreground/70 bg-white/[0.03] rounded px-2 py-0.5">{t}</span>
+                <ol className="space-y-3">
+                  {[
+                    {
+                      title: "Search and shortlist",
+                      desc: "Filter by locality, budget, BHK or campus distance. Real photos, real prices.",
+                    },
+                    {
+                      title: "Contact the owner",
+                      desc: "Reveal the number and call or WhatsApp directly. No agent in the middle, no fee.",
+                    },
+                    {
+                      title: "Visit and close",
+                      desc: "Schedule a visit, negotiate yourself, and keep the brokerage in your pocket.",
+                    },
+                  ].map((step, i) => (
+                    <li
+                      key={step.title}
+                      className="flex gap-4 rounded-2xl border border-white/[0.06] bg-card/50 p-5 transition-colors hover:border-white/[0.1]"
+                    >
+                      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-sm font-semibold tabular-nums text-primary">
+                        {i + 1}
+                      </span>
+                      <div>
+                        <h3 className="mb-1 text-[15px] font-semibold text-foreground">
+                          {step.title}
+                        </h3>
+                        <p className="text-[13px] leading-relaxed text-muted-foreground">
+                          {step.desc}
+                        </p>
+                      </div>
+                    </li>
                   ))}
-                </div>
-              </Link>
-
-              <Link
-                href="/rent"
-                className="group rounded-xl border border-white/[0.06] bg-card/50 p-6 hover:border-blue-500/20 transition-all"
-              >
-                <div className="flex items-start justify-between mb-4">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-500/10 border border-blue-500/15">
-                    <Key className="h-5 w-5 text-blue-400" />
-                  </div>
-                  <ArrowRight className="h-4 w-4 text-muted-foreground group-hover:text-foreground transition-colors" />
-                </div>
-                <h3 className="text-base font-semibold text-foreground mb-2">Rent</h3>
-                <p className="text-sm text-muted-foreground mb-3">
-                  Flats, PG, co-living. Monthly rent from ₹5,000. No broker fee.
-                </p>
-                <div className="flex flex-wrap gap-2">
-                  {["PG", "Shared flat", "Studio", "Furnished"].map((t) => (
-                    <span key={t} className="text-[11px] text-muted-foreground/70 bg-white/[0.03] rounded px-2 py-0.5">{t}</span>
-                  ))}
-                </div>
-              </Link>
-
-              <Link
-                href="/list-property"
-                className="group rounded-xl border border-dashed border-primary/15 bg-card/50 p-6 hover:border-primary/30 transition-all sm:col-span-2 lg:col-span-1"
-              >
-                <div className="flex items-start justify-between mb-4">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 border border-primary/15">
-                    <Building2 className="h-5 w-5 text-primary" />
-                  </div>
-                  <ArrowRight className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
-                </div>
-                <h3 className="text-base font-semibold text-foreground mb-2">List property</h3>
-                <p className="text-sm text-muted-foreground mb-3">
-                  Free to list. Reach genuine buyers and tenants. 5 minutes to publish.
-                </p>
-                <span className="text-xs font-semibold text-primary">Free for sellers</span>
-              </Link>
-            </div>
-          </div>
-        </section>
-      </ScrollReveal>
-
-      {/* ── Student Housing ─────────────────────────────────────── */}
-      <section className="mx-auto w-full max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
-        <div className="rounded-xl border border-violet-500/15 bg-violet-950/15 p-6 sm:p-8">
-          <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
-            <div className="flex items-start gap-4">
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-violet-900/40 border border-violet-500/15">
-                <GraduationCap className="h-5 w-5 text-violet-400" />
-              </div>
-              <div>
-                <h2 className="text-base font-semibold text-foreground mb-1">Student Housing</h2>
-                <p className="text-sm text-muted-foreground mb-3">
-                  PGs and hostels near {uniCount}+ universities. Distances computed from campus locations.
-                </p>
-                <div className="flex flex-wrap gap-2">
-                  {["GLA University", "DU North Campus", "Amity Noida", "Mukherjee Nagar"].map((u) => (
-                    <span key={u} className="text-[11px] text-violet-300/60 bg-violet-500/[0.06] rounded px-2 py-0.5">{u}</span>
-                  ))}
-                </div>
-              </div>
-            </div>
-            <Link
-              href="/student-housing"
-              className={cn(buttonVariants(), "shrink-0 self-start sm:self-center bg-violet-600 hover:bg-violet-700")}
-            >
-              View listings
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* ── Browse by city ────────────────────────────────────────── */}
-      {(brajCities.length > 0 || ncrCities.length > 0) && (
-        <ScrollReveal>
-          <section className="py-16 sm:py-20">
-            <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
-              <div className="mb-8">
-                <p className="text-[11px] uppercase tracking-widest font-medium text-muted-foreground mb-2">Popular Cities</p>
-                <h2 className="text-xl font-semibold text-foreground sm:text-2xl">
-                  Explore properties by city
-                </h2>
+                </ol>
               </div>
 
-              {brajCities.length > 0 && (
-                <div className="mb-8">
-                  <p className="text-xs font-medium text-muted-foreground mb-3 flex items-center gap-2 uppercase tracking-wider">
-                    <MapPin className="h-3 w-3" />
-                    Braj Region
-                  </p>
-                  <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
-                    {brajCities.map((city) => (
+              {/* Popular cities */}
+              <div className="lg:col-span-7">
+                <SectionHeading
+                  eyebrow="Popular cities"
+                  title="Explore properties by city"
+                  action={{ href: "/search", label: "View all cities" }}
+                  className="mb-8"
+                />
+
+                <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+                  {brajCities.slice(0, 4).map((city) => (
+                    <CityTile
+                      key={city.id}
+                      city={city}
+                      href={`/buy/${city.slug}`}
+                      count={cityCounts[city.id]}
+                    />
+                  ))}
+                </div>
+
+                {brajCities.length > 4 && (
+                  <div className="mt-4 flex flex-wrap gap-2">
+                    {brajCities.slice(4).map((city) => (
                       <Link
                         key={city.id}
                         href={`/buy/${city.slug}`}
-                        className="group flex flex-col items-center justify-center gap-2 rounded-xl border border-white/[0.06] bg-card/50 p-5 text-center hover:border-primary/20 hover:bg-card/80 transition-all"
+                        prefetch={false}
+                        className="rounded-lg border border-white/[0.06] bg-card/50 px-3 py-1.5 text-[13px] text-muted-foreground transition-colors hover:border-primary/20 hover:text-foreground"
                       >
-                        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/[0.06]">
-                          <MapPin className="h-3.5 w-3.5 text-primary" />
-                        </div>
-                        <span className="text-sm font-medium text-foreground">{city.name}</span>
+                        {city.name}
                       </Link>
                     ))}
                   </div>
-                </div>
-              )}
-
-              {ncrCities.length > 0 && (
-                <div>
-                  <div className="flex items-center justify-between mb-3">
-                    <p className="text-xs font-medium text-muted-foreground flex items-center gap-2 uppercase tracking-wider">
-                      <GraduationCap className="h-3 w-3" />
-                      Delhi NCR — Student Housing
-                    </p>
-                    <Link
-                      href="/student-housing"
-                      className="text-xs font-medium text-muted-foreground hover:text-foreground flex items-center gap-1 transition-colors"
-                    >
-                      View all
-                      <ChevronRight className="h-3 w-3" />
-                    </Link>
-                  </div>
-                  <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
-                    {ncrCities.map((city) => (
-                      <Link
-                        key={city.id}
-                        href={`/student-housing/${city.slug}`}
-                        className="group flex flex-col items-center justify-center gap-2 rounded-xl border border-white/[0.06] bg-card/50 p-5 text-center hover:border-violet-500/20 hover:bg-card/80 transition-all"
-                      >
-                        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-violet-500/[0.06]">
-                          <GraduationCap className="h-3.5 w-3.5 text-violet-400" />
-                        </div>
-                        <span className="text-sm font-medium text-foreground">{city.name}</span>
-                      </Link>
-                    ))}
-                  </div>
-                </div>
-              )}
+                )}
+              </div>
             </div>
-          </section>
-        </ScrollReveal>
-      )}
+          </div>
+        </section>
+      </ScrollReveal>
 
-      {/* ── Bottom CTA ────────────────────────────────────────────── */}
-      <section className="mx-auto w-full max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
-        <div className="relative overflow-hidden rounded-2xl border border-primary/20 bg-gradient-to-br from-primary/[0.08] via-card to-card p-10 sm:p-14 text-center">
-          {/* Decorative glow */}
-          <div className="pointer-events-none absolute -top-20 left-1/2 -translate-x-1/2 h-40 w-[400px] rounded-full bg-primary/[0.08] blur-[80px]" />
+      {/* ══ Student housing ═══════════════════════════════════════ */}
+      <ScrollReveal>
+        <section className={cn(CONTAINER, "section-y")}>
+          <div className="rounded-3xl border border-violet-500/15 bg-gradient-to-br from-violet-950/25 via-card/60 to-card/60 p-6 sm:p-10">
+            <div className="grid gap-10 lg:grid-cols-2 lg:gap-14">
+              <div>
+                <div className="mb-5 flex h-10 w-10 items-center justify-center rounded-xl border border-violet-500/20 bg-violet-500/10">
+                  <GraduationCap className="h-5 w-5 text-violet-400" aria-hidden />
+                </div>
+                <p className="mb-2.5 text-[11px] font-medium uppercase tracking-[0.18em] text-violet-400/90">
+                  Student housing
+                </p>
+                <h2 className="mb-3 text-balance text-2xl font-semibold leading-tight text-foreground sm:text-[1.75rem]">
+                  Not a category. A whole ecosystem.
+                </h2>
+                <p className="mb-6 max-w-lg text-pretty text-sm leading-relaxed text-muted-foreground">
+                  Per-bed pricing, room-level availability, sharing and gender preferences, and
+                  campus distances computed from the university&rsquo;s own geo-pin — never typed
+                  in by a listing agent.
+                </p>
+
+                <ul className="mb-7 space-y-2.5">
+                  {[
+                    "Per-bed pricing, not per-flat guesswork",
+                    "Room-level availability with sharing and gender filters",
+                    "Walking distance from the campus gate, computed",
+                  ].map((point) => (
+                    <li key={point} className="flex items-start gap-2.5 text-[13px] text-muted-foreground">
+                      <BadgeCheck className="mt-0.5 h-3.5 w-3.5 shrink-0 text-violet-400" aria-hidden />
+                      {point}
+                    </li>
+                  ))}
+                </ul>
+
+                <div className="flex flex-wrap gap-3">
+                  <Link
+                    href="/student-housing"
+                    className={cn(
+                      buttonVariants({ size: "lg" }),
+                      "gap-2 bg-violet-600 text-white hover:bg-violet-500"
+                    )}
+                  >
+                    Explore student housing
+                    <ArrowRight className="h-4 w-4" aria-hidden />
+                  </Link>
+                </div>
+              </div>
+
+              <div>
+                <p className="mb-3 text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                  Campuses on the map
+                </p>
+                <div className="mb-8 flex flex-wrap gap-2">
+                  {universities.map((u) => (
+                    <Link
+                      key={u.id}
+                      href={`/college/${u.slug}`}
+                      prefetch={false}
+                      className="rounded-lg border border-violet-500/12 bg-violet-500/[0.06] px-3 py-1.5 text-[13px] text-violet-200/80 transition-colors hover:border-violet-400/30 hover:text-violet-100"
+                    >
+                      {u.name}
+                    </Link>
+                  ))}
+                  {uniCount > universities.length && (
+                    <span className="rounded-lg border border-white/[0.06] px-3 py-1.5 text-[13px] text-muted-foreground">
+                      +{uniCount - universities.length} more
+                    </span>
+                  )}
+                </div>
+
+                {ncrCities.length > 0 && (
+                  <>
+                    <p className="mb-3 text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                      Student cities
+                    </p>
+                    <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+                      {ncrCities.slice(0, 6).map((city) => (
+                        <CityTile
+                          key={city.id}
+                          city={city}
+                          href={`/student-housing/${city.slug}`}
+                          count={cityCounts[city.id]}
+                          variant="student"
+                          className="aspect-[5/4]"
+                        />
+                      ))}
+                    </div>
+                  </>
+                )}
+              </div>
+            </div>
+          </div>
+        </section>
+      </ScrollReveal>
+
+      {/* ══ Safety ════════════════════════════════════════════════ */}
+      <ScrollReveal>
+        <section className="border-y border-white/[0.05] bg-card/20">
+          <div className={cn(CONTAINER, "section-y")}>
+            <div className="grid gap-10 lg:grid-cols-12 lg:gap-14">
+              <div className="lg:col-span-4">
+                <div className="mb-5 flex h-11 w-11 items-center justify-center rounded-xl border border-primary/20 bg-primary/[0.08]">
+                  <Shield className="h-5 w-5 text-primary" aria-hidden />
+                </div>
+                <p className="mb-2.5 text-[11px] font-medium uppercase tracking-[0.18em] text-primary/80">
+                  Trust &amp; safety
+                </p>
+                <h2 className="mb-3 text-balance text-2xl font-semibold leading-tight text-foreground sm:text-[1.75rem]">
+                  Safety you can check, not just claim
+                </h2>
+                <p className="text-pretty text-sm leading-relaxed text-muted-foreground">
+                  Sellers are identity-verified before a listing goes live, and every listing is
+                  reviewed before it reaches you.
+                </p>
+              </div>
+
+              <div className="grid gap-4 sm:grid-cols-3 lg:col-span-8">
+                {[
+                  {
+                    icon: UserCheck,
+                    title: "Verified sellers",
+                    desc: "Identity documents checked by our team before publishing. The badge shows what was verified and when.",
+                  },
+                  {
+                    icon: Handshake,
+                    title: "No middlemen",
+                    desc: "You reach the owner or their listed representative directly. Seekers never pay for a contact.",
+                  },
+                  {
+                    icon: Eye,
+                    title: "Transparent listings",
+                    desc: "Price is mandatory to publish, photos are the property's own, and stale listings expire.",
+                  },
+                ].map(({ icon: Icon, title, desc }) => (
+                  <div
+                    key={title}
+                    className="rounded-2xl border border-white/[0.06] bg-card/50 p-5 transition-colors hover:border-white/[0.1]"
+                  >
+                    <div className="mb-4 flex h-9 w-9 items-center justify-center rounded-lg border border-primary/10 bg-primary/[0.07]">
+                      <Icon className="h-4 w-4 text-primary" aria-hidden />
+                    </div>
+                    <h3 className="mb-2 text-[15px] font-semibold text-foreground">{title}</h3>
+                    <p className="text-[13px] leading-relaxed text-muted-foreground">{desc}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
+      </ScrollReveal>
+
+      {/* ══ Closing CTA ═══════════════════════════════════════════ */}
+      <section className={cn(CONTAINER, "section-y")}>
+        <div className="relative overflow-hidden rounded-3xl border border-primary/20 bg-gradient-to-br from-primary/[0.09] via-card to-card px-6 py-12 text-center sm:px-14 sm:py-16">
+          <div className="pointer-events-none absolute -top-24 left-1/2 h-48 w-[520px] -translate-x-1/2 rounded-full bg-primary/[0.1] blur-[90px]" />
 
           <div className="relative">
-            <h2 className="text-2xl font-semibold text-foreground mb-3 sm:text-3xl">
+            <h2 className="mb-3 text-balance text-2xl font-semibold text-foreground sm:text-3xl">
               Have a property to sell or rent?
             </h2>
-            <p className="text-muted-foreground mb-8 max-w-md mx-auto">
-              List for free. Reach verified buyers and tenants. 5 minutes to publish.
+            <p className="mx-auto mb-8 max-w-md text-pretty text-sm leading-relaxed text-muted-foreground">
+              List it free, get verified once, and talk to genuine seekers directly. Most owners
+              publish in about five minutes.
             </p>
-            <div className="flex flex-col sm:flex-row gap-3 justify-center">
-              <Link
-                href="/list-property"
-                className={cn(buttonVariants({ size: "lg" }), "gap-2")}
-              >
-                <Building2 className="h-4 w-4" />
-                Post property
+            <div className="flex flex-col justify-center gap-3 sm:flex-row">
+              <Link href="/list-property" className={cn(buttonVariants({ size: "lg" }), "gap-2")}>
+                <Building2 className="h-4 w-4" aria-hidden />
+                Post your property
               </Link>
               <Link
-                href="/auth/register"
-                className={cn(buttonVariants({ variant: "outline", size: "lg" }))}
+                href="/search"
+                className={cn(buttonVariants({ variant: "outline", size: "lg" }), "gap-2")}
               >
-                Create account
+                <Search className="h-4 w-4" aria-hidden />
+                Browse verified listings
               </Link>
             </div>
           </div>

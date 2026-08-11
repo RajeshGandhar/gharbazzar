@@ -2,6 +2,7 @@
 
 import { useCallback, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { formatPrice } from "@/lib/utils/format";
 
 interface RangeFilterProps {
   label: string;
@@ -12,7 +13,6 @@ interface RangeFilterProps {
   absoluteMin: number;
   absoluteMax: number;
   step: number;
-  formatValue: (v: number) => string;
   baseUrl: string;
 }
 
@@ -25,7 +25,6 @@ export function RangeFilter({
   absoluteMin,
   absoluteMax,
   step,
-  formatValue,
   baseUrl,
 }: RangeFilterProps) {
   const [min, setMin] = useState(currentMin ?? absoluteMin);
@@ -57,8 +56,8 @@ export function RangeFilter({
     <div>
       <p className="text-sm font-semibold text-foreground mb-3">{label}</p>
       <div className="flex items-center justify-between text-xs text-muted-foreground mb-2">
-        <span>{formatValue(min)}</span>
-        <span>{formatValue(max)}</span>
+        <span>{formatPrice(min)}</span>
+        <span>{formatPrice(max)}</span>
       </div>
 
       {/* Dual-thumb range slider */}

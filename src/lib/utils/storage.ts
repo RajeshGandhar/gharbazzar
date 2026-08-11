@@ -28,6 +28,24 @@ export function getPropertyImageUrl(path: string | null | undefined): string | n
   return getStorageUrl("property-images", path);
 }
 
+/**
+ * True when a URL can be served through `next/image`: a local asset path, or
+ * a file on the configured Supabase host (the only remote pattern allowed by
+ * next.config.ts and by the CSP). Editorial URLs pointing anywhere else are
+ * rejected so callers can fall back instead of rendering a broken frame.
+ */
+export function isOptimizableImageUrl(url: string | null | undefined): url is string {
+  if (!url) return false;
+  if (url.startsWith("/")) return true;
+  const base = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  if (!base) return false;
+  try {
+    return new URL(url).hostname === new URL(base).hostname;
+  } catch {
+    return false;
+  }
+}
+
 type PropertyImageRef = {
   path: string;
   thumbnail_path?: string | null;

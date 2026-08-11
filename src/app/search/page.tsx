@@ -272,13 +272,6 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
         absoluteMin={input.purpose === "rent" ? 1000 : 100000}
         absoluteMax={input.purpose === "rent" ? 100000 : 50000000}
         step={input.purpose === "rent" ? 1000 : 100000}
-        formatValue={(v) =>
-          v >= 10000000
-            ? `₹${(v / 10000000).toFixed(1)}Cr`
-            : v >= 100000
-              ? `₹${(v / 100000).toFixed(0)}L`
-              : `₹${v.toLocaleString("en-IN")}`
-        }
         baseUrl={baseUrl}
       />
 

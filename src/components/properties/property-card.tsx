@@ -95,7 +95,6 @@ function ImageCarousel({ urls, title }: { urls: string[]; title: string }) {
               className="object-cover"
               placeholder="blur"
               blurDataURL={SHIMMER_DATA_URL}
-              priority={i === 0}
             />
           </div>
         ))}
