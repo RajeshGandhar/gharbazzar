@@ -18,7 +18,7 @@ export function FeaturedProperties({ properties }: { properties: PremiumProperty
       <ScrollReveal>
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
-            <h2 className="font-display text-2xl font-semibold text-foreground sm:text-3xl">
+            <h2 className="text-2xl font-semibold text-foreground sm:text-3xl">
               Featured Properties
             </h2>
             <p className="mt-2 text-sm text-muted-foreground">
@@ -28,7 +28,7 @@ export function FeaturedProperties({ properties }: { properties: PremiumProperty
           {properties.length > 0 && (
             <Link
               href="/search"
-              className="text-sm font-semibold text-primary transition-colors hover:text-primary-soft"
+              className="text-sm font-semibold text-primary hover:text-primary-soft"
             >
               View all properties →
             </Link>

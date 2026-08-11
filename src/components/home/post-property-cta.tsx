@@ -9,7 +9,7 @@ export function PostPropertyCTA() {
       <ScrollReveal>
         <div className="grid overflow-hidden rounded-xl border border-border bg-surface lg:grid-cols-2">
           <div className="flex flex-col justify-center p-7 sm:p-10">
-            <h2 className="font-display text-2xl font-semibold text-foreground sm:text-3xl">
+            <h2 className="text-2xl font-semibold text-foreground sm:text-3xl">
               Have a Property to Sell or Rent?
             </h2>
             <p className="mt-3 max-w-md text-sm leading-relaxed text-muted-foreground sm:text-base">

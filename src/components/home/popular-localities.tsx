@@ -28,22 +28,12 @@ export function PopularLocalities({ localities }: { localities: LocalityTile[] }
     <section id="localities" className="scroll-mt-24 border-y border-border bg-surface/30">
       <div className="container-page py-14 sm:py-16">
         <ScrollReveal>
-          <div className="flex flex-wrap items-end justify-between gap-4">
-            <div>
-              <h2 className="font-display text-2xl font-semibold text-foreground sm:text-3xl">
-                Explore Popular Localities
-              </h2>
-              <p className="mt-2 text-sm text-muted-foreground">
-                Discover where home seekers are searching the most.
-              </p>
-            </div>
-            <Link
-              href="/buy"
-              className="text-sm font-semibold text-primary transition-colors hover:text-primary-soft"
-            >
-              View all cities →
-            </Link>
-          </div>
+          <h2 className="text-2xl font-semibold text-foreground sm:text-3xl">
+            Explore Popular Localities
+          </h2>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Discover where home seekers are searching the most.
+          </p>
         </ScrollReveal>
 
         <ul className="mt-7 grid grid-cols-2 gap-3 md:grid-cols-4">

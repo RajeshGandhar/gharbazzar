@@ -44,7 +44,7 @@ export function WhyGharBazaar() {
     <section id="why" className="scroll-mt-24 border-y border-border bg-surface/30">
       <div className="container-page py-14 sm:py-16">
         <ScrollReveal>
-          <h2 className="max-w-xl font-display text-2xl font-semibold text-foreground sm:text-3xl">
+          <h2 className="max-w-xl text-2xl font-semibold text-foreground sm:text-3xl">
             Property Search, Made Simpler.
           </h2>
         </ScrollReveal>

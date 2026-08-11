@@ -1,4 +1,3 @@
-import { Sora } from "next/font/google";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getCachedPropertyTypes } from "@/lib/cache/master-data";
 import {
@@ -18,19 +17,6 @@ import { PostPropertyCTA } from "@/components/home/post-property-cta";
 import { Stats, type StatItem } from "@/components/home/stats";
 
 export const revalidate = 600;
-
-/**
- * Sora is self-hosted by next/font (no external request, so the existing CSP
- * needs no change) and exposed only as a CSS variable on this page's wrapper.
- * `--font-display` falls back to Geist wherever --font-sora is undefined, so
- * every other route keeps its typography untouched.
- */
-const sora = Sora({
-  subsets: ["latin"],
-  weight: ["500", "600", "700"],
-  variable: "--font-sora",
-  display: "swap",
-});
 
 /**
  * Editorial photography for the category rail and city tiles.
@@ -144,7 +130,9 @@ export default async function HomePage() {
   ].slice(0, 4);
 
   return (
-    <div className={`${sora.variable} flex flex-col`}>
+    /* `lovable-landing` is the hook the landing theme is scoped to — see
+       the body:has() block in globals.css. */
+    <div className="lovable-landing flex flex-col">
       <Hero
         cities={cities.map((c) => ({ slug: c.slug, name: c.name }))}
         propertyTypes={propertyTypes.map((t) => ({

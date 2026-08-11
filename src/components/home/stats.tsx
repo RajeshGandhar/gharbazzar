@@ -1,5 +1,4 @@
 import { ScrollReveal } from "@/components/shared/scroll-reveal";
-import { cn } from "@/lib/utils";
 
 /**
  * Platform figures.
@@ -23,14 +22,7 @@ export function Stats({ items }: { items: StatItem[] }) {
   return (
     <section className="border-y border-border bg-surface/40">
       <div className="container-page py-10 sm:py-12">
-        {/* Column count follows the number of true figures, so dropping a
-            zero-value stat closes the row instead of leaving a hole in it. */}
-        <ul
-          className={cn(
-            "grid grid-cols-2 gap-6",
-            items.length === 3 ? "md:grid-cols-3" : "md:grid-cols-4"
-          )}
-        >
+        <ul className="grid grid-cols-2 gap-6 md:grid-cols-4">
           {items.map((stat, i) => (
             <ScrollReveal as="li" key={stat.id} delay={i * 60}>
               <p className="font-display text-3xl font-semibold text-primary sm:text-4xl">

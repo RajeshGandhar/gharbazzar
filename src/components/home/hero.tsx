@@ -63,7 +63,7 @@ export function Hero({
             <ShieldCheck className="size-3.5 text-primary" aria-hidden="true" />
             Verified listings · Direct owners · Zero brokerage
           </p>
-          <h1 className="mt-5 font-display text-4xl font-semibold leading-[1.08] text-foreground sm:text-5xl lg:text-6xl">
+          <h1 className="mt-5 text-4xl font-semibold leading-[1.08] text-foreground sm:text-5xl lg:text-6xl">
             Find Your Perfect Home
             <span className="block">
               Where <span className="text-primary">Life</span> Happens

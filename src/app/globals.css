@@ -41,13 +41,16 @@
   --color-chart-5:        var(--chart-5);
   --color-gold:           var(--gold);
   --color-gold-foreground: var(--gold-foreground);
-  --radius-sm:  calc(var(--radius) * 0.6);
-  --radius-md:  calc(var(--radius) * 0.8);
+  /* Additive radius scale, copied from the reference design so rounded-md /
+     -xl / -2xl resolve to exactly its values (6px / 12px / 16px at a 0.5rem
+     base) rather than to a proportional approximation. */
+  --radius-sm:  calc(var(--radius) - 4px);
+  --radius-md:  calc(var(--radius) - 2px);
   --radius-lg:  var(--radius);
-  --radius-xl:  calc(var(--radius) * 1.4);
-  --radius-2xl: calc(var(--radius) * 1.8);
-  --radius-3xl: calc(var(--radius) * 2.2);
-  --radius-4xl: calc(var(--radius) * 2.6);
+  --radius-xl:  calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-3xl: calc(var(--radius) + 12px);
+  --radius-4xl: calc(var(--radius) + 16px);
   --radius-full: 9999px;
 
   /* GharBazaar brand tokens */
@@ -63,10 +66,9 @@
   --color-primary-soft:   var(--primary-soft);
   --color-success:        var(--success);
 
-  /* Display face. Sora is loaded by the landing page and scoped to its
-     own subtree, so --font-sora is undefined everywhere else and the
-     rest of the app falls back to Geist untouched. */
-  --font-display:         var(--font-sora, var(--font-geist-sans));
+  /* Display face. Geist by default; the landing theme re-points this at
+     Sora, so the rest of the app's typography is untouched. */
+  --font-display:         var(--font-geist-sans);
 }
 
 /* ── Permanent dark theme ── */
@@ -78,47 +80,46 @@
   --gold:             oklch(0.78 0.14 82);
   --gold-foreground:  oklch(0.10 0 0);
 
-  /* ── Neutral ramp ──
-     Adopted from the reference landing design: a blue-slate axis (hue 259)
-     that sits well above black, with body copy bright enough to read as
-     content rather than as a whisper. These are semantic tokens, so the
-     whole app moves with them and the shared navbar and footer stay in
-     agreement with the landing page instead of banding against it.
-
-     The brand green below is deliberately unchanged — the reference design
-     is amber, GharBazaar is not. */
-  --background:       oklch(0.198 0.021 259);
-  --foreground:       oklch(0.965 0.005 250);
-  --card:             oklch(0.238 0.024 259);
-  --card-foreground:  oklch(0.965 0.005 250);
-  --popover:          oklch(0.238 0.024 259);
-  --popover-foreground: oklch(0.965 0.005 250);
+  --background:       oklch(0.13 0.004 280);
+  --foreground:       oklch(0.93 0.003 90);
+  --card:             oklch(0.165 0.005 280);
+  --card-foreground:  oklch(0.93 0.003 90);
+  --popover:          oklch(0.185 0.006 280);
+  --popover-foreground: oklch(0.93 0.003 90);
   --primary:          oklch(0.65 0.12 152);
   --primary-foreground: oklch(0.08 0 0);
-  --secondary:        oklch(0.288 0.026 259);
-  --secondary-foreground: oklch(0.965 0.005 250);
-  --muted:            oklch(0.268 0.024 259);
-  --muted-foreground: oklch(0.735 0.017 256);
-  --accent:           oklch(0.298 0.028 259);
-  --accent-foreground: oklch(0.965 0.005 250);
+  --secondary:        oklch(0.19 0.008 280);
+  --secondary-foreground: oklch(0.88 0 0);
+  --muted:            oklch(0.19 0.008 280);
+  --muted-foreground: oklch(0.55 0.008 280);
+  --accent:           oklch(0.20 0.02 152);
+  --accent-foreground: oklch(0.93 0 0);
 
-  /* Raised planes, stepped off --background on the same slate axis. */
-  --surface:          oklch(0.238 0.024 259);
-  --surface-2:        oklch(0.278 0.026 259);
+  /* Raised planes, stepped off --background (0.13) on the same violet
+     axis so they read as one material under the green brand. */
+  --surface:          oklch(0.165 0.005 280);
+  --surface-2:        oklch(0.205 0.007 280);
   /* Lifted green for hover on primary fills. */
   --primary-soft:     oklch(0.72 0.13 152);
-  /* Verification green — distinct from --primary so it reads as a signal. */
+  /* Verification green — nudged toward teal so it is legible as a
+     distinct signal next to --primary rather than reading as a repeat. */
   --success:          oklch(0.74 0.13 162);
-  --destructive:      oklch(0.62 0.21 24);
-  --border:           oklch(1 0 0 / 11%);
-  --input:            oklch(1 0 0 / 14%);
+  --destructive:      oklch(0.65 0.20 25);
+  --border:           oklch(1 0 0 / 7%);
+  --input:            oklch(1 0 0 / 10%);
   --ring:             oklch(0.65 0.12 152);
   --radius:           0.5rem;
 
-  /* Elevation used by the landing surfaces. Depth comes from a tight
-     contact shadow plus a wide, very soft ambient one. */
-  --shadow-card:      0 1px 2px oklch(0 0 0 / 0.4), 0 12px 32px -16px oklch(0 0 0 / 0.55);
-  --shadow-lift:      0 18px 44px -20px oklch(0 0 0 / 0.7);
+  /* Base tint the .glass utilities are mixed from. Declared as a token so
+     a scoped theme (the landing page) can re-anchor the sticky navbar to
+     its own background without touching the utility. */
+  --glass-base:       oklch(0.14 0.004 280);
+  --glass-base-heavy: oklch(0.15 0.005 280);
+
+  /* Elevation. Overridden inside the landing scope with the reference
+     design's own values. */
+  --shadow-card:      none;
+  --shadow-lift:      none;
 
   --chart-1: oklch(0.65 0.12 152);
   --chart-2: oklch(0.60 0.10 200);
@@ -126,14 +127,79 @@
   --chart-4: oklch(0.65 0.12 55);
   --chart-5: oklch(0.58 0.15 25);
 
-  --sidebar:            oklch(0.238 0.024 259);
-  --sidebar-foreground: oklch(0.965 0.005 250);
+  --sidebar:            oklch(0.145 0.005 280);
+  --sidebar-foreground: oklch(0.93 0.003 90);
   --sidebar-primary:    oklch(0.65 0.12 152);
   --sidebar-primary-foreground: oklch(0.08 0 0);
-  --sidebar-accent:     oklch(0.288 0.026 259);
-  --sidebar-accent-foreground: oklch(0.965 0.005 250);
-  --sidebar-border:     oklch(1 0 0 / 11%);
+  --sidebar-accent:     oklch(0.20 0.02 152);
+  --sidebar-accent-foreground: oklch(0.93 0 0);
+  --sidebar-border:     oklch(1 0 0 / 7%);
   --sidebar-ring:       oklch(0.65 0.12 152);
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   Landing theme — verbatim from the Lovable implementation
+   (gharbazaar-landing-page/src/styles.css).
+
+   Every value below is copied from that file, not derived: the amber
+   primary, the slate neutral ramp, the border alphas, the shadows and the
+   two font faces. Nothing here is a GharBazaar substitution.
+
+   Scoped with :has() on <body> rather than on the page wrapper so the
+   shared navbar and footer — which are siblings of the page content, not
+   children — pick the theme up too, and the whole landing route reads as
+   one design. Every other route keeps the GharBazaar tokens above.
+   ──────────────────────────────────────────────────────────────────────── */
+body:has(.lovable-landing) {
+  --radius: 0.5rem;
+  --background: oklch(0.198 0.021 259);
+  --foreground: oklch(0.965 0.005 250);
+  --surface: oklch(0.238 0.024 259);
+  --surface-2: oklch(0.278 0.026 259);
+  --card: oklch(0.238 0.024 259);
+  --card-foreground: oklch(0.965 0.005 250);
+  --popover: oklch(0.238 0.024 259);
+  --popover-foreground: oklch(0.965 0.005 250);
+  --primary: oklch(0.762 0.152 63);
+  --primary-foreground: oklch(0.21 0.04 60);
+  --primary-soft: oklch(0.83 0.11 72);
+  --secondary: oklch(0.288 0.026 259);
+  --secondary-foreground: oklch(0.965 0.005 250);
+  --muted: oklch(0.268 0.024 259);
+  --muted-foreground: oklch(0.735 0.017 256);
+  --accent: oklch(0.298 0.028 259);
+  --accent-foreground: oklch(0.965 0.005 250);
+  --destructive: oklch(0.62 0.21 24);
+  --destructive-foreground: oklch(0.98 0.003 248);
+  --success: oklch(0.72 0.14 158);
+  --border: oklch(1 0 0 / 11%);
+  --input: oklch(1 0 0 / 14%);
+  --ring: oklch(0.762 0.152 63);
+  --shadow-card: 0 1px 2px oklch(0 0 0 / 0.4), 0 12px 32px -16px oklch(0 0 0 / 0.55);
+  --shadow-lift: 0 18px 44px -20px oklch(0 0 0 / 0.7);
+  --chart-1: oklch(0.762 0.152 63);
+  --chart-2: oklch(0.6 0.118 184.704);
+  --chart-3: oklch(0.398 0.07 227.392);
+  --chart-4: oklch(0.828 0.189 84.429);
+  --chart-5: oklch(0.769 0.188 70.08);
+  --sidebar: oklch(0.238 0.024 259);
+  --sidebar-foreground: oklch(0.965 0.005 250);
+  --sidebar-primary: oklch(0.762 0.152 63);
+  --sidebar-primary-foreground: oklch(0.21 0.04 60);
+  --sidebar-accent: oklch(0.288 0.026 259);
+  --sidebar-accent-foreground: oklch(0.965 0.005 250);
+  --sidebar-border: oklch(1 0 0 / 11%);
+  --sidebar-ring: oklch(0.762 0.152 63);
+
+  /* The reference sets these as the page's two faces: Sora for display,
+     Manrope for body copy. Both are self-hosted by next/font. */
+  --font-display: var(--font-sora);
+  --glass-base: oklch(0.198 0.021 259);
+  --glass-base-heavy: oklch(0.21 0.022 259);
+
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-manrope), ui-sans-serif, system-ui, sans-serif;
 }
 
 @layer base {
@@ -150,16 +216,19 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
-  /* Display face for headings.
-     --font-display resolves to Sora only where --font-sora is defined,
-     which is the landing page's own subtree. Every other route falls
-     through to Geist, so the app's typography is untouched. */
-  h1, h2, h3, h4 {
+  h1, h2, h3, h4, h5, h6 {
+    @apply tracking-tight;
+  }
+
+  /* Reference rule, copied verbatim: display face and tracking on h1–h4,
+     applied only inside the landing theme. */
+  body:has(.lovable-landing) :is(h1, h2, h3, h4) {
     font-family: var(--font-display);
     letter-spacing: -0.02em;
   }
-  h5, h6 {
-    @apply tracking-tight;
+  body:has(.lovable-landing) :focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
   }
 }
 
@@ -189,15 +258,15 @@
   }
 
   /* ── Glass — navbar / overlays ── */
-  /* Tracks the neutral ramp above, so the sticky navbar reads as the same
-     material as the page it floats over rather than a darker band. */
+  /* Mixed from --glass-base so the sticky navbar re-anchors to whichever
+     theme is in scope instead of staying pinned to one palette. */
   .glass {
-    background: oklch(0.198 0.021 259 / 80%);
+    background: color-mix(in oklch, var(--glass-base) 80%, transparent);
     backdrop-filter: blur(12px) saturate(150%);
     -webkit-backdrop-filter: blur(12px) saturate(150%);
   }
   .glass-heavy {
-    background: oklch(0.21 0.022 259 / 94%);
+    background: color-mix(in oklch, var(--glass-base-heavy) 94%, transparent);
     backdrop-filter: blur(20px) saturate(180%);
     -webkit-backdrop-filter: blur(20px) saturate(180%);
   }

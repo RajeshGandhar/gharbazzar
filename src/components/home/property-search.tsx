@@ -90,11 +90,28 @@ const BHK = [
   { label: "4+ BHK", value: "4" },
 ];
 
+/* ---------------------------------------------------------------------------
+ * Advanced panel.
+ *
+ * The reference design shows three fields here (Possession, Furnishing,
+ * Listed By). `searchSchema` has no possession or seller-type parameter, so
+ * those two would be controls the backend cannot honour. The panel keeps the
+ * reference's three-column shape and fills it with the three filters that are
+ * actually supported.
+ * ------------------------------------------------------------------------ */
+
 const FURNISHING = [
-  { label: "Furnishing", value: "" },
+  { label: "Any", value: "" },
   { label: "Unfurnished", value: "unfurnished" },
   { label: "Semi-Furnished", value: "semi_furnished" },
   { label: "Fully Furnished", value: "fully_furnished" },
+];
+
+const SORT = [
+  { label: "Newest first", value: "newest" },
+  { label: "Price: low to high", value: "price_asc" },
+  { label: "Price: high to low", value: "price_desc" },
+  { label: "Most popular", value: "popular" },
 ];
 
 const RECENT_KEY = "gharbazaar:recent-searches";
@@ -192,7 +209,7 @@ function Field({
         id={id}
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full appearance-none truncate rounded-md border border-border bg-surface-2 px-3 py-3 pr-9 text-sm text-foreground transition-colors hover:border-primary/40 focus:border-primary/60 focus:outline-none"
+        className="w-full appearance-none truncate rounded-md border border-border bg-surface-2 px-3 py-3 pr-9 text-sm text-foreground transition-colors hover:border-primary/40"
       >
         {children}
       </select>
@@ -220,6 +237,7 @@ export function PropertySearch({
   const [budget, setBudget] = useState("Budget");
   const [bhk, setBhk] = useState("BHK");
   const [furnishing, setFurnishing] = useState("");
+  const [sort, setSort] = useState("newest");
   const [showAdvanced, setShowAdvanced] = useState(false);
 
   const [listening, setListening] = useState(false);
@@ -247,6 +265,9 @@ export function PropertySearch({
   function selectTab(next: TabId) {
     setTab(next);
     setBudget("Budget");
+    // Bedrooms mean nothing for land or commercial space; clearing it stops a
+    // stale BHK from being carried into a search that cannot honour it.
+    if (next === "commercial" || next === "plots") setBhk("BHK");
     const nextTab = TABS.find((t) => t.id === next);
     const nextTypes = propertyTypes.filter((t) =>
       nextTab?.categories.includes(t.category ?? "")
@@ -277,6 +298,8 @@ export function PropertySearch({
     if (bhkOption?.value) params.set("bedrooms", bhkOption.value);
 
     if (furnishing) params.set("furnishing", furnishing);
+    // `newest` is the schema default; omitting it keeps the URL clean.
+    if (sort && sort !== "newest") params.set("sort", sort);
 
     return `/search?${params.toString()}`;
   }
@@ -407,50 +430,42 @@ export function PropertySearch({
           </button>
         </div>
 
-        {/* Primary filters */}
+        {/* Primary filters — three fields, matching the reference layout. */}
         <div className="mt-3 flex flex-col gap-2 lg:flex-row lg:items-center">
-          <div className="flex min-w-0 flex-1 flex-col gap-2 sm:flex-row">
-            <Field id="filter-city" label="City" value={city} onChange={setCity}>
-              <option value="">Any City</option>
-              {cities.map((c) => (
-                <option key={c.slug} value={c.slug}>
-                  {c.name}
+          <div className="min-w-0 flex-1">
+            <div className="flex flex-col gap-2 sm:flex-row">
+              <Field
+                id="filter-property-type"
+                label="Property type"
+                value={propertyType}
+                onChange={setPropertyType}
+              >
+                <option value="" className="bg-surface-2 text-foreground">
+                  Property Type
                 </option>
-              ))}
-            </Field>
+                {scopedTypes.map((t) => (
+                  <option key={t.slug} value={t.slug} className="bg-surface-2 text-foreground">
+                    {t.name}
+                  </option>
+                ))}
+              </Field>
 
-            <Field
-              id="filter-property-type"
-              label="Property type"
-              value={propertyType}
-              onChange={setPropertyType}
-            >
-              <option value="">Property Type</option>
-              {scopedTypes.map((t) => (
-                <option key={t.slug} value={t.slug}>
-                  {t.name}
-                </option>
-              ))}
-            </Field>
-
-            <Field id="filter-budget" label="Budget" value={budget} onChange={setBudget}>
-              {BUDGETS[purpose].map((b) => (
-                <option key={b.label} value={b.label}>
-                  {b.label}
-                </option>
-              ))}
-            </Field>
-
-            {/* BHK is meaningless for land and commercial space. */}
-            {(tab === "buy" || tab === "rent") && (
-              <Field id="filter-bhk" label="Bedrooms" value={bhk} onChange={setBhk}>
-                {BHK.map((b) => (
-                  <option key={b.label} value={b.label}>
+              <Field id="filter-budget" label="Budget" value={budget} onChange={setBudget}>
+                {BUDGETS[purpose].map((b) => (
+                  <option key={b.label} value={b.label} className="bg-surface-2 text-foreground">
                     {b.label}
                   </option>
                 ))}
               </Field>
-            )}
+
+              <Field id="filter-bhk" label="Bedrooms" value={bhk} onChange={setBhk}>
+                {BHK.map((b) => (
+                  <option key={b.label} value={b.label} className="bg-surface-2 text-foreground">
+                    {b.label}
+                  </option>
+                ))}
+              </Field>
+            </div>
           </div>
 
           <div className="flex gap-2">
@@ -479,13 +494,69 @@ export function PropertySearch({
             id="advanced-filters"
             className="mt-3 grid gap-2 rounded-lg border border-border bg-surface-2/60 p-3 sm:grid-cols-3"
           >
-            <Field id="filter-furnishing" label="Furnishing" value={furnishing} onChange={setFurnishing}>
-              {FURNISHING.map((f) => (
-                <option key={f.label} value={f.value}>
-                  {f.label}
-                </option>
-              ))}
-            </Field>
+            <div>
+              <label
+                htmlFor="adv-city"
+                className="mb-1.5 block text-xs font-medium text-muted-foreground"
+              >
+                City
+              </label>
+              <select
+                id="adv-city"
+                value={city}
+                onChange={(e) => setCity(e.target.value)}
+                className="w-full rounded-md border border-border bg-surface px-3 py-2.5 text-sm text-foreground"
+              >
+                <option value="">Any City</option>
+                {cities.map((c) => (
+                  <option key={c.slug} value={c.slug}>
+                    {c.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label
+                htmlFor="adv-furnishing"
+                className="mb-1.5 block text-xs font-medium text-muted-foreground"
+              >
+                Furnishing
+              </label>
+              <select
+                id="adv-furnishing"
+                value={furnishing}
+                onChange={(e) => setFurnishing(e.target.value)}
+                className="w-full rounded-md border border-border bg-surface px-3 py-2.5 text-sm text-foreground"
+              >
+                {FURNISHING.map((f) => (
+                  <option key={f.label} value={f.value}>
+                    {f.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label
+                htmlFor="adv-sort"
+                className="mb-1.5 block text-xs font-medium text-muted-foreground"
+              >
+                Sort by
+              </label>
+              <select
+                id="adv-sort"
+                value={sort}
+                onChange={(e) => setSort(e.target.value)}
+                className="w-full rounded-md border border-border bg-surface px-3 py-2.5 text-sm text-foreground"
+              >
+                {SORT.map((s) => (
+                  <option key={s.value} value={s.value}>
+                    {s.label}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
         )}
       </form>
