@@ -78,35 +78,47 @@
   --gold:             oklch(0.78 0.14 82);
   --gold-foreground:  oklch(0.10 0 0);
 
-  --background:       oklch(0.13 0.004 280);
-  --foreground:       oklch(0.93 0.003 90);
-  --card:             oklch(0.165 0.005 280);
-  --card-foreground:  oklch(0.93 0.003 90);
-  --popover:          oklch(0.185 0.006 280);
-  --popover-foreground: oklch(0.93 0.003 90);
+  /* ── Neutral ramp ──
+     Adopted from the reference landing design: a blue-slate axis (hue 259)
+     that sits well above black, with body copy bright enough to read as
+     content rather than as a whisper. These are semantic tokens, so the
+     whole app moves with them and the shared navbar and footer stay in
+     agreement with the landing page instead of banding against it.
+
+     The brand green below is deliberately unchanged — the reference design
+     is amber, GharBazaar is not. */
+  --background:       oklch(0.198 0.021 259);
+  --foreground:       oklch(0.965 0.005 250);
+  --card:             oklch(0.238 0.024 259);
+  --card-foreground:  oklch(0.965 0.005 250);
+  --popover:          oklch(0.238 0.024 259);
+  --popover-foreground: oklch(0.965 0.005 250);
   --primary:          oklch(0.65 0.12 152);
   --primary-foreground: oklch(0.08 0 0);
-  --secondary:        oklch(0.19 0.008 280);
-  --secondary-foreground: oklch(0.88 0 0);
-  --muted:            oklch(0.19 0.008 280);
-  --muted-foreground: oklch(0.55 0.008 280);
-  --accent:           oklch(0.20 0.02 152);
-  --accent-foreground: oklch(0.93 0 0);
+  --secondary:        oklch(0.288 0.026 259);
+  --secondary-foreground: oklch(0.965 0.005 250);
+  --muted:            oklch(0.268 0.024 259);
+  --muted-foreground: oklch(0.735 0.017 256);
+  --accent:           oklch(0.298 0.028 259);
+  --accent-foreground: oklch(0.965 0.005 250);
 
-  /* Raised planes, stepped off --background (0.13) on the same violet
-     axis so they read as one material under the green brand. */
-  --surface:          oklch(0.165 0.005 280);
-  --surface-2:        oklch(0.205 0.007 280);
+  /* Raised planes, stepped off --background on the same slate axis. */
+  --surface:          oklch(0.238 0.024 259);
+  --surface-2:        oklch(0.278 0.026 259);
   /* Lifted green for hover on primary fills. */
   --primary-soft:     oklch(0.72 0.13 152);
-  /* Verification green — nudged toward teal so it is legible as a
-     distinct signal next to --primary rather than reading as a repeat. */
+  /* Verification green — distinct from --primary so it reads as a signal. */
   --success:          oklch(0.74 0.13 162);
-  --destructive:      oklch(0.65 0.20 25);
-  --border:           oklch(1 0 0 / 7%);
-  --input:            oklch(1 0 0 / 10%);
+  --destructive:      oklch(0.62 0.21 24);
+  --border:           oklch(1 0 0 / 11%);
+  --input:            oklch(1 0 0 / 14%);
   --ring:             oklch(0.65 0.12 152);
   --radius:           0.5rem;
+
+  /* Elevation used by the landing surfaces. Depth comes from a tight
+     contact shadow plus a wide, very soft ambient one. */
+  --shadow-card:      0 1px 2px oklch(0 0 0 / 0.4), 0 12px 32px -16px oklch(0 0 0 / 0.55);
+  --shadow-lift:      0 18px 44px -20px oklch(0 0 0 / 0.7);
 
   --chart-1: oklch(0.65 0.12 152);
   --chart-2: oklch(0.60 0.10 200);
@@ -114,13 +126,13 @@
   --chart-4: oklch(0.65 0.12 55);
   --chart-5: oklch(0.58 0.15 25);
 
-  --sidebar:            oklch(0.145 0.005 280);
-  --sidebar-foreground: oklch(0.93 0.003 90);
+  --sidebar:            oklch(0.238 0.024 259);
+  --sidebar-foreground: oklch(0.965 0.005 250);
   --sidebar-primary:    oklch(0.65 0.12 152);
   --sidebar-primary-foreground: oklch(0.08 0 0);
-  --sidebar-accent:     oklch(0.20 0.02 152);
-  --sidebar-accent-foreground: oklch(0.93 0 0);
-  --sidebar-border:     oklch(1 0 0 / 7%);
+  --sidebar-accent:     oklch(0.288 0.026 259);
+  --sidebar-accent-foreground: oklch(0.965 0.005 250);
+  --sidebar-border:     oklch(1 0 0 / 11%);
   --sidebar-ring:       oklch(0.65 0.12 152);
 }
 
@@ -138,7 +150,15 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
-  h1, h2, h3, h4, h5, h6 {
+  /* Display face for headings.
+     --font-display resolves to Sora only where --font-sora is defined,
+     which is the landing page's own subtree. Every other route falls
+     through to Geist, so the app's typography is untouched. */
+  h1, h2, h3, h4 {
+    font-family: var(--font-display);
+    letter-spacing: -0.02em;
+  }
+  h5, h6 {
     @apply tracking-tight;
   }
 }
@@ -169,15 +189,41 @@
   }
 
   /* ── Glass — navbar / overlays ── */
+  /* Tracks the neutral ramp above, so the sticky navbar reads as the same
+     material as the page it floats over rather than a darker band. */
   .glass {
-    background: oklch(0.14 0.004 280 / 80%);
+    background: oklch(0.198 0.021 259 / 80%);
     backdrop-filter: blur(12px) saturate(150%);
     -webkit-backdrop-filter: blur(12px) saturate(150%);
   }
   .glass-heavy {
-    background: oklch(0.15 0.005 280 / 94%);
+    background: oklch(0.21 0.022 259 / 94%);
     backdrop-filter: blur(20px) saturate(180%);
     -webkit-backdrop-filter: blur(20px) saturate(180%);
+  }
+
+  /* ── Scroll reveal ──
+     Paired with <ScrollReveal>. The element ships in its resting hidden
+     state and the observer flips data-visible once, so the animation is
+     pure CSS and costs no main-thread work per frame. */
+  .reveal {
+    opacity: 0;
+    transform: translateY(14px);
+    transition:
+      opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+      transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .reveal[data-visible="true"] {
+    opacity: 1;
+    transform: none;
+  }
+  /* Without scripting the observer never fires, so the resting hidden
+     state would swallow the page. Show everything instead. */
+  @media (scripting: none) {
+    .reveal {
+      opacity: 1;
+      transform: none;
+    }
   }
 
   /* ── Motion ── */

@@ -49,7 +49,7 @@ export function ActionCards() {
     <section className="container-page py-14 sm:py-16">
       <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         {actions.map(({ id, title, text, cta, href, Icon }, i) => (
-          <ScrollReveal as="li" key={id} delay={i * 0.07}>
+          <ScrollReveal as="li" key={id} delay={i * 70}>
             <Link
               href={href}
               className="group flex h-full flex-col justify-between rounded-lg border border-border bg-surface p-5 transition-colors hover:border-primary/45"

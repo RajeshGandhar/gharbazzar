@@ -48,7 +48,7 @@ export function PopularLocalities({ localities }: { localities: LocalityTile[] }
 
         <ul className="mt-7 grid grid-cols-2 gap-3 md:grid-cols-4">
           {localities.map((locality, i) => (
-            <ScrollReveal as="li" key={locality.id} delay={(i % 4) * 0.07}>
+            <ScrollReveal as="li" key={locality.id} delay={(i % 4) * 70}>
               <Link
                 href={`/buy/${locality.slug}`}
                 className="group relative block aspect-[5/4] overflow-hidden rounded-lg border border-border"

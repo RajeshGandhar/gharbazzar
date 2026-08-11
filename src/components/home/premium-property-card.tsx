@@ -37,7 +37,7 @@ export function PremiumPropertyCard({ property }: { property: PremiumPropertyVie
     property.locality && property.locality !== property.city ? property.locality : null;
 
   return (
-    <article className="group relative flex h-full flex-col overflow-hidden rounded-lg border border-border bg-surface transition-colors hover:border-primary/40">
+    <article className="group relative flex h-full flex-col overflow-hidden rounded-lg border border-border bg-surface shadow-[var(--shadow-card)] transition-colors hover:border-primary/40">
       <div className="relative aspect-[4/3] overflow-hidden bg-surface-2">
         {property.imageUrl ? (
           <Image

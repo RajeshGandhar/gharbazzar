@@ -327,7 +327,7 @@ export function PropertySearch({
   return (
     <section
       aria-label="Property search"
-      className="rounded-xl border border-border bg-surface/95 p-4 shadow-elevated-lg backdrop-blur-xl sm:p-5"
+      className="rounded-xl border border-border bg-surface/95 p-4 shadow-[var(--shadow-lift)] backdrop-blur-xl sm:p-5"
     >
       {/* Tabs */}
       <div className="border-b border-border pb-3">

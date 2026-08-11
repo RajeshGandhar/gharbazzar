@@ -40,7 +40,7 @@ export function FeaturedProperties({ properties }: { properties: PremiumProperty
         <ShortlistProvider>
           <ul className="mt-7 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {properties.map((property, i) => (
-              <ScrollReveal as="li" key={property.id} delay={(i % 3) * 0.09}>
+              <ScrollReveal as="li" key={property.id} delay={(i % 3) * 90}>
                 <PremiumPropertyCard property={property} />
               </ScrollReveal>
             ))}

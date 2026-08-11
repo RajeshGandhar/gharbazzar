@@ -32,7 +32,7 @@ export function Stats({ items }: { items: StatItem[] }) {
           )}
         >
           {items.map((stat, i) => (
-            <ScrollReveal as="li" key={stat.id} delay={i * 0.06}>
+            <ScrollReveal as="li" key={stat.id} delay={i * 60}>
               <p className="font-display text-3xl font-semibold text-primary sm:text-4xl">
                 {stat.value}
               </p>

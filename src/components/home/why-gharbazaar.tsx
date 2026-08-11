@@ -50,7 +50,7 @@ export function WhyGharBazaar() {
         </ScrollReveal>
         <ul className="mt-8 grid gap-x-8 gap-y-7 sm:grid-cols-2 lg:grid-cols-3">
           {benefits.map(({ Icon, title, text }, i) => (
-            <ScrollReveal as="li" key={title} delay={(i % 3) * 0.07}>
+            <ScrollReveal as="li" key={title} delay={(i % 3) * 70}>
               <div className="flex gap-3.5">
                 <Icon
                   className="mt-0.5 size-5 shrink-0 text-primary"
