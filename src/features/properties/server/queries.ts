@@ -260,7 +260,7 @@ export async function getSpotlightProperty(): Promise<PropertyCardData | null> {
     .from("properties")
     .select(`
       id, slug, title, price, purpose, city_id, area_id, bedrooms,
-      built_up_area, area_unit, rental_kind, gender_policy, is_featured, is_verified, published_at,
+      built_up_area, area_unit, rental_kind, gender_policy, is_featured, published_at,
       cities(name, slug),
       areas(name, slug),
       property_images!inner(path, thumbnail_path, is_cover, position)
@@ -290,10 +290,11 @@ export async function getLandingProperties(
     .from("properties")
     .select(`
       id, slug, title, price, purpose, city_id, area_id, bedrooms, bathrooms,
-      built_up_area, area_unit, rental_kind, gender_policy, is_featured, is_verified, published_at,
+      built_up_area, area_unit, rental_kind, gender_policy, is_featured, published_at,
       cities(name, slug),
       areas(name, slug),
       property_types(name),
+      sellers(is_verified),
       property_images(path, thumbnail_path, is_cover, position)
     `)
     .eq("status", "active")
@@ -314,7 +315,7 @@ export async function getFeaturedProperties(limit = 4): Promise<PropertyCardData
     .from("properties")
     .select(`
       id, slug, title, price, purpose, city_id, area_id, bedrooms,
-      built_up_area, area_unit, rental_kind, gender_policy, is_featured, is_verified, published_at,
+      built_up_area, area_unit, rental_kind, gender_policy, is_featured, published_at,
       cities(name, slug),
       areas(name, slug),
       property_images(path, thumbnail_path, is_cover, position)

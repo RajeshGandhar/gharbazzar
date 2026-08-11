@@ -15,10 +15,17 @@ import { resolveCoverImageUrl } from "@/lib/utils/storage";
  * listing degrades instead of rendering a fabricated value.
  */
 
-/** Property row plus the two extra columns the landing card displays. */
+/**
+ * Property row plus the extra joins the landing card displays.
+ *
+ * `sellers.is_verified` is the seller's KYC flag — verification is a property
+ * of the seller in this schema, not of the listing, so the card's Verified
+ * badge reads from the joined seller rather than from the property row.
+ */
 export type LandingPropertyData = PropertyCardData & {
   bathrooms?: number | null;
   property_types?: { name: string } | null;
+  sellers?: { is_verified: boolean } | null;
 };
 
 export interface PremiumPropertyView {
@@ -59,7 +66,7 @@ export function toPremiumCard(property: LandingPropertyData): PremiumPropertyVie
         ? formatArea(property.built_up_area, property.area_unit ?? "sqft")
         : null,
     propertyType: property.property_types?.name ?? null,
-    verified: property.is_verified ?? false,
+    verified: property.sellers?.is_verified ?? false,
     imageUrl: resolveCoverImageUrl(property.property_images),
   };
 }
