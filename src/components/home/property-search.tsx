@@ -418,7 +418,6 @@ export function PropertySearch({
             onClick={toggleVoice}
             aria-label={listening ? "Stop voice search" : "Search by voice"}
             aria-pressed={listening}
-            aria-describedby="voice-disclosure"
             className={cn(
               "grid size-10 shrink-0 place-items-center rounded-md border transition-colors",
               listening
@@ -579,11 +578,6 @@ export function PropertySearch({
           ))}
         </div>
       )}
-
-      <p id="voice-disclosure" className="mt-3 text-[11px] leading-relaxed text-muted-foreground/70">
-        Voice search uses your browser&apos;s built-in speech recognition, which may send audio to
-        your browser vendor for processing. GharBazaar never records or stores audio.
-      </p>
 
       <p aria-live="polite" className="sr-only">
         {status}

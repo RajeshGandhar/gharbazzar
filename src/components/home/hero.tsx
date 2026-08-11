@@ -61,7 +61,7 @@ export function Hero({
         <div className="max-w-2xl animate-in fade-in slide-in-from-bottom-4 fill-mode-both duration-700">
           <p className="inline-flex items-center gap-2 rounded-full border border-border bg-surface/70 px-3 py-1.5 text-xs font-medium text-muted-foreground backdrop-blur">
             <ShieldCheck className="size-3.5 text-primary" aria-hidden="true" />
-            Verified listings · Direct owners · Zero brokerage
+            Trusted by Home Seekers
           </p>
           <h1 className="mt-5 text-4xl font-semibold leading-[1.08] text-foreground sm:text-5xl lg:text-6xl">
             Find Your Perfect Home
@@ -70,7 +70,7 @@ export function Hero({
             </span>
           </h1>
           <p className="mt-4 max-w-lg text-base text-muted-foreground sm:text-lg">
-            Explore verified properties across Braj and Delhi NCR.
+            Explore verified properties across India.
           </p>
         </div>
 
